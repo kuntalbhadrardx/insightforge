@@ -1,0 +1,37 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.15.0+cpu
+
+# CPU-only torch wheels keep the image small enough for a 512 MB free tier;
+# sentence-transformers pulls torch in anyway, this just makes it the +cpu build.
+#
+# Backend (FastAPI) dependencies — pinned for reproducible deployments.
+# Install: pip install -r backend/requirements.txt
+# Run with a SINGLE worker: the dataset cache is per-process (see README).
+
+# Web framework
+fastapi==0.162.0
+uvicorn==0.54.0
+python-multipart==0.0.32
+pydantic==2.14.1
+
+# Configuration
+python-dotenv==1.2.4
+
+# Supabase (Postgres + pgvector + Storage + Auth)
+supabase==2.33.0
+httpx==0.28.1
+
+# PDF parsing and embeddings
+pymupdf==2.0
+sentence-transformers==6.2.0
+numpy==2.5.4
+
+# Tabular analytics and ML
+pandas==3.1.0
+scikit-learn==1.9.1
+
+# LLM / agents
+groq==1.7.0
+
+# Per-user rate limiting
+slowapi==0.1.10

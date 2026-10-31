@@ -62,7 +62,7 @@ Request path: the Streamlit app signs in against Supabase, stores the access tok
 ## Setup
 
 ### 1. Prerequisites
-- Python 3.11+
+- Python 3.14.7 (the version every pin below was resolved against; see `runtime.txt`)
 - A Supabase project with the `vector` extension enabled, plus the tables/RPC used by `backend/db.py` (`documents`, `chunks`, `datasets`, `agent_runs`, `reports`, and the `match_chunks` function).
 - A Groq API key.
 
@@ -73,8 +73,8 @@ python -m venv .venv
 # Windows: .\.venv\Scripts\activate
 source .venv/bin/activate
 
-pip install -r requirements.txt            # backend
-pip install -r requirements-frontend.txt   # frontend
+pip install -r backend/requirements.txt   # backend (FastAPI, CPU-only torch)
+pip install -r requirements.txt           # frontend (Streamlit)
 ```
 
 ### 3. Configure
@@ -96,7 +96,8 @@ streamlit run app.py --server.port 8501
 Set `BACKEND_URL` (env var or `st.secrets["BACKEND_URL"]`) to the backend origin, and add the frontend origin to `ALLOWED_ORIGINS` on the API.
 
 ### Deployment notes
-- **Backend:** any container host works (Render, Railway, Fly.io, a VM). Start with a single worker and a persistent process; the first request loads MiniLM, so give the instance ~1 GB RAM.
+- **Python version: 3.14.7.** `runtime.txt` pins `python-3.14.7` for Render; set Render's `PYTHON_VERSION` env var to `3.14.7` if you prefer the dashboard, and pick Python 3.14 under Streamlit Community Cloud → *Advanced settings → Python version*. The pins (torch 2.15, scikit-learn 1.9, pandas 3.1) are built for this interpreter — a different minor version will fail to resolve wheels.
+- **Backend:** any container host works (Render, Railway, Fly.io, a VM). Build from the `insightforge` directory so both `requirements.txt` files and `runtime.txt` are found. Start with a single worker and a persistent process; the first request loads MiniLM, so give the instance ~1 GB RAM.
 - **Frontend:** Streamlit Community Cloud or a container. Provide `BACKEND_URL`, `SUPABASE_URL` and `SUPABASE_ANON_KEY` as secrets/env vars — never the service-role key.
 - **CORS:** `ALLOWED_ORIGINS` is a comma-separated allow-list, e.g. `https://insightforge.streamlit.app`.
 - **Rate limits** are in-memory (slowapi default). Multiple API instances each keep their own counters; for a shared budget, point slowapi at Redis.
