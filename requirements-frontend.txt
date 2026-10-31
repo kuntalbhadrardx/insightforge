@@ -1,0 +1,10 @@
+# Frontend (Streamlit) dependencies — pinned for reproducible deployments.
+# Install: pip install -r requirements-frontend.txt
+# Run: streamlit run app.py
+
+streamlit==1.66.1
+plotly==7.1.0
+pandas==3.1.0
+requests==2.34.2
+supabase==2.33.0
+python-dotenv==1.2.4
