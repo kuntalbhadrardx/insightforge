@@ -98,7 +98,7 @@ Set `BACKEND_URL` (env var or `st.secrets["BACKEND_URL"]`) to the backend origin
 ### Deployment notes
 - **Python version: 3.14.7.** `runtime.txt` pins `python-3.14.7` for Render; set Render's `PYTHON_VERSION` env var to `3.14.7` if you prefer the dashboard, and pick Python 3.14 under Streamlit Community Cloud → *Advanced settings → Python version*. The pins (torch 2.15, scikit-learn 1.9, pandas 3.1) are built for this interpreter — a different minor version will fail to resolve wheels.
 - **Backend:** any container host works (Render, Railway, Fly.io, a VM). Build from the `insightforge` directory so both `requirements.txt` files and `runtime.txt` are found. Start with a single worker and a persistent process; the first request loads MiniLM, so give the instance ~1 GB RAM.
-- **Frontend:** Streamlit Community Cloud or a container. Provide `BACKEND_URL`, `SUPABASE_URL` and `SUPABASE_ANON_KEY` as secrets/env vars — never the service-role key.
+- **Frontend:** Streamlit Community Cloud or a container. Provide `BACKEND_URL`, `SUPABASE_URL` and `SUPABASE_ANON_KEY` as secrets/env vars — never the service-role key. Add `APP_URL` (your Streamlit app URL) so confirmation emails from the sign-up tab link back to the app, and allow it under Supabase → Authentication → URL configuration.
 - **CORS:** `ALLOWED_ORIGINS` is a comma-separated allow-list, e.g. `https://insightforge.streamlit.app`.
 - **Rate limits** are in-memory (slowapi default). Multiple API instances each keep their own counters; for a shared budget, point slowapi at Redis.
 
@@ -113,6 +113,7 @@ Set `BACKEND_URL` (env var or `st.secrets["BACKEND_URL"]`) to the backend origin
 | `MATCH_THRESHOLD` | backend | no | `0.05` | pgvector cosine cut-off; MiniLM scores are compressed |
 | `ALLOWED_ORIGINS` | backend | no | localhost dev origins | Comma-separated CORS allow-list |
 | `BACKEND_URL` | frontend | yes (deployed) | `http://127.0.0.1:8000` | Base URL of the FastAPI service |
+| `APP_URL` | frontend | no | – | Public URL used as the sign-up confirmation redirect (`st.secrets["APP_URL"]`); omitted from the request when unset |
 | `INSIGHTFORGE_TIMEOUT` | frontend | no | `180` | HTTP timeout (seconds) |
 | `MAX_UPLOAD_MB` | backend | no | `15` | PDF size cap |
 | `MAX_DATASET_MB` | backend | no | `10` | CSV size cap |

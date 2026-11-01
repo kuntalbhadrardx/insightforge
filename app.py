@@ -33,6 +33,7 @@ import html
 import io
 import json
 import os
+import re
 import time
 from datetime import datetime, timezone
 from typing import Any
@@ -58,6 +59,14 @@ def _secret_or_none(name: str) -> str | None:
     except Exception:
         return None
     return str(value) if value else None
+
+
+def resolve_app_url() -> str | None:
+    """``APP_URL`` from st.secrets (or the environment) for sign-up redirects."""
+    for candidate in (_secret_or_none("APP_URL"), os.getenv("APP_URL")):
+        if candidate and candidate.strip():
+            return candidate.strip()
+    return None
 
 
 def resolve_backend_url() -> str:
@@ -242,6 +251,87 @@ def sign_in(email: str, password: str) -> str | None:
     st.session_state["user_email"] = getattr(user, "email", None) or email.strip()
     st.session_state["user_id"] = getattr(user, "id", None)
     return None
+
+
+#: Deliberately permissive: "something@domain.tld" without spaces.
+EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$")
+MIN_PASSWORD_LENGTH = 8
+
+
+def validate_signup(email: str, password: str, confirm_password: str) -> str | None:
+    """Client-side checks that run before any request to Supabase."""
+    if not EMAIL_PATTERN.match((email or "").strip()):
+        return "Enter a valid email address, for example you@example.com."
+    if len(password or "") < MIN_PASSWORD_LENGTH:
+        return f"Password must be at least {MIN_PASSWORD_LENGTH} characters."
+    if password != confirm_password:
+        return "Passwords do not match."
+    return None
+
+
+def _friendly_signup_error(exc: Exception) -> str:
+    """Map Supabase sign-up failures onto readable text (never a stack trace)."""
+    message = str(exc).lower()
+    if "already registered" in message or "already been registered" in message:
+        return "That email is already registered. Use the Sign in tab instead."
+    if "already exists" in message:
+        return "That email is already registered. Use the Sign in tab instead."
+    if "password" in message and ("least" in message or "weak" in message):
+        return f"Password must be at least {MIN_PASSWORD_LENGTH} characters."
+    if "rate limit" in message or "too many" in message:
+        return "Too many sign-up attempts. Wait a minute and try again."
+    if "invalid" in message and "email" in message:
+        return "That email address was rejected. Check it and try again."
+    if "signups not allowed" in message or "disabled" in message:
+        return "New sign-ups are currently disabled for this project."
+    return "Could not create the account. Please try again in a moment."
+
+
+def sign_up(
+    email: str, password: str, confirm_password: str
+) -> tuple[str | None, str | None]:
+    """Create an account. Returns ``(error, notice)``; both ``None`` means signed in."""
+    email = (email or "").strip()
+    problem = validate_signup(email, password, confirm_password)
+    if problem:
+        return problem, None
+
+    client = supabase_auth_client()
+    if client is None:
+        return (
+            "Supabase is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY "
+            "in .env and restart Streamlit.",
+            None,
+        )
+
+    payload: dict[str, Any] = {"email": email, "password": password}
+    app_url = resolve_app_url()
+    if app_url:
+        payload["options"] = {"email_redirect_to": app_url}
+
+    try:
+        result = client.auth.sign_up(payload)
+    except Exception as exc:
+        return _friendly_signup_error(exc), None
+
+    session = getattr(result, "session", None)
+    user = getattr(result, "user", None)
+    token = getattr(session, "access_token", None) if session else None
+    if token:
+        # Email confirmation is disabled: the account is usable right away.
+        st.session_state["access_token"] = token
+        st.session_state["refresh_token"] = getattr(session, "refresh_token", None)
+        st.session_state["user_email"] = getattr(user, "email", None) or email
+        st.session_state["user_id"] = getattr(user, "id", None)
+        return None, None
+
+    identities = getattr(user, "identities", None)
+    if user is not None and isinstance(identities, list) and not identities:
+        # Supabase reports a fresh user with no identities when the address is
+        # already taken and confirmation is on, instead of raising an error.
+        return "That email is already registered. Use the Sign in tab instead.", None
+
+    return None, "Check your inbox and confirm your email, then sign in."
 
 
 def refresh_access_token() -> bool:
@@ -1121,20 +1211,47 @@ def render_sidebar() -> None:
             notice = st.session_state.pop("auth_notice", None)
             if notice:
                 st.warning(notice)
-            with st.form("sign_in_form"):
-                email = st.text_input("Email", key="sign_in_email")
-                password = st.text_input(
-                    "Password", type="password", key="sign_in_password"
-                )
-                submitted = st.form_submit_button("Sign in", type="primary")
-            if submitted:
-                error = sign_in(email, password)
-                if error:
-                    st.error(error)
-                else:
-                    st.rerun()
+            sign_in_tab, sign_up_tab = st.tabs(["Sign in", "Sign up"])
+            with sign_in_tab:
+                with st.form("sign_in_form"):
+                    email = st.text_input("Email", key="sign_in_email")
+                    password = st.text_input(
+                        "Password", type="password", key="sign_in_password"
+                    )
+                    submitted = st.form_submit_button("Sign in", type="primary")
+                if submitted:
+                    error = sign_in(email, password)
+                    if error:
+                        st.error(error)
+                    else:
+                        st.rerun()
+            with sign_up_tab:
+                with st.form("sign_up_form"):
+                    new_email = st.text_input("Email", key="sign_up_email")
+                    new_password = st.text_input(
+                        "Password",
+                        type="password",
+                        key="sign_up_password",
+                        help=f"At least {MIN_PASSWORD_LENGTH} characters.",
+                    )
+                    confirm_password = st.text_input(
+                        "Confirm password", type="password", key="sign_up_confirm"
+                    )
+                    sign_up_submitted = st.form_submit_button(
+                        "Create account", type="primary"
+                    )
+                if sign_up_submitted:
+                    sign_up_error, sign_up_notice = sign_up(
+                        new_email, new_password, confirm_password
+                    )
+                    if sign_up_error:
+                        st.error(sign_up_error)
+                    elif sign_up_notice:
+                        st.success(sign_up_notice, icon="📧")
+                    else:
+                        st.rerun()
             st.caption(
-                "Sign in with your Supabase account. The backend derives your user id "
+                "Sign in or create an account. The backend derives your user id "
                 "from the access token, so every document and query is scoped to you."
             )
         st.caption(f"API · `{API_BASE_URL}`")
@@ -1857,9 +1974,9 @@ def main() -> None:
 
     if not is_signed_in():
         st.info(
-            "**Sign in to continue.** Open the sidebar, enter your Supabase email and "
-            "password, and InsightForge will scope every upload, question and agent run "
-            "to your account.",
+            "**Sign in to continue.** Open the sidebar and use the **Sign in** tab, or "
+            "create an account in the **Sign up** tab, and InsightForge will scope every "
+            "upload, question and agent run to your account.",
             icon="🔐",
         )
         return
