@@ -203,12 +203,17 @@ class DocumentListResponse(BaseModel):
 # App setup
 # ---------------------------------------------------------------------------
 #: Explicit allow-list used when ALLOWED_ORIGINS is unset or emptied. It holds
-#: only the frontends that actually exist: local Streamlit dev on 8501 and the
-#: deployed Streamlit app. Adding an origin here is a deliberate act; nothing is
-#: derived from the request or from a wildcard.
+#: only the frontends that actually exist: local Streamlit dev on 8501, the Vite
+#: console's dev server on 5173 and its preview build on 4173, and the deployed
+#: Streamlit app. Adding an origin here is a deliberate act; nothing is derived
+#: from the request or from a wildcard.
 DEFAULT_ALLOWED_ORIGINS = (
     "http://localhost:8501,"
     "http://127.0.0.1:8501,"
+    "http://localhost:5173,"
+    "http://127.0.0.1:5173,"
+    "http://localhost:4173,"
+    "http://127.0.0.1:4173,"
     "https://insightforge-hcg9t92fcmbxquh3dozwqv.streamlit.app"
 )
 
