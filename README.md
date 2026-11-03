@@ -63,7 +63,7 @@ Request path: the Streamlit app signs in against Supabase, stores the access tok
 
 ### 1. Prerequisites
 - Python 3.14.7 (the version every pin below was resolved against; see `runtime.txt`)
-- A Supabase project with the `vector` extension enabled, plus the tables/RPC used by `backend/db.py` (`documents`, `chunks`, `datasets`, `agent_runs`, `reports`, and the `match_chunks` function).
+- A Supabase project with the `vector` extension enabled, plus the tables/RPC used by `backend/db.py` (`documents`, `chunks`, `datasets`, `agent_runs`, `reports`, `chat_history`, and the `match_chunks` + `hybrid_search_chunks` functions). New migrations live in `supabase/migrations/`; run each file once in the Supabase SQL Editor (`20261103000000_chat_history.sql` creates the chat table and its RLS policies, `20261103000100_hybrid_search.sql` adds the full-text column and the RRF ranking function).
 - A Groq API key.
 
 ### 2. Install
@@ -99,7 +99,7 @@ Set `BACKEND_URL` (env var or `st.secrets["BACKEND_URL"]`) to the backend origin
 - **Python version: 3.14.7.** `runtime.txt` pins `python-3.14.7` for Render; set Render's `PYTHON_VERSION` env var to `3.14.7` if you prefer the dashboard, and pick Python 3.14 under Streamlit Community Cloud → *Advanced settings → Python version*. The pins (torch 2.15, scikit-learn 1.9, pandas 3.1) are built for this interpreter — a different minor version will fail to resolve wheels.
 - **Backend:** any container host works (Render, Railway, Fly.io, a VM). Build from the `insightforge` directory so both `requirements.txt` files and `runtime.txt` are found. Start with a single worker and a persistent process; the first request loads MiniLM, so give the instance ~1 GB RAM.
 - **Frontend:** Streamlit Community Cloud or a container. Provide `BACKEND_URL`, `SUPABASE_URL` and `SUPABASE_ANON_KEY` as secrets/env vars — never the service-role key. Add `APP_URL` (your Streamlit app URL) so confirmation emails from the sign-up tab link back to the app, and allow it under Supabase → Authentication → URL configuration.
-- **CORS:** `ALLOWED_ORIGINS` is a comma-separated allow-list, e.g. `https://insightforge.streamlit.app`.
+- **CORS:** `ALLOWED_ORIGINS` is an exact, comma-separated origin allow-list (scheme + host + optional port, no paths, no trailing slash, no `*`) with credentials enabled and only `GET`/`POST`/`OPTIONS` plus `Authorization`/`Content-Type`/`Accept` headers permitted. Left unset it falls back to `http://localhost:8501`, `http://127.0.0.1:8501` and the deployed Streamlit app; set it to your own frontend origin when you fork the repo.
 - **Rate limits** are in-memory (slowapi default). Multiple API instances each keep their own counters; for a shared budget, point slowapi at Redis.
 
 ## Environment variables
@@ -111,7 +111,7 @@ Set `BACKEND_URL` (env var or `st.secrets["BACKEND_URL"]`) to the backend origin
 | `SUPABASE_SERVICE_ROLE_KEY` | backend only | yes | – | Server-side DB/storage access (bypasses RLS) |
 | `GROQ_API_KEY` | backend | yes | – | LLM + agent calls |
 | `MATCH_THRESHOLD` | backend | no | `0.05` | pgvector cosine cut-off; MiniLM scores are compressed |
-| `ALLOWED_ORIGINS` | backend | no | localhost dev origins | Comma-separated CORS allow-list |
+| `ALLOWED_ORIGINS` | backend | no | localhost:8501, 127.0.0.1:8501, deployed Streamlit app | Exact comma-separated CORS allow-list; trailing slashes are stripped, `*` is ignored |
 | `BACKEND_URL` | frontend | yes (deployed) | `http://127.0.0.1:8000` | Base URL of the FastAPI service |
 | `APP_URL` | frontend | no | – | Public URL used as the sign-up confirmation redirect (`st.secrets["APP_URL"]`); omitted from the request when unset |
 | `INSIGHTFORGE_TIMEOUT` | frontend | no | `180` | HTTP timeout (seconds) |

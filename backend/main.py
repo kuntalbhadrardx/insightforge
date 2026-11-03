@@ -14,7 +14,7 @@ import logging
 import os
 import re
 import uuid
-from typing import Any
+from typing import Any, Literal, Sequence
 
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
@@ -69,8 +69,12 @@ MAX_CACHED_DATAFRAMES = int(_env_number("MAX_CACHED_DATAFRAMES", 50))
 #: low; ranking, not filtering, decides which excerpts reach the LLM.
 MATCH_THRESHOLD = _env_number("MATCH_THRESHOLD", 0.05)
 MATCH_COUNT = int(_env_number("MATCH_COUNT", 6))
+#: Most recent chat turns returned for one document; older turns stay in Postgres.
+CHAT_HISTORY_LIMIT = int(_env_number("CHAT_HISTORY_LIMIT", 500))
+#: RRF damping constant for hybrid retrieval. 60 is the value from the original
+#: Reciprocal Rank Fusion paper; larger values flatten the contribution of rank.
+HYBRID_RRF_K = int(_env_number("HYBRID_RRF_K", 60))
 
-DEFAULT_CORS_ORIGINS = "http://localhost:3000,http://localhost:5173,http://localhost:8501"
 PDF_CONTENT_TYPES = {"application/pdf", "application/octet-stream"}
 PDF_EXTENSIONS = {".pdf"}
 CSV_EXTENSIONS = {".csv"}
@@ -80,6 +84,8 @@ RATE_LIMIT_UPLOAD = os.getenv("RATE_LIMIT_UPLOAD", "5/minute")
 RATE_LIMIT_QA = os.getenv("RATE_LIMIT_QA", "10/minute")
 RATE_LIMIT_ANOMALIES = os.getenv("RATE_LIMIT_ANOMALIES", "10/minute")
 RATE_LIMIT_AGENT = os.getenv("RATE_LIMIT_AGENT", "10/minute")
+#: A single Q&A turn writes two messages, and the UI reloads the thread on open.
+RATE_LIMIT_CHAT = os.getenv("RATE_LIMIT_CHAT", "60/minute")
 RATE_LIMIT_MESSAGE = (
     "You've made too many requests in a short period. Please wait a minute and try again."
 )
@@ -155,18 +161,93 @@ class HealthResponse(BaseModel):
     model: str
 
 
+class ChatMessageRecord(BaseModel):
+    id: str
+    document_id: str
+    role: str
+    content: str
+    citations: list[dict[str, Any]] = Field(default_factory=list)
+    created_at: str | None = None
+
+
+class ChatMessageRequest(BaseModel):
+    document_id: uuid.UUID
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=20_000)
+    citations: list[Any] | None = Field(
+        default=None,
+        description="Page numbers or citation objects saved with the message.",
+    )
+
+
+class ChatHistoryResponse(BaseModel):
+    document_id: str
+    count: int
+    messages: list[ChatMessageRecord]
+
+
+class DocumentSummary(BaseModel):
+    id: str
+    filename: str
+    total_pages: int | None = None
+    chunk_count: int | None = None
+    created_at: str | None = None
+
+
+class DocumentListResponse(BaseModel):
+    count: int
+    documents: list[DocumentSummary]
+
+
 # ---------------------------------------------------------------------------
 # App setup
 # ---------------------------------------------------------------------------
+#: Explicit allow-list used when ALLOWED_ORIGINS is unset or emptied. It holds
+#: only the frontends that actually exist: local Streamlit dev on 8501 and the
+#: deployed Streamlit app. Adding an origin here is a deliberate act; nothing is
+#: derived from the request or from a wildcard.
+DEFAULT_ALLOWED_ORIGINS = (
+    "http://localhost:8501,"
+    "http://127.0.0.1:8501,"
+    "https://insightforge-hcg9t92fcmbxquh3dozwqv.streamlit.app"
+)
+
+
 def _parse_origins(raw: str | None) -> list[str]:
+    """Normalise a comma-separated origin list into exact Origin-header values.
+
+    Browsers send ``Origin`` without a trailing slash and the CORS middleware
+    compares it byte-for-byte, so ``https://app.streamlit.app/`` in a config
+    file would never match and every preflight would fail. Whitespace and
+    duplicates are dropped for the same reason; ``*`` is refused because a
+    credentialed allow-list must name concrete origins.
+    """
     if not raw:
-        raw = DEFAULT_CORS_ORIGINS
-    return [origin.strip() for origin in raw.split(",") if origin.strip()]
+        raw = DEFAULT_ALLOWED_ORIGINS
+    origins: list[str] = []
+    for entry in raw.split(","):
+        origin = entry.strip().rstrip("/")
+        if not origin:
+            continue
+        if origin == "*":
+            logger.warning(
+                "Ignoring '*' in ALLOWED_ORIGINS: credentialed CORS requires "
+                "explicit origins. Known origins are unaffected."
+            )
+            continue
+        if origin not in origins:
+            origins.append(origin)
+    if not origins:
+        origins = _parse_origins(DEFAULT_ALLOWED_ORIGINS)
+    return origins
 
 
-#: Comma-separated browser origins allowed to call this API. ``CORS_ORIGINS``
-#: is still honoured so existing .env files keep working.
-_origins = _parse_origins(os.getenv("ALLOWED_ORIGINS") or os.getenv("CORS_ORIGINS"))
+#: Browser origins allowed to call this API. ``CORS_ORIGINS`` is still read as a
+#: fallback so .env files written before the rename keep working.
+ALLOWED_ORIGINS = _parse_origins(
+    os.getenv("ALLOWED_ORIGINS") or os.getenv("CORS_ORIGINS")
+)
+logger.info("CORS allow-list: %s", ", ".join(ALLOWED_ORIGINS))
 
 app = FastAPI(
     title="InsightForge API",
@@ -179,12 +260,14 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_origins,
-    # Wildcard origins cannot be combined with credentialed requests.
-    allow_credentials="*" not in _origins,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    # Safe to enable only because ALLOWED_ORIGINS never contains "*".
+    allow_credentials=True,
+    # Only what the API actually serves: reads, uploads and CORS preflights.
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+    # Browsers may add If-None-Match/User-Agent on their own; only these three
+    # are accepted if a page sets them explicitly.
+    allow_headers=["Authorization", "Content-Type", "Accept"],
 )
 
 
@@ -296,6 +379,56 @@ def _require_owned_document(document_id: str, user_id: str) -> dict[str, Any]:
     return document
 
 
+def _optional_int(value: Any) -> int | None:
+    """Coerce a Supabase numeric column into an int, or ``None``."""
+    if value is None or isinstance(value, bool):
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _normalise_chat_citations(raw: list[Any] | None) -> list[dict[str, Any]]:
+    """Store citations as jsonb objects, accepting bare page numbers too.
+
+    ``/paper/qa`` returns ``PageCitation`` objects (``page_number``,
+    ``similarity``, ``document_id``); older clients may send plain page numbers.
+    Anything that is not a page reference is dropped rather than persisted as a
+    half-typed blob.
+    """
+    citations: list[dict[str, Any]] = []
+    for item in raw or []:
+        if isinstance(item, dict):
+            entry = {str(key): value for key, value in item.items() if value is not None}
+            if entry:
+                citations.append(entry)
+        elif isinstance(item, (int, float)) and not isinstance(item, bool):
+            page = int(item)
+            if page > 0:
+                citations.append({"page_number": page})
+    return citations
+
+
+def _chat_message_record(row: dict[str, Any]) -> ChatMessageRecord:
+    """Map a ``chat_history`` row onto the response model."""
+    stored = row.get("citations")
+    citations = (
+        [item for item in stored if isinstance(item, dict)]
+        if isinstance(stored, list)
+        else []
+    )
+    created_at = row.get("created_at")
+    return ChatMessageRecord(
+        id=str(row.get("id") or ""),
+        document_id=str(row.get("document_id") or ""),
+        role=str(row.get("role") or ""),
+        content=str(row.get("content") or ""),
+        citations=citations,
+        created_at=str(created_at) if created_at is not None else None,
+    )
+
+
 def _build_qa_prompt(question: str, contexts: list[dict[str, Any]]) -> str:
     blocks = [
         f"[page {match['page_number']}] {match['content']}" for match in contexts
@@ -338,6 +471,78 @@ async def _db_call(action: str, func: Any, *args: Any, **kwargs: Any) -> Any:
     except db.DatabaseError as exc:
         logger.error("Database operation failed (%s): %s", action, exc)
         raise HTTPException(status_code=502, detail=f"Database error during {action}.") from exc
+
+
+async def _retrieve_context(
+    *,
+    question: str,
+    query_embedding: Sequence[float],
+    user_id: str,
+    document_id: str,
+    match_count: int,
+) -> list[dict[str, Any]]:
+    """Rank a paper's chunks with hybrid search, best-first.
+
+    The ``hybrid_search_chunks`` RPC fuses a pgvector scan with a Postgres
+    full-text query using Reciprocal Rank Fusion, so a passage whose wording
+    matches the question surfaces even when its embedding is unremarkable.
+    If that RPC is unavailable (migration not applied yet) the call falls back
+    to the previous pgvector-only ranking instead of failing the question.
+    """
+    try:
+        matches = await _db_call(
+            "hybrid search",
+            db.hybrid_search_chunks,
+            user_id=user_id,
+            query_text=question,
+            query_embedding=query_embedding,
+            match_count=match_count,
+            document_id=document_id,
+            rrf_k=HYBRID_RRF_K,
+        )
+    except HTTPException as exc:
+        if exc.status_code != 502:
+            raise
+        logger.warning(
+            "Hybrid search unavailable (%s); falling back to pgvector-only retrieval",
+            exc.detail,
+        )
+    else:
+        logger.info(
+            "Hybrid retrieval: %d chunk(s), best rrf=%.4f",
+            len(matches),
+            float(matches[0].get("rrf_score") or 0.0) if matches else 0.0,
+        )
+        return matches
+
+    matches = await _db_call(
+        "vector search",
+        db.search_paper_chunks,
+        user_id=user_id,
+        query_embedding=query_embedding,
+        match_threshold=MATCH_THRESHOLD,
+        match_count=match_count,
+        document_id=document_id,
+    )
+
+    if not matches and MATCH_THRESHOLD > 0.0:
+        # A stricter MATCH_THRESHOLD was configured. Rather than claim the document
+        # holds nothing relevant, retry unfiltered once and let ranking decide.
+        logger.info(
+            "No chunks passed threshold %.3f; retrying unfiltered for document %s",
+            MATCH_THRESHOLD,
+            document_id,
+        )
+        matches = await _db_call(
+            "vector search (relaxed)",
+            db.search_paper_chunks,
+            user_id=user_id,
+            query_embedding=query_embedding,
+            match_threshold=0.0,
+            match_count=match_count,
+            document_id=document_id,
+        )
+    return matches
 
 
 # ---------------------------------------------------------------------------
@@ -516,33 +721,13 @@ async def paper_qa(
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    matches = await _db_call(
-        "vector search",
-        db.search_paper_chunks,
-        user_id=user_id,
+    matches = await _retrieve_context(
+        question=payload.question,
         query_embedding=query_embedding,
-        match_threshold=MATCH_THRESHOLD,
-        match_count=payload.match_count,
+        user_id=user_id,
         document_id=document_id,
+        match_count=payload.match_count,
     )
-
-    if not matches and MATCH_THRESHOLD > 0.0:
-        # A stricter MATCH_THRESHOLD was configured. Rather than claim the document
-        # holds nothing relevant, retry unfiltered once and let ranking decide.
-        logger.info(
-            "No chunks passed threshold %.3f; retrying unfiltered for document %s",
-            MATCH_THRESHOLD,
-            document_id,
-        )
-        matches = await _db_call(
-            "vector search (relaxed)",
-            db.search_paper_chunks,
-            user_id=user_id,
-            query_embedding=query_embedding,
-            match_threshold=0.0,
-            match_count=payload.match_count,
-            document_id=document_id,
-        )
 
     if not matches:
         return PaperQAResponse(
@@ -581,6 +766,113 @@ async def paper_qa(
         answer=answer or "The language model returned an empty answer.",
         citations=[best_by_page[page] for page in sorted(best_by_page)],
     )
+
+
+@app.get("/documents", response_model=DocumentListResponse, tags=["papers"])
+async def list_documents(
+    limit: int = 50,
+    user_id: str = Depends(get_current_user_id),
+) -> DocumentListResponse:
+    """List the caller's indexed papers, newest first.
+
+    The frontend uses this to reopen a paper in a later session, which is what
+    makes a saved conversation reachable again.
+    """
+    rows = await _db_call(
+        "document list",
+        db.list_documents,
+        user_id=user_id,
+        limit=max(1, min(int(limit), 100)),
+    )
+    documents = [
+        DocumentSummary(
+            id=str(row.get("id") or ""),
+            filename=str(row.get("filename") or "document"),
+            total_pages=_optional_int(row.get("total_pages")),
+            chunk_count=_optional_int(row.get("chunk_count")),
+            created_at=str(row["created_at"]) if row.get("created_at") else None,
+        )
+        for row in rows
+    ]
+    return DocumentListResponse(count=len(documents), documents=documents)
+
+
+@app.get(
+    "/chat/history/{document_id}",
+    response_model=ChatHistoryResponse,
+    tags=["chat"],
+)
+async def get_chat_history(
+    document_id: uuid.UUID,
+    user_id: str = Depends(get_current_user_id),
+) -> ChatHistoryResponse:
+    """Return one document's saved conversation, oldest message first."""
+    document_id_str = str(document_id)
+    await _db_call("paper lookup", _require_owned_document, document_id_str, user_id)
+    rows = await _db_call(
+        "chat history fetch",
+        db.list_chat_history,
+        user_id=user_id,
+        document_id=document_id_str,
+        limit=CHAT_HISTORY_LIMIT,
+    )
+    messages = [_chat_message_record(row) for row in rows]
+    return ChatHistoryResponse(
+        document_id=document_id_str, count=len(messages), messages=messages
+    )
+
+
+@app.post(
+    "/chat/message",
+    response_model=ChatMessageRecord,
+    status_code=201,
+    tags=["chat"],
+)
+@limiter.limit(RATE_LIMIT_CHAT)
+async def save_chat_message(
+    request: Request,
+    payload: ChatMessageRequest,
+    user_id: str = Depends(get_current_user_id),
+) -> ChatMessageRecord:
+    """Persist one chat turn (a user question or an assistant answer)."""
+    content = payload.content.strip()
+    if not content:
+        raise HTTPException(
+            status_code=422, detail="Chat message content must not be blank."
+        )
+
+    document_id_str = str(payload.document_id)
+    await _db_call("paper lookup", _require_owned_document, document_id_str, user_id)
+
+    row = await _db_call(
+        "chat message insert",
+        db.insert_chat_message,
+        user_id=user_id,
+        document_id=document_id_str,
+        role=payload.role,
+        content=content,
+        citations=_normalise_chat_citations(payload.citations),
+    )
+    return _chat_message_record(row)
+
+
+@app.delete("/chat/history/{document_id}", tags=["chat"])
+@limiter.limit(RATE_LIMIT_CHAT)
+async def delete_chat_history(
+    request: Request,
+    document_id: uuid.UUID,
+    user_id: str = Depends(get_current_user_id),
+) -> dict[str, Any]:
+    """Delete one document's conversation for the caller (Clear Chat)."""
+    document_id_str = str(document_id)
+    await _db_call("paper lookup", _require_owned_document, document_id_str, user_id)
+    deleted = await _db_call(
+        "chat history delete",
+        db.clear_chat_history,
+        user_id=user_id,
+        document_id=document_id_str,
+    )
+    return {"document_id": document_id_str, "deleted": deleted}
 
 
 @app.post(

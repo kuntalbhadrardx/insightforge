@@ -8,3 +8,5 @@ pandas==3.1.0
 requests==2.34.2
 supabase==2.33.0
 python-dotenv==1.2.4
+# PDF export of the agent's executive brief (pure Python, no system deps).
+fpdf2==2.9.0

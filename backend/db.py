@@ -570,6 +570,137 @@ def get_document(*, document_id: str, user_id: str) -> dict[str, Any] | None:
     return rows[0] if rows else None
 
 
+def list_documents(*, user_id: str, limit: int = 50) -> list[dict[str, Any]]:
+    """List a user's documents newest first, with chunk counts when available.
+
+    ``chunks(count)`` is an embedded PostgREST aggregate resolved through the
+    ``chunks.document_id`` foreign key. If a project's schema or PostgREST cache
+    does not expose that relationship the query fails, so it falls back to a
+    plain list -- the picker still works, just without counts.
+    """
+    columns = "id,filename,total_pages,created_at"
+    try:
+        rows = _execute(
+            get_client()
+            .table("documents")
+            .select(f"{columns},chunks(count)")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .limit(limit),
+            "list documents",
+        )
+    except DatabaseError:
+        logger.warning(
+            "Embedded chunks(count) unavailable; listing documents without counts",
+            exc_info=True,
+        )
+        rows = _execute(
+            get_client()
+            .table("documents")
+            .select(columns)
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .limit(limit),
+            "list documents",
+        )
+
+    documents: list[dict[str, Any]] = []
+    for row in rows:
+        embedded = row.pop("chunks", None)
+        count: Any = None
+        if isinstance(embedded, list) and embedded:
+            first = embedded[0]
+            count = first.get("count") if isinstance(first, dict) else None
+        elif isinstance(embedded, dict):
+            count = embedded.get("count")
+        try:
+            row["chunk_count"] = int(count) if count is not None else None
+        except (TypeError, ValueError):
+            row["chunk_count"] = None
+        documents.append(row)
+    return documents
+
+
+# ---------------------------------------------------------------------------
+# chat_history
+# ---------------------------------------------------------------------------
+#: Roles permitted by the ``chat_history.role`` check constraint.
+CHAT_ROLES = ("user", "assistant")
+#: Upper bound on a single history read; the API pages nothing yet.
+CHAT_HISTORY_MAX_ROWS = 500
+
+
+def insert_chat_message(
+    *,
+    user_id: str,
+    document_id: str,
+    role: str,
+    content: str,
+    citations: Sequence[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Persist one chat turn and return the stored row."""
+    role_value = (role or "").strip().lower()
+    if role_value not in CHAT_ROLES:
+        raise DatabaseError(
+            f"Invalid chat role {role!r}; expected one of {', '.join(CHAT_ROLES)}."
+        )
+    text = (content or "").strip()
+    if not text:
+        raise DatabaseError("Refusing to store an empty chat message.")
+
+    rows = _execute(
+        get_client()
+        .table("chat_history")
+        .insert(
+            {
+                "user_id": user_id,
+                "document_id": document_id,
+                "role": role_value,
+                "content": text,
+                "citations": _as_json_object(list(citations)) if citations else None,
+            }
+        ),
+        "insert chat message",
+    )
+    if not rows:
+        raise DatabaseError("Chat message insert returned no row.")
+    return rows[0]
+
+
+def list_chat_history(
+    *,
+    user_id: str,
+    document_id: str,
+    limit: int = CHAT_HISTORY_MAX_ROWS,
+) -> list[dict[str, Any]]:
+    """Return one document's conversation for ``user_id``, oldest message first."""
+    if limit <= 0:
+        raise DatabaseError("limit must be positive.")
+    return _execute(
+        get_client()
+        .table("chat_history")
+        .select("id,user_id,document_id,role,content,citations,created_at")
+        .eq("user_id", user_id)
+        .eq("document_id", document_id)
+        .order("created_at", desc=False)
+        .limit(min(limit, CHAT_HISTORY_MAX_ROWS)),
+        "fetch chat history",
+    )
+
+
+def clear_chat_history(*, user_id: str, document_id: str) -> int:
+    """Delete every stored turn for one document; returns the rows removed."""
+    rows = _execute(
+        get_client()
+        .table("chat_history")
+        .delete()
+        .eq("user_id", user_id)
+        .eq("document_id", document_id),
+        "clear chat history",
+    )
+    return len(rows)
+
+
 # ---------------------------------------------------------------------------
 # chunks
 # ---------------------------------------------------------------------------
@@ -654,6 +785,65 @@ def search_paper_chunks(
             }
         )
     results.sort(key=lambda item: item["similarity"], reverse=True)
+    return results
+
+
+def hybrid_search_chunks(
+    *,
+    user_id: str,
+    query_text: str,
+    query_embedding: Sequence[float],
+    match_count: int = 6,
+    document_id: str | None = None,
+    rrf_k: int = 60,
+) -> list[dict[str, Any]]:
+    """Call the ``hybrid_search_chunks`` RPC (vector + full-text, fused by RRF).
+
+    Returns one entry per chunk with its page number, cosine similarity, the
+    fused ``rrf_score`` and the per-list ranks, already ordered best-first.
+    A chunk found only by the text query has ``similarity`` 0 and a null
+    ``vector_rank``; one found only by the vector scan has a null ``fts_rank``.
+    """
+    if len(query_embedding) != 384:
+        raise DatabaseError(
+            f"Query embedding must have 384 dimensions, got {len(query_embedding)}."
+        )
+    if match_count <= 0:
+        raise DatabaseError("match_count must be positive.")
+    if rrf_k < 0:
+        raise DatabaseError("rrf_k must be zero or positive.")
+
+    params: dict[str, Any] = {
+        "query_text": (query_text or "").strip(),
+        "query_embedding": [float(value) for value in query_embedding],
+        "match_count": int(match_count),
+        "filter_user_id": user_id,
+        "filter_document_id": document_id,
+        "rrf_k": int(rrf_k),
+    }
+
+    rows = _execute(
+        get_client().rpc("hybrid_search_chunks", params),
+        "hybrid_search_chunks RPC",
+    )
+
+    results: list[dict[str, Any]] = []
+    for row in rows:
+        vector_rank = row.get("vector_rank")
+        fts_rank = row.get("fts_rank")
+        results.append(
+            {
+                "id": row.get("chunk_id") or row.get("id"),
+                "document_id": row.get("document_id"),
+                "content": row.get("content") or "",
+                "page_number": int(row.get("page_number") or 1),
+                "similarity": float(row.get("similarity") or 0.0),
+                "rrf_score": float(row.get("rrf_score") or 0.0),
+                "vector_rank": int(vector_rank) if vector_rank is not None else None,
+                "fts_rank": int(fts_rank) if fts_rank is not None else None,
+            }
+        )
+    results.sort(key=lambda item: item["rrf_score"], reverse=True)
     return results
 
 
@@ -770,12 +960,19 @@ __all__ = [
     "get_dataset",
     "get_user_from_token",
     "get_document",
+    "hybrid_search_chunks",
     "insert_chunks_batch",
     "insert_dataset",
     "insert_document",
+    "list_documents",
     "remove_file",
     "save_agent_run",
     "save_report",
     "search_paper_chunks",
     "upload_file",
+    "CHAT_HISTORY_MAX_ROWS",
+    "CHAT_ROLES",
+    "clear_chat_history",
+    "insert_chat_message",
+    "list_chat_history",
 ]

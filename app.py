@@ -40,6 +40,8 @@ from typing import Any
 
 import pandas as pd
 from dotenv import load_dotenv
+from fpdf import FPDF
+from fpdf.fonts import FontFace
 import plotly.express as px
 import requests
 import streamlit as st
@@ -504,6 +506,36 @@ def api_run_agent(
     )
 
 
+def api_list_documents(limit: int = 50) -> dict[str, Any]:
+    return api_request("GET", "/documents", params={"limit": limit})
+
+
+def api_chat_history(document_id: str) -> dict[str, Any]:
+    return api_request("GET", f"/chat/history/{document_id}")
+
+
+def api_save_chat_message(
+    document_id: str,
+    role: str,
+    content: str,
+    citations: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    return api_request(
+        "POST",
+        "/chat/message",
+        json={
+            "document_id": document_id,
+            "role": role,
+            "content": content,
+            "citations": citations or None,
+        },
+    )
+
+
+def api_clear_chat(document_id: str) -> dict[str, Any]:
+    return api_request("DELETE", f"/chat/history/{document_id}")
+
+
 # ---------------------------------------------------------------------------
 # Response normalisation
 # ---------------------------------------------------------------------------
@@ -523,6 +555,134 @@ def normalise_citations(raw: Any) -> list[int]:
         if page > 0 and page not in pages:
             pages.append(page)
     return pages
+
+
+def history_rows_to_entries(rows: list[Any]) -> list[dict[str, Any]]:
+    """Rebuild Q&A pairs from stored ``user``/``assistant`` rows.
+
+    A ``user`` row opens an entry and the next ``assistant`` row fills in its
+    answer and citations. An unanswered question (a crash between the two saves)
+    or an orphaned answer stays visible instead of disappearing.
+    """
+    entries: list[dict[str, Any]] = []
+    pending: dict[str, Any] | None = None
+
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        role = str(row.get("role") or "").strip().lower()
+        content = str(row.get("content") or "")
+
+        if role == "user":
+            if pending is not None:
+                entries.append(pending)
+            pending = {
+                "question": content,
+                "answer": "",
+                "citations": [],
+                "asked_at": row.get("created_at"),
+            }
+        elif role == "assistant":
+            citations = normalise_citations(row.get("citations"))
+            if pending is None:
+                entries.append(
+                    {
+                        "question": "",
+                        "answer": content,
+                        "citations": citations,
+                        "asked_at": row.get("created_at"),
+                    }
+                )
+            else:
+                pending["answer"] = content
+                pending["citations"] = citations
+                entries.append(pending)
+                pending = None
+
+    if pending is not None:
+        entries.append(pending)
+    return entries
+
+
+def load_chat_history(document_id: str) -> None:
+    """Fetch a document's saved conversation into ``qa_history``."""
+    try:
+        payload = api_chat_history(document_id)
+    except BackendError as exc:
+        st.session_state["qa_history"] = []
+        st.session_state["chat_load_error"] = str(exc)
+        # Mark it loaded anyway: retrying every rerun would hammer a failing API.
+        st.session_state["chat_history_loaded_for"] = document_id
+        return
+
+    rows = payload.get("messages")
+    st.session_state["qa_history"] = history_rows_to_entries(
+        rows if isinstance(rows, list) else []
+    )
+    st.session_state["chat_history_loaded_for"] = document_id
+
+
+def ensure_chat_history_loaded() -> None:
+    """Load persisted history, once per document per Streamlit session."""
+    document_id = st.session_state.get("document_id")
+    if not document_id or not is_signed_in():
+        return
+    if st.session_state.get("chat_history_loaded_for") == document_id:
+        return
+    load_chat_history(str(document_id))
+
+
+def persist_chat_turn(document_id: str, entry: dict[str, Any]) -> None:
+    """Save a question and its answer; a failed write never hides the answer."""
+    pages = normalise_citations(entry.get("citations") or [])
+    citations = [{"page_number": page} for page in pages] or None
+    try:
+        api_save_chat_message(document_id, "user", entry.get("question", ""))
+        api_save_chat_message(
+            document_id, "assistant", entry.get("answer", ""), citations
+        )
+    except BackendError as exc:
+        st.session_state["chat_persist_error"] = str(exc)
+        return
+    st.session_state["chat_persist_error"] = None
+
+
+def open_document(document: dict[str, Any]) -> None:
+    """Switch the workspace to a previously indexed paper."""
+    document_id = str(document.get("id") or "")
+    if not document_id:
+        return
+    st.session_state["document_id"] = document_id
+    st.session_state["document_filename"] = document.get("filename") or "document"
+    st.session_state["document_pages"] = document.get("total_pages")
+    st.session_state["document_chunks"] = document.get("chunk_count")
+    st.session_state["qa_history"] = []
+    st.session_state["chat_history_loaded_for"] = None
+    st.session_state["chat_load_error"] = None
+    st.session_state["chat_persist_error"] = None
+    st.rerun()
+
+
+def clear_chat_history() -> None:
+    """Delete the active document's conversation from Supabase and this session."""
+    document_id = st.session_state.get("document_id")
+    if not document_id:
+        return
+
+    try:
+        api_clear_chat(str(document_id))
+    except BackendError as exc:
+        st.session_state["chat_persist_error"] = (
+            f"Could not clear the saved chat history: {exc}"
+        )
+        st.rerun()
+        return
+
+    st.session_state["qa_history"] = []
+    st.session_state["chat_history_loaded_for"] = str(document_id)
+    st.session_state["chat_persist_error"] = None
+    st.session_state["chat_notice"] = "Chat history cleared for this paper."
+    st.rerun()
 
 
 def normalise_summary(payload: dict[str, Any]) -> dict[str, Any]:
@@ -648,6 +808,11 @@ SESSION_DEFAULTS: dict[str, Any] = {
     "dataset_df": None,
     "dataset_summary": {},
     "qa_history": [],
+    "executive_report": None,
+    "chat_history_loaded_for": None,
+    "chat_notice": None,
+    "chat_load_error": None,
+    "chat_persist_error": None,
     "last_agent_run": None,
     "anomaly_result": None,
     "anomaly_contamination": DEFAULT_CONTAMINATION,
@@ -1270,6 +1435,41 @@ def render_sidebar() -> None:
             '<div class="if-side-label"><span class="if-step">1</span>Paper ingestion</div>',
             unsafe_allow_html=True,
         )
+        documents: list[dict[str, Any]] = []
+        if is_signed_in():
+            try:
+                listing = api_list_documents()
+                raw_documents = listing.get("documents")
+                if isinstance(raw_documents, list):
+                    documents = [
+                        doc for doc in raw_documents if isinstance(doc, dict)
+                    ]
+            except BackendError:
+                # A broken listing must not block indexing a fresh paper.
+                documents = []
+
+        if documents:
+            choices: dict[str, dict[str, Any]] = {}
+            for document in documents:
+                label = str(document.get("filename") or "document")
+                pages = document.get("total_pages")
+                if pages:
+                    label += f" · {fmt_int(pages)}p"
+                choices[label] = document
+
+            picked = st.selectbox(
+                "Open an indexed paper",
+                list(choices),
+                index=None,
+                placeholder="Reopen a paper from an earlier session…",
+                key="open_document_label",
+            )
+            if st.button("📂 Open paper", width="stretch", key="open_document_button"):
+                if picked:
+                    open_document(choices[picked])
+                else:
+                    st.warning("Choose a paper first.")
+
         uploaded_pdf = st.file_uploader(
             "Upload a research paper (PDF)", type=["pdf"], key="pdf_uploader"
         )
@@ -1307,6 +1507,10 @@ def render_sidebar() -> None:
                         st.session_state["document_chunks"] = chunks
                         st.session_state["document_pages"] = payload.get("total_pages")
                         st.session_state["qa_history"] = []
+                        st.session_state["chat_history_loaded_for"] = payload.get(
+                            "document_id"
+                        )
+                        st.session_state["chat_notice"] = None
                     except BackendError as exc:
                         status.update(label="Indexing failed", state="error", expanded=True)
                         show_backend_error(exc)
@@ -1322,6 +1526,16 @@ def render_sidebar() -> None:
                 + "</span></div>",
                 unsafe_allow_html=True,
             )
+            if st.button(
+                "🗑 Clear chat",
+                width="stretch",
+                key="clear_chat_button",
+                help=(
+                    "Delete this paper's saved conversation from Supabase and "
+                    "from this session."
+                ),
+            ):
+                clear_chat_history()
         else:
             st.caption("No paper indexed yet.")
 
@@ -1393,6 +1607,7 @@ def render_sidebar() -> None:
 # ---------------------------------------------------------------------------
 def render_paper_tab() -> None:
     document_id = st.session_state.get("document_id")
+    ensure_chat_history_loaded()
     if not document_id:
         st.markdown("## 📄 Research Paper Q&A")
         empty_state(
@@ -1415,6 +1630,22 @@ def render_paper_tab() -> None:
             f'<div style="text-align:right; padding-top: 14px;">'
             f'{badge(f"{fmt_int(pages)} pages" if pages else "document ready", "ok")}</div>',
             unsafe_allow_html=True,
+        )
+
+    notice = st.session_state.pop("chat_notice", None)
+    if notice:
+        st.success(notice, icon="💾")
+    load_error = st.session_state.pop("chat_load_error", None)
+    if load_error:
+        st.warning(
+            "Saved chat history could not be loaded, so this thread starts empty. "
+            f"{load_error}"
+        )
+    persist_error = st.session_state.pop("chat_persist_error", None)
+    if persist_error:
+        st.warning(
+            "This conversation is not being saved, so it will be gone after a "
+            f"reload. {persist_error}"
         )
 
     history: list[dict[str, Any]] = st.session_state.get("qa_history") or []
@@ -1462,6 +1693,7 @@ def render_paper_tab() -> None:
     }
     history.append(entry)
     st.session_state["qa_history"] = history
+    persist_chat_turn(str(document_id), entry)
     st.rerun()
 
 
@@ -1753,6 +1985,424 @@ def render_anomaly_tab() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Executive brief export (Markdown / PDF)
+# ---------------------------------------------------------------------------
+#: MIME type for the Markdown download.
+MARKDOWN_MIME = "text/markdown"
+
+#: Unicode TrueType fonts, first match wins. A Windows dev box and the Debian
+#: container Streamlit Cloud runs in ship different fonts, so the builder probes
+#: known locations and falls back to fpdf2's built-in Helvetica (Latin-1).
+_PDF_FONT_CANDIDATES: tuple[tuple[str, str], ...] = (
+    (
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    ),
+    (
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+    ),
+    ("C:/Windows/Fonts/segoeui.ttf", "C:/Windows/Fonts/segoeuib.ttf"),
+    ("C:/Windows/Fonts/arial.ttf", "C:/Windows/Fonts/arialbd.ttf"),
+    (
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
+        "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+    ),
+)
+
+#: Characters the built-in fonts cannot encode, mapped to ASCII equivalents.
+_PDF_ASCII_FALLBACKS = {
+    "’": "'",
+    "‘": "'",
+    "“": '"',
+    "”": '"',
+    "–": "-",
+    "—": "-",
+    "…": "...",
+    "•": "-",
+    "·": "-",
+    "→": "->",
+    "←": "<-",
+    "≥": ">=",
+    "≤": "<=",
+    "×": "x",
+    "÷": "/",
+    "≈": "~",
+    "✓": "v",
+    "⚠": "!",
+    "�\u00a0": " ",
+}
+
+_TABLE_SEPARATOR = re.compile(r"^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$")
+
+
+def _pdf_safe(text: str, unicode_ok: bool) -> str:
+    """Make text renderable: Latin-1-safe when only the built-in fonts exist."""
+    if unicode_ok:
+        return text
+    for bad, good in _PDF_ASCII_FALLBACKS.items():
+        text = text.replace(bad, good)
+    return text.encode("latin-1", "replace").decode("latin-1")
+
+
+def _strip_inline_markdown(text: str) -> str:
+    """Flatten inline emphasis and links so no stray ``*`` or ``_`` reaches the PDF.
+
+    The agent writes identifiers such as ``p_value`` and ``A_B_test``; passing
+    those to a Markdown renderer would silently italicise them.
+    """
+    text = re.sub(r"!\[([^\]]*)\]\([^)]*\)", r"\1", text)
+    text = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1 (\2)", text)
+    text = re.sub(r"`([^`]*)`", r"\1", text)
+    text = re.sub(r"\*\*\*(.+?)\*\*\*", r"\1", text)
+    text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
+    text = re.sub(r"(?<!\w)__(.+?)__(?!\w)", r"\1", text)
+    text = re.sub(r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)", r"\1", text)
+    text = re.sub(r"(?<!\w)_([^_]+)_(?!\w)", r"\1", text)
+    return text.strip()
+
+
+def _split_table_row(line: str) -> list[str]:
+    """Split a pipe-table row into trimmed cells."""
+    row = line.strip()
+    if row.startswith("|"):
+        row = row[1:]
+    if row.endswith("|"):
+        row = row[:-1]
+    return [cell.strip() for cell in row.split("|")]
+
+
+def parse_markdown_blocks(markdown_text: str) -> list[tuple[Any, ...]]:
+    """Split a brief into renderable blocks: headings, bullets, tables, code…"""
+    lines = (markdown_text or "").replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    blocks: list[tuple[Any, ...]] = []
+    index = 0
+
+    while index < len(lines):
+        stripped = lines[index].strip()
+
+        if not stripped:
+            index += 1
+            continue
+
+        if stripped.startswith("```"):
+            index += 1
+            code: list[str] = []
+            while index < len(lines) and not lines[index].strip().startswith("```"):
+                code.append(lines[index])
+                index += 1
+            index += 1
+            blocks.append(("code", "\n".join(code)))
+            continue
+
+        if _TABLE_SEPARATOR.match(stripped):
+            # Separator with no header row above it: nothing to render.
+            index += 1
+            continue
+
+        if (
+            stripped.startswith("|")
+            and index + 1 < len(lines)
+            and _TABLE_SEPARATOR.match(lines[index + 1].strip())
+        ):
+            rows = [_split_table_row(stripped)]
+            index += 2
+            while index < len(lines) and lines[index].strip().startswith("|"):
+                rows.append(_split_table_row(lines[index]))
+                index += 1
+            blocks.append(("table", rows))
+            continue
+
+        heading = re.match(r"^(#{1,6})\s+(.*)$", stripped)
+        if heading:
+            blocks.append(("heading", len(heading.group(1)), heading.group(2).strip()))
+            index += 1
+            continue
+
+        if re.match(r"^(-{3,}|\*{3,}|_{3,})$", stripped):
+            blocks.append(("rule",))
+            index += 1
+            continue
+
+        if re.match(r"^[-*+]\s+", stripped):
+            blocks.append(("bullet", re.sub(r"^[-*+]\s+", "", stripped)))
+            index += 1
+            continue
+
+        numbered = re.match(r"^(\d+)[.)]\s+(.*)$", stripped)
+        if numbered:
+            blocks.append(("numbered", numbered.group(1), numbered.group(2).strip()))
+            index += 1
+            continue
+
+        if stripped.startswith(">"):
+            blocks.append(("quote", stripped.lstrip(">").strip()))
+            index += 1
+            continue
+
+        paragraph: list[str] = [stripped]
+        index += 1
+        while index < len(lines):
+            following = lines[index].strip()
+            if (
+                not following
+                or following.startswith(("#", "- ", "* ", "+ ", ">", "```", "|"))
+                or _TABLE_SEPARATOR.match(following)
+                or re.match(r"^\d+[.)]\s+", following)
+            ):
+                break
+            paragraph.append(following)
+            index += 1
+        blocks.append(("paragraph", " ".join(paragraph)))
+
+    return blocks
+
+
+class _BriefPDF(FPDF):
+    """A4 brief with a page footer; font choice is carried on the instance."""
+
+    brief_title = "InsightForge brief"
+    font_family = "Helvetica"
+    unicode_ok = False
+
+    def footer(self) -> None:
+        self.set_y(-14)
+        self.set_font(self.font_family, "", 8)
+        self.set_text_color(130, 138, 150)
+        label = _pdf_safe(self.brief_title, self.unicode_ok)
+        self.cell(0, 6, f"{label[:80]} - page {self.page_no()}/{{nb}}", align="C")
+
+
+def _register_pdf_font(pdf: FPDF) -> tuple[str, bool]:
+    """Register a Unicode TTF when one exists; otherwise keep core Helvetica."""
+    for regular, bold in _PDF_FONT_CANDIDATES:
+        if not os.path.exists(regular):
+            continue
+        try:
+            pdf.add_font("Brief", "", regular)
+            pdf.add_font("Brief", "B", bold if os.path.exists(bold) else regular)
+            return "Brief", True
+        except Exception:
+            continue
+    return "Helvetica", False
+
+
+def _table_column_widths(rows: list[list[str]], total: float) -> list[float]:
+    """Size columns by their longest cell so wide text gets the room."""
+    columns = max((len(row) for row in rows), default=1)
+    weights: list[float] = []
+    for column in range(columns):
+        longest = max(
+            (len(row[column]) for row in rows if column < len(row)), default=1
+        )
+        weights.append(float(max(4, min(longest, 34))))
+    scale = total / sum(weights)
+    return [weight * scale for weight in weights]
+
+
+def build_brief_pdf(
+    markdown_text: str, title: str = "InsightForge brief"
+) -> tuple[bytes | None, str | None]:
+    """Render a Markdown brief to PDF bytes.
+
+    Returns ``(pdf_bytes, error_message)``: exactly one of them is ``None``, so
+    the caller can disable the button and show the reason instead of raising
+    inside a Streamlit render.
+    """
+    if not (markdown_text or "").strip():
+        return None, "There is nothing to export yet."
+
+    try:
+        pdf = _BriefPDF(format="A4", unit="mm")
+        family, unicode_ok = _register_pdf_font(pdf)
+        pdf.font_family = family
+        pdf.unicode_ok = unicode_ok
+        pdf.brief_title = title
+
+        pdf.set_auto_page_break(auto=True, margin=20)
+        pdf.set_margins(18, 16, 18)
+        pdf.alias_nb_pages()
+        pdf.add_page()
+
+        body_color = (31, 36, 48)
+        accent_color = (176, 96, 26)
+        muted_color = (110, 118, 132)
+
+        pdf.set_font(family, "B", 17)
+        pdf.set_text_color(*body_color)
+        pdf.multi_cell(0, 8, _pdf_safe(_strip_inline_markdown(title), unicode_ok))
+        pdf.ln(2)
+        pdf.set_draw_color(220, 224, 232)
+        pdf.set_line_width(0.4)
+        pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
+        pdf.ln(4)
+
+        for block in parse_markdown_blocks(markdown_text):
+            kind = block[0]
+            pdf.set_x(pdf.l_margin)
+
+            if kind == "heading":
+                level, text = int(block[1]), str(block[2])
+                size = {1: 15.5, 2: 13.0, 3: 11.8}.get(level, 11.0)
+                pdf.ln(3.0 if level > 1 else 1.0)
+                pdf.set_font(family, "B", size)
+                pdf.set_text_color(*accent_color)
+                pdf.multi_cell(
+                    0,
+                    size * 0.42,
+                    _pdf_safe(_strip_inline_markdown(text), unicode_ok),
+                    align="L",
+                )
+                pdf.set_text_color(*body_color)
+                pdf.ln(1.4)
+
+            elif kind in ("bullet", "numbered"):
+                text = str(block[-1])
+                if kind == "bullet":
+                    marker = "•" if unicode_ok else "-"
+                else:
+                    marker = f"{block[1]}."
+                pdf.set_font(family, "", 10.2)
+                pdf.set_text_color(*body_color)
+                indent = 5.0
+                pdf.set_x(pdf.l_margin + indent)
+                pdf.multi_cell(
+                    pdf.epw - indent,
+                    5.4,
+                    _pdf_safe(f"{marker} {_strip_inline_markdown(text)}", unicode_ok),
+                    align="L",
+                )
+                pdf.ln(0.8)
+
+            elif kind == "table":
+                rows = [
+                    [
+                        _pdf_safe(_strip_inline_markdown(cell), unicode_ok)
+                        for cell in row
+                    ]
+                    for row in block[1]
+                ]
+                columns = max(len(row) for row in rows)
+                rows = [row + [""] * (columns - len(row)) for row in rows]
+                pdf.set_font(family, "", 9.0)
+                pdf.set_text_color(*body_color)
+                pdf.ln(1.2)
+                with pdf.table(
+                    width=pdf.epw,
+                    col_widths=_table_column_widths(rows, pdf.epw),
+                    text_align="LEFT",
+                    line_height=5.0,
+                    headings_style=FontFace(
+                        emphasis="BOLD",
+                        fill_color=(240, 242, 246),
+                        color=body_color,
+                    ),
+                    borders_layout="HORIZONTAL_LINES",
+                    first_row_as_headings=True,
+                ) as table:
+                    for row in rows:
+                        table_row = table.row()
+                        for cell in row:
+                            table_row.cell(cell)
+                pdf.ln(2.5)
+
+            elif kind == "code":
+                pdf.set_font("Courier", "", 8.6)
+                pdf.set_text_color(*body_color)
+                pdf.set_fill_color(244, 246, 249)
+                pdf.multi_cell(
+                    pdf.epw,
+                    4.6,
+                    _pdf_safe(str(block[1]), False),
+                    align="L",
+                    fill=True,
+                )
+                pdf.ln(1.8)
+
+            elif kind == "quote":
+                pdf.set_font(family, "", 10.0)
+                pdf.set_text_color(*muted_color)
+                pdf.set_x(pdf.l_margin + 5)
+                pdf.multi_cell(
+                    pdf.epw - 5,
+                    5.4,
+                    _pdf_safe(_strip_inline_markdown(str(block[1])), unicode_ok),
+                    align="L",
+                )
+                pdf.set_text_color(*body_color)
+                pdf.ln(1.5)
+
+            elif kind == "rule":
+                pdf.ln(1.5)
+                pdf.set_draw_color(220, 224, 232)
+                pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
+                pdf.ln(2.5)
+
+            else:  # paragraph
+                pdf.set_font(family, "", 10.2)
+                pdf.set_text_color(*body_color)
+                pdf.multi_cell(
+                    0,
+                    5.5,
+                    _pdf_safe(_strip_inline_markdown(str(block[1])), unicode_ok),
+                    align="L",
+                )
+                pdf.ln(1.8)
+
+        return bytes(pdf.output()), None
+    except Exception as exc:  # pragma: no cover - defensive
+        return None, f"PDF export failed: {exc}"
+
+
+def brief_timestamp(finished_at: Any = None) -> str:
+    """Filename stamp taken from the run's completion time, not the rerun clock."""
+    digits = "".join(ch for ch in str(finished_at or "") if ch.isdigit())
+    if len(digits) >= 14:
+        return digits[:14]
+    return datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+
+
+def render_brief_export_bar(
+    report_text: str,
+    *,
+    title: str = "InsightForge brief",
+    finished_at: Any = None,
+) -> None:
+    """Side-by-side Markdown and PDF downloads for the executive brief."""
+    stamp = brief_timestamp(finished_at)
+    has_report = bool((report_text or "").strip())
+
+    markdown_col, pdf_col = st.columns(2)
+
+    with markdown_col:
+        st.download_button(
+            "📄 Download as Markdown (.md)",
+            data=(report_text or "").encode("utf-8"),
+            file_name=f"insightforge_brief_{stamp}.md",
+            mime=MARKDOWN_MIME,
+            width="stretch",
+            key="download_brief_markdown",
+            disabled=not has_report,
+        )
+
+    with pdf_col:
+        pdf_bytes, pdf_error = (
+            build_brief_pdf(report_text, title=title) if has_report else (None, None)
+        )
+        st.download_button(
+            "🧾 Download as PDF",
+            data=pdf_bytes or b"",
+            file_name=f"insightforge_brief_{stamp}.pdf",
+            mime="application/pdf",
+            width="stretch",
+            key="download_brief_pdf",
+            disabled=pdf_bytes is None,
+        )
+        if pdf_error:
+            st.caption(pdf_error)
+
+
+# ---------------------------------------------------------------------------
 # Tab 4: Autonomous agent
 # ---------------------------------------------------------------------------
 def render_agent_tab() -> None:
@@ -1889,6 +2539,8 @@ def render_agent_tab() -> None:
                 "iterations": payload.get("iterations"),
                 "finished_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             }
+            # The export bar reads this directly, so the brief survives reruns.
+            st.session_state["executive_report"] = payload.get("report") or ""
 
     run = st.session_state.get("last_agent_run")
     if not isinstance(run, dict):
@@ -1909,15 +2561,19 @@ def render_agent_tab() -> None:
             f"{run.get('iterations') or '—'} iterations"
         )
     with header_cols[1]:
-        report_text = run.get("report") or ""
-        st.download_button(
-            "📥 Download Markdown Report",
-            data=report_text.encode("utf-8"),
-            file_name=f"insightforge-report-{run.get('run_id') or 'draft'}.md",
-            mime="text/markdown",
-            width="stretch",
-            key="download_agent_report",
+        st.markdown(
+            f'<div style="text-align:right; padding-top: 14px;">'
+            f'{badge("executive brief", "ok")}</div>',
+            unsafe_allow_html=True,
         )
+
+    report_text = st.session_state.get("executive_report") or run.get("report") or ""
+    render_brief_export_bar(
+        report_text,
+        title=str(run.get("title") or "InsightForge brief"),
+        finished_at=run.get("finished_at"),
+    )
+    st.write("")
 
     with st.container(border=True):
         st.markdown(
