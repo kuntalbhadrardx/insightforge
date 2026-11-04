@@ -10,6 +10,8 @@ Interactive docs are served at ``/docs`` on whatever origin hosts this app.
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 import logging
 import os
 import re
@@ -25,10 +27,10 @@ from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from starlette.concurrency import run_in_threadpool
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 
 from . import agent as agent_module
-from . import analytics, db, pdf_rag
+from . import analytics, brief_export, db, pdf_rag
 
 load_dotenv()
 
@@ -199,22 +201,29 @@ class DocumentListResponse(BaseModel):
     documents: list[DocumentSummary]
 
 
+class ReportSummary(BaseModel):
+    id: str
+    title: str
+    created_at: str | None = None
+
+
+class ReportListResponse(BaseModel):
+    count: int
+    reports: list[ReportSummary]
+
+
 # ---------------------------------------------------------------------------
 # App setup
 # ---------------------------------------------------------------------------
 #: Explicit allow-list used when ALLOWED_ORIGINS is unset or emptied. It holds
-#: only the frontends that actually exist: local Streamlit dev on 8501, the Vite
-#: console's dev server on 5173 and its preview build on 4173, and the deployed
-#: Streamlit app. Adding an origin here is a deliberate act; nothing is derived
-#: from the request or from a wildcard.
+#: only the frontend that actually exists: the Vite console's dev server on 5173
+#: and its preview build on 4173. Adding an origin here is a deliberate act;
+#: nothing is derived from the request or from a wildcard.
 DEFAULT_ALLOWED_ORIGINS = (
-    "http://localhost:8501,"
-    "http://127.0.0.1:8501,"
     "http://localhost:5173,"
     "http://127.0.0.1:5173,"
     "http://localhost:4173,"
-    "http://127.0.0.1:4173,"
-    "https://insightforge-hcg9t92fcmbxquh3dozwqv.streamlit.app"
+    "http://127.0.0.1:4173"
 )
 
 
@@ -222,7 +231,7 @@ def _parse_origins(raw: str | None) -> list[str]:
     """Normalise a comma-separated origin list into exact Origin-header values.
 
     Browsers send ``Origin`` without a trailing slash and the CORS middleware
-    compares it byte-for-byte, so ``https://app.streamlit.app/`` in a config
+    compares it byte-for-byte, so ``https://console.example.com/`` in a config
     file would never match and every preflight would fail. Whitespace and
     duplicates are dropped for the same reason; ``*`` is refused because a
     credentialed allow-list must name concrete origins.
@@ -1008,6 +1017,9 @@ async def dataset_anomalies(
             entry["df"],
             contamination,
             features or None,
+            # Adds the score histogram and per-feature contribution ranking the
+            # dashboard charts; the agent tool keeps the lean payload.
+            include_diagnostics=True,
         )
     except analytics.DatasetError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -1015,6 +1027,95 @@ async def dataset_anomalies(
     result["dataset_id"] = str(dataset_id)
     result["filename"] = entry["filename"]
     return result
+
+
+def _brief_filename(title: str, created_at: Any, extension: str) -> str:
+    """Filename stamp from the brief's own creation time, not the request clock."""
+    stamp = "".join(ch for ch in str(created_at or "") if ch.isdigit())[:14]
+    if len(stamp) < 14:
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    return f"insightforge_brief_{stamp}.{extension}"
+
+
+async def _require_owned_report(report_id: str, user_id: str) -> dict[str, Any]:
+    """Load a report the caller owns; 404 for both missing and foreign rows."""
+    row = await _db_call(
+        "report lookup", db.get_report, report_id=report_id, user_id=user_id
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="Report not found.")
+    return row
+
+
+@app.get("/reports", response_model=ReportListResponse, tags=["reports"])
+async def list_reports(
+    limit: int = 20,
+    user_id: str = Depends(get_current_user_id),
+) -> ReportListResponse:
+    """List the caller's saved executive briefs, newest first."""
+    rows = await _db_call(
+        "report list",
+        db.list_reports,
+        user_id=user_id,
+        limit=max(1, min(int(limit), 50)),
+    )
+    reports = [
+        ReportSummary(
+            id=str(row.get("id") or ""),
+            title=str(row.get("title") or "InsightForge brief"),
+            created_at=str(row["created_at"]) if row.get("created_at") else None,
+        )
+        for row in rows
+    ]
+    return ReportListResponse(count=len(reports), reports=reports)
+
+
+@app.get("/reports/{report_id}/export/markdown", tags=["reports"])
+async def export_report_markdown(
+    report_id: uuid.UUID,
+    user_id: str = Depends(get_current_user_id),
+) -> Response:
+    """Download one brief as a Markdown file attachment."""
+    row = await _require_owned_report(str(report_id), user_id)
+    content = str(row.get("content_markdown") or "")
+    if not content.strip():
+        raise HTTPException(
+            status_code=422, detail="This brief has no content to export."
+        )
+
+    filename = _brief_filename(
+        str(row.get("title") or "InsightForge brief"), row.get("created_at"), "md"
+    )
+    return Response(
+        content=content.encode("utf-8"),
+        media_type=f"{brief_export.MARKDOWN_MIME}; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@app.get("/reports/{report_id}/export/pdf", tags=["reports"])
+async def export_report_pdf(
+    report_id: uuid.UUID,
+    user_id: str = Depends(get_current_user_id),
+) -> Response:
+    """Download one brief as a rendered PDF attachment."""
+    row = await _require_owned_report(str(report_id), user_id)
+    title = str(row.get("title") or "InsightForge brief")
+
+    pdf_bytes, error = await run_in_threadpool(
+        brief_export.build_brief_pdf, str(row.get("content_markdown") or ""), title
+    )
+    if pdf_bytes is None:
+        raise HTTPException(
+            status_code=422, detail=error or "This brief could not be rendered as a PDF."
+        )
+
+    filename = _brief_filename(title, row.get("created_at"), "pdf")
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 @app.post("/agent/run", response_model=AgentRunResponse, tags=["agent"])

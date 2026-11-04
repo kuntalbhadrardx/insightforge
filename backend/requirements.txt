@@ -33,5 +33,8 @@ scikit-learn==1.9.1
 # LLM / agents
 groq==1.7.0
 
+# Executive-brief export (Markdown -> PDF, pure Python, no system deps)
+fpdf2==2.9.0
+
 # Per-user rate limiting
 slowapi==0.1.10

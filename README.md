@@ -33,7 +33,7 @@ InsightForge is an AI research and data-analysis workspace: upload a PDF and ask
 
 ```mermaid
 flowchart LR
-    U[User browser] -->|email + password| S[Streamlit frontend<br/>app.py]
+    U[User browser] -->|email + password| S[React console<br/>frontend/]
     S -->|sign-in| GA[Supabase Auth]
     GA -->|JWT session| S
     S -->|Authorization: Bearer JWT| API[FastAPI backend<br/>backend/main.py]
@@ -45,7 +45,7 @@ flowchart LR
     API -->|computed dataset JSON| MEM[(In-process<br/>dataframe cache)]
 ```
 
-Request path: the Streamlit app signs in against Supabase, stores the access token, and attaches `Authorization: Bearer <token>` to every backend call. The backend validates that token with Supabase, derives the user id, and scopes every query and storage path to it. Uploads are parsed and validated (size, type, row/column/page caps) before anything is written. Rate limiting runs per user id (IP for anonymous calls).
+Request path: the React console signs in against Supabase, stores the access token, and attaches `Authorization: Bearer <token>` to every backend call. The backend validates that token with Supabase, derives the user id, and scopes every query and storage path to it. Uploads are parsed and validated (size, type, row/column/page caps) before anything is written. Rate limiting runs per user id (IP for anonymous calls).
 
 ## Tech stack
 
@@ -74,7 +74,7 @@ python -m venv .venv
 source .venv/bin/activate
 
 pip install -r backend/requirements.txt   # backend (FastAPI, CPU-only torch)
-pip install -r requirements.txt           # frontend (Streamlit)
+cd frontend && npm install                # React console (Vite + Tailwind v4)
 ```
 
 ### 3. Configure
@@ -91,15 +91,16 @@ uvicorn backend.main:app --host 0.0.0.0 --port 8000 --workers 1
 
 ### 5. Run the frontend
 ```bash
-streamlit run app.py --server.port 8501
+cd frontend
+npm run dev          # http://127.0.0.1:5173
 ```
-Set `BACKEND_URL` (env var or `st.secrets["BACKEND_URL"]`) to the backend origin, and add the frontend origin to `ALLOWED_ORIGINS` on the API.
+Set `VITE_BACKEND_URL`, `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `frontend/.env`, and make sure the console's origin is in `ALLOWED_ORIGINS` on the API (`5173` and `4173` are the defaults).
 
 ### Deployment notes
-- **Python version: 3.14.7.** `runtime.txt` pins `python-3.14.7` for Render; set Render's `PYTHON_VERSION` env var to `3.14.7` if you prefer the dashboard, and pick Python 3.14 under Streamlit Community Cloud → *Advanced settings → Python version*. The pins (torch 2.15, scikit-learn 1.9, pandas 3.1) are built for this interpreter — a different minor version will fail to resolve wheels.
-- **Backend:** any container host works (Render, Railway, Fly.io, a VM). Build from the `insightforge` directory so both `requirements.txt` files and `runtime.txt` are found. Start with a single worker and a persistent process; the first request loads MiniLM, so give the instance ~1 GB RAM.
-- **Frontend:** Streamlit Community Cloud or a container. Provide `BACKEND_URL`, `SUPABASE_URL` and `SUPABASE_ANON_KEY` as secrets/env vars — never the service-role key. Add `APP_URL` (your Streamlit app URL) so confirmation emails from the sign-up tab link back to the app, and allow it under Supabase → Authentication → URL configuration.
-- **CORS:** `ALLOWED_ORIGINS` is an exact, comma-separated origin allow-list (scheme + host + optional port, no paths, no trailing slash, no `*`) with credentials enabled and only `GET`/`POST`/`OPTIONS` plus `Authorization`/`Content-Type`/`Accept` headers permitted. Left unset it falls back to `http://localhost:8501`, `http://127.0.0.1:8501` and the deployed Streamlit app; set it to your own frontend origin when you fork the repo.
+- **Python version: 3.14.7.** `runtime.txt` pins `python-3.14.7` for Render; set Render's `PYTHON_VERSION` env var to `3.14.7` if you prefer the dashboard. The pins (torch 2.15, scikit-learn 1.9, pandas 3.1) are built for this interpreter — a different minor version will fail to resolve wheels.
+- **Backend:** any container host works (Render, Railway, Fly.io, a VM). Build from the `insightforge` directory so `backend/requirements.txt` and `runtime.txt` are found. Start with a single worker and a persistent process; the first request loads MiniLM, so give the instance ~1 GB RAM.
+- **Frontend:** any static host (Cloudflare Pages, Netlify, Vercel) or a container running `npm run build` + `vite preview`. Provide `VITE_BACKEND_URL`, `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` at build time — never the service-role key, and remember Vite inlines `VITE_*` values into the bundle. Allow the console's URL under Supabase → Authentication → URL configuration so confirmation emails link back to it.
+- **CORS:** `ALLOWED_ORIGINS` is an exact, comma-separated origin allow-list (scheme + host + optional port, no paths, no trailing slash, no `*`) with credentials enabled and only `GET`/`POST`/`OPTIONS` plus `Authorization`/`Content-Type`/`Accept` headers permitted. Left unset it falls back to `http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:4173` and `http://127.0.0.1:4173`; set it to your own frontend origin when you fork the repo.
 - **Rate limits** are in-memory (slowapi default). Multiple API instances each keep their own counters; for a shared budget, point slowapi at Redis.
 
 ## Environment variables
@@ -199,18 +200,21 @@ Reading the table: the injected anomalies are well separated, so recall saturate
 
 ```
 insightforge/
-├── app.py                       # Streamlit frontend (single file)
+├── frontend/                    # React console (Vite + Tailwind v4)
+│   ├── src/App.jsx              # auth gate, sidebar, RAG chat, export bar
+│   ├── src/api.js               # backend bridge
+│   └── src/components/          # Uploader, AnomalyPanel (Plotly)
 ├── backend/
 │   ├── main.py                  # FastAPI routes, auth, limits, rate limiting
 │   ├── db.py                    # Supabase helpers (service-role client)
 │   ├── analytics.py             # EDA + IsolationForest + leakage guard
 │   ├── pdf_rag.py               # PDF parsing, chunking, MiniLM embeddings
-│   └── agent.py                 # Groq tool-calling agent
+│   ├── agent.py                 # Groq tool-calling agent
+│   ├── brief_export.py          # Markdown brief -> PDF renderer
+│   └── requirements.txt         # backend pins
 ├── benchmarks/
 │   ├── benchmark_anomalies.py
 │   └── complex_metrics_test.csv
-├── requirements.txt             # backend pins
-├── requirements-frontend.txt    # frontend pins
 ├── .env.example
 └── .gitignore
 ```

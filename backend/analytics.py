@@ -320,12 +320,87 @@ def build_anomaly_breakdown(
     }
 
 
+def _robust_deviations(
+    matrix: pd.DataFrame,
+    values: np.ndarray,
+    medians: pd.Series,
+) -> np.ndarray:
+    """Absolute per-cell deviation in robust z units (median absolute deviation).
+
+    A plain standard deviation lets one extreme cell dominate, which is exactly
+    what the outlier rows are, so the scale is 1.4826 * MAD with a standard
+    deviation and then 1.0 fallback for near-constant columns.
+    """
+    centre = medians.reindex(matrix.columns).to_numpy(dtype=float)
+    centred = np.abs(values - centre)
+    mad = np.median(centred, axis=0) * 1.4826
+    std = values.std(axis=0)
+    scale = np.where(mad > 0, mad, np.where(std > 0, std, 1.0))
+    return centred / scale
+
+
+def _feature_contributions(
+    matrix: pd.DataFrame,
+    deviations: np.ndarray,
+    anomalies: np.ndarray,
+) -> dict[str, Any]:
+    """Rank features by how far they push the anomalous rows off the baseline."""
+    names = [str(name) for name in matrix.columns]
+    mask = np.asarray(anomalies, dtype=bool)
+    if not mask.any():
+        return {"features": [], "total_deviation": 0.0}
+
+    anomalous = deviations[mask].mean(axis=0)
+    normal = deviations[~mask].mean(axis=0) if (~mask).any() else np.zeros_like(anomalous)
+    total = float(anomalous.sum())
+
+    features = [
+        {
+            "feature": names[index],
+            "anomalous_deviation": round(float(anomalous[index]), 3),
+            "normal_deviation": round(float(normal[index]), 3),
+            "contribution_percent": (
+                round(float(anomalous[index]) / total * 100, 2) if total > 0 else 0.0
+            ),
+        }
+        for index in range(len(names))
+    ]
+    features.sort(key=lambda row: row["contribution_percent"], reverse=True)
+    return {"features": features, "total_deviation": round(total, 3)}
+
+
+def _score_distribution(
+    scores: np.ndarray, anomalies: np.ndarray, offset: float
+) -> dict[str, Any]:
+    """Histogram of IsolationForest decision scores, split by flag.
+
+    ``decision_function`` returns larger values for normal rows, so the
+    anomalous rows pile up at the left tail; ``offset`` is the cut-off sklearn
+    actually used, which is what the reference line on the chart marks.
+    """
+    bins = max(5, min(30, int(np.sqrt(max(len(scores), 1))) + 5))
+    counts, edges = np.histogram(scores, bins=bins)
+    anomalous_counts, _ = np.histogram(scores[np.asarray(anomalies, dtype=bool)], bins=edges)
+    mids = [round(float((edges[i] + edges[i + 1]) / 2), 4) for i in range(len(edges) - 1)]
+    return {
+        "bin_centres": mids,
+        "bin_edges": [round(float(edge), 4) for edge in edges],
+        "normal": [int(total - flagged) for total, flagged in zip(counts, anomalous_counts)],
+        "anomalous": [int(flagged) for flagged in anomalous_counts],
+        "score_min": round(float(scores.min()), 4),
+        "score_max": round(float(scores.max()), 4),
+        "score_median": round(float(np.median(scores)), 4),
+        "threshold": round(float(offset), 4),
+    }
+
+
 def detect_outliers(
     df: pd.DataFrame,
     contamination: float = DEFAULT_CONTAMINATION,
     feature_columns: list[str] | None = None,
     include_breakdown: bool = False,
     include_row_flags: bool = False,
+    include_diagnostics: bool = False,
 ) -> dict[str, Any]:
     """Run IsolationForest over the selected numeric columns of ``df``.
 
@@ -430,6 +505,19 @@ def detect_outliers(
     if include_row_flags:
         # Used by the benchmark to score flags against ground truth.
         result["row_is_anomaly"] = [bool(flag) for flag in row_mask]
+    if include_diagnostics:
+        # Aggregates only -- per-cell scores never leave the process -- for the
+        # dashboard's score histogram and per-feature contribution ranking.
+        deviations = _robust_deviations(matrix, values, medians)
+        result["diagnostics"] = {
+            "score_distribution": _score_distribution(
+                scores, flags == -1, float(model.offset_)
+            ),
+            "feature_contributions": _feature_contributions(
+                matrix, deviations, flags == -1
+            ),
+            "n_estimators": int(getattr(model, "n_estimators", 0) or 0),
+        }
     return result
 
 

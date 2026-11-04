@@ -923,6 +923,37 @@ def save_agent_run(
     return rows[0]
 
 
+def list_reports(*, user_id: str, limit: int = 20) -> list[dict[str, Any]]:
+    """Return the caller's saved briefs, newest first.
+
+    Only metadata is selected: the Markdown body is fetched by
+    :func:`get_report` when someone actually exports it, so listing stays cheap.
+    """
+    return _execute(
+        get_client()
+        .table("reports")
+        .select("id,user_id,title,created_at")
+        .eq("user_id", user_id)
+        .order("created_at", desc=True)
+        .limit(limit),
+        "list reports",
+    )
+
+
+def get_report(*, report_id: str, user_id: str) -> dict[str, Any] | None:
+    """Fetch one saved brief owned by ``user_id`` (or ``None``)."""
+    rows = _execute(
+        get_client()
+        .table("reports")
+        .select("id,user_id,title,content_markdown,created_at")
+        .eq("id", report_id)
+        .eq("user_id", user_id)
+        .limit(1),
+        "fetch report",
+    )
+    return rows[0] if rows else None
+
+
 def save_report(
     *,
     user_id: str,
@@ -960,11 +991,13 @@ __all__ = [
     "get_dataset",
     "get_user_from_token",
     "get_document",
+    "get_report",
     "hybrid_search_chunks",
     "insert_chunks_batch",
     "insert_dataset",
     "insert_document",
     "list_documents",
+    "list_reports",
     "remove_file",
     "save_agent_run",
     "save_report",
