@@ -73,7 +73,7 @@ python -m venv .venv
 # Windows: .\.venv\Scripts\activate
 source .venv/bin/activate
 
-pip install -r backend/requirements.txt   # backend (FastAPI, CPU-only torch)
+pip install -r requirements.txt   # backend (FastAPI, CPU-only torch)
 cd frontend && npm install                # React console (Vite + Tailwind v4)
 ```
 
@@ -98,7 +98,7 @@ Set `VITE_BACKEND_URL`, `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `fro
 
 ### Deployment notes
 - **Python version: 3.14.7.** `runtime.txt` pins `python-3.14.7` for Render; set Render's `PYTHON_VERSION` env var to `3.14.7` if you prefer the dashboard. The pins (torch 2.15, scikit-learn 1.9, pandas 3.1) are built for this interpreter — a different minor version will fail to resolve wheels.
-- **Backend:** any container host works (Render, Railway, Fly.io, a VM). Build from the `insightforge` directory so `backend/requirements.txt` and `runtime.txt` are found. Start with a single worker and a persistent process; the first request loads MiniLM, so give the instance ~1 GB RAM.
+- **Backend:** any container host works (Render, Railway, Fly.io, a VM). Build from the `insightforge` directory so the root `requirements.txt` and `runtime.txt` are found (Railway detects the Python service from that root requirements file). Start with a single worker and a persistent process; the first request loads MiniLM, so give the instance ~1 GB RAM.
 - **Frontend:** any static host (Cloudflare Pages, Netlify, Vercel) or a container running `npm run build` + `vite preview`. Provide `VITE_BACKEND_URL`, `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` at build time — never the service-role key, and remember Vite inlines `VITE_*` values into the bundle. Allow the console's URL under Supabase → Authentication → URL configuration so confirmation emails link back to it.
 - **CORS:** `ALLOWED_ORIGINS` is an exact, comma-separated origin allow-list (scheme + host + optional port, no paths, no trailing slash, no `*`) with credentials enabled and only `GET`/`POST`/`OPTIONS` plus `Authorization`/`Content-Type`/`Accept` headers permitted. Left unset it falls back to `http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:4173` and `http://127.0.0.1:4173`; set it to your own frontend origin when you fork the repo.
 - **Rate limits** are in-memory (slowapi default). Multiple API instances each keep their own counters; for a shared budget, point slowapi at Redis.
@@ -210,8 +210,8 @@ insightforge/
 │   ├── analytics.py             # EDA + IsolationForest + leakage guard
 │   ├── pdf_rag.py               # PDF parsing, chunking, MiniLM embeddings
 │   ├── agent.py                 # Groq tool-calling agent
-│   ├── brief_export.py          # Markdown brief -> PDF renderer
-│   └── requirements.txt         # backend pins
+│   └── brief_export.py          # Markdown brief -> PDF renderer
+├── requirements.txt             # backend pins (root, for Railway detection)
 ├── benchmarks/
 │   ├── benchmark_anomalies.py
 │   └── complex_metrics_test.csv

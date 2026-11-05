@@ -5,7 +5,7 @@ torch==2.15.0+cpu
 # sentence-transformers pulls torch in anyway, this just makes it the +cpu build.
 #
 # Backend (FastAPI) dependencies — pinned for reproducible deployments.
-# Install: pip install -r backend/requirements.txt
+# Install: pip install -r requirements.txt
 # Run with a SINGLE worker: the dataset cache is per-process (see README).
 
 # Web framework
