@@ -1,4 +1,4 @@
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+export const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 /** Prefer the API's own message (FastAPI puts it in `detail`) over a generic one. */
 async function readError(res, fallback) {
@@ -20,7 +20,7 @@ function authHeaders(token) {
 }
 
 export async function fetchDocuments(token) {
-  const res = await fetch(`${BACKEND_URL}/documents`, {
+  const res = await fetch(`${BASE_URL}/documents`, {
     headers: authHeaders(token)
   });
   if (!res.ok) throw new Error(await readError(res, "Failed to load documents"));
@@ -39,7 +39,7 @@ export async function uploadFile(endpoint, file, token) {
   const body = new FormData();
   body.append("file", file);
 
-  const res = await fetch(`${BACKEND_URL}${endpoint}`, {
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
     method: "POST",
     headers: authHeaders(token),
     body
@@ -49,7 +49,7 @@ export async function uploadFile(endpoint, file, token) {
 }
 
 export async function fetchChatHistory(documentId, token) {
-  const res = await fetch(`${BACKEND_URL}/chat/history/${documentId}`, {
+  const res = await fetch(`${BASE_URL}/chat/history/${documentId}`, {
     headers: authHeaders(token)
   });
   if (!res.ok) throw new Error(await readError(res, "Failed to load history"));
@@ -57,7 +57,7 @@ export async function fetchChatHistory(documentId, token) {
 }
 
 export async function deleteChatHistory(documentId, token) {
-  const res = await fetch(`${BACKEND_URL}/chat/history/${documentId}`, {
+  const res = await fetch(`${BASE_URL}/chat/history/${documentId}`, {
     method: "DELETE",
     headers: authHeaders(token)
   });
@@ -66,7 +66,7 @@ export async function deleteChatHistory(documentId, token) {
 }
 
 export async function sendQuery(documentId, query, token) {
-  const res = await fetch(`${BACKEND_URL}/paper/qa`, {
+  const res = await fetch(`${BASE_URL}/paper/qa`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export async function sendQuery(documentId, query, token) {
 
 /** Saved executive briefs (newest first) — the agent's persisted reports. */
 export async function fetchReports(token) {
-  const res = await fetch(`${BACKEND_URL}/reports`, {
+  const res = await fetch(`${BASE_URL}/reports`, {
     headers: authHeaders(token)
   });
   if (!res.ok) throw new Error(await readError(res, "Failed to load briefs"));
@@ -94,7 +94,7 @@ export async function fetchReports(token) {
  * Returns `{ blob, filename }`; the filename comes from Content-Disposition.
  */
 export async function downloadReport(reportId, format, token) {
-  const res = await fetch(`${BACKEND_URL}/reports/${reportId}/export/${format}`, {
+  const res = await fetch(`${BASE_URL}/reports/${reportId}/export/${format}`, {
     headers: authHeaders(token)
   });
   if (!res.ok) {
@@ -117,7 +117,7 @@ export async function runAnomalies(datasetId, { contamination, features } = {}, 
   if (contamination !== undefined) body.append("contamination", String(contamination));
   for (const feature of features ?? []) body.append("features", feature);
 
-  const res = await fetch(`${BACKEND_URL}/dataset/${datasetId}/anomalies`, {
+  const res = await fetch(`${BASE_URL}/dataset/${datasetId}/anomalies`, {
     method: "POST",
     headers: authHeaders(token),
     body
@@ -128,7 +128,7 @@ export async function runAnomalies(datasetId, { contamination, features } = {}, 
 
 export async function checkBackend() {
   try {
-    const res = await fetch(`${BACKEND_URL}/health`, {
+    const res = await fetch(`${BASE_URL}/health`, {
       signal: AbortSignal.timeout(4000)
     });
     return res.ok;
@@ -136,5 +136,3 @@ export async function checkBackend() {
     return false;
   }
 }
-
-export { BACKEND_URL };
