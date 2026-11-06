@@ -216,10 +216,12 @@ class ReportListResponse(BaseModel):
 # App setup
 # ---------------------------------------------------------------------------
 #: Explicit allow-list used when ALLOWED_ORIGINS is unset or emptied. It holds
-#: only the frontend that actually exists: the Vite console's dev server on 5173
-#: and its preview build on 4173. Adding an origin here is a deliberate act;
-#: nothing is derived from the request or from a wildcard.
+#: only the frontends that actually exist: the deployed console on Vercel and the
+#: Vite console's local dev server on 5173 and its preview build on 4173. Adding
+#: an origin here is a deliberate act; nothing is derived from the request or
+#: from a wildcard.
 DEFAULT_ALLOWED_ORIGINS = (
+    "https://insightforge-chi.vercel.app,"
     "http://localhost:5173,"
     "http://127.0.0.1:5173,"
     "http://localhost:4173,"
@@ -277,11 +279,11 @@ app.add_middleware(
     allow_origins=ALLOWED_ORIGINS,
     # Safe to enable only because ALLOWED_ORIGINS never contains "*".
     allow_credentials=True,
-    # Only what the API actually serves: reads, uploads and CORS preflights.
-    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
-    # Browsers may add If-None-Match/User-Agent on their own; only these three
-    # are accepted if a page sets them explicitly.
-    allow_headers=["Authorization", "Content-Type", "Accept"],
+    # Any method; the routes themselves decide what they actually answer.
+    allow_methods=["*"],
+    # Any requested header; allow_credentials stays safe because the origin
+    # allow-list above never contains "*".
+    allow_headers=["*"],
 )
 
 
