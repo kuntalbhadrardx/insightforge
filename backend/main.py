@@ -265,6 +265,19 @@ ALLOWED_ORIGINS = _parse_origins(
 )
 logger.info("CORS allow-list: %s", ", ".join(ALLOWED_ORIGINS))
 
+#: Vercel mints a fresh hostname for every deployment
+#: (``insightforge-chi.vercel.app``, ``insightforge-71m3uc7m-just-me-ef24.vercel.app``
+#: and so on), so an exact allow-list can never name the console that is actually
+#: serving. This pattern is scoped to this project's names and deliberately does
+#: not match arbitrary ``*.vercel.app`` hosts, which are public and free.
+DEFAULT_ALLOWED_ORIGIN_REGEX = r"^https://insightforge(?:-[a-z0-9-]+)?\.vercel\.app$"
+
+#: Pattern of extra origins to accept, in addition to the allow-list above.
+ALLOWED_ORIGIN_REGEX = (
+    os.getenv("ALLOWED_ORIGIN_REGEX") or DEFAULT_ALLOWED_ORIGIN_REGEX
+)
+logger.info("CORS origin pattern: %s", ALLOWED_ORIGIN_REGEX)
+
 app = FastAPI(
     title="InsightForge API",
     version="1.0.0",
@@ -277,7 +290,9 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    # Safe to enable only because ALLOWED_ORIGINS never contains "*".
+    # Covers Vercel's per-deployment hostnames, which no fixed list can track.
+    allow_origin_regex=ALLOWED_ORIGIN_REGEX,
+    # Safe to enable only because neither rule below ever accepts "*".
     allow_credentials=True,
     # Any method; the routes themselves decide what they actually answer.
     allow_methods=["*"],
