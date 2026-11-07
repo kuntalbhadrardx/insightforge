@@ -1,0 +1,105 @@
+/* Landing page lighting. Scoped to landing.html — the console never imports this. */
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* The narrow column of light behind the hero. */
+.lp-shaft-core {
+  position: absolute;
+  left: 50%;
+  top: -22%;
+  width: 128px;
+  height: 116%;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(236, 255, 244, 0.45) 18%,
+    rgba(255, 255, 255, 0.9) 42%,
+    rgba(226, 255, 238, 0.85) 66%,
+    rgba(167, 243, 208, 0.45) 86%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  filter: blur(26px);
+  animation: lp-breathe 9s ease-in-out infinite;
+}
+
+/* The wider haze that carries the same light into the page edges. */
+.lp-shaft-haze {
+  position: absolute;
+  left: 50%;
+  top: -18%;
+  width: 430px;
+  height: 112%;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(214, 255, 233, 0.12) 30%,
+    rgba(190, 255, 214, 0.18) 56%,
+    rgba(134, 239, 172, 0.1) 80%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  filter: blur(90px);
+}
+
+/* A one-pixel filament so the beam has a hard centre. */
+.lp-shaft-filament {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.85) 38%,
+    rgba(236, 255, 244, 0.95) 55%,
+    rgba(255, 255, 255, 0) 92%
+  );
+  filter: blur(1.5px);
+}
+
+/* Bloom behind the product window. */
+.lp-bloom {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: min(1100px, 130%);
+  height: 620px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(219, 255, 236, 0.5) 0%,
+    rgba(167, 243, 208, 0.3) 38%,
+    rgba(52, 211, 153, 0.12) 64%,
+    rgba(4, 7, 10, 0) 100%
+  );
+  filter: blur(50px);
+  pointer-events: none;
+}
+
+@keyframes lp-breathe {
+  0%,
+  100% {
+    opacity: 0.62;
+  }
+  50% {
+    opacity: 0.88;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-shaft-core {
+    animation: none;
+    opacity: 0.75;
+  }
+}

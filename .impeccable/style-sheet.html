@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>InsightForge — Design System</title>
+<style>
+  :root{
+    --canvas:#020617; --surface:#0f172a; --raised:#1e293b;
+    --line:#1e293b; --line-strong:#334155;
+    --ink:#f8fafc; --ink-2:#e2e8f0; --muted:#94a3b8; --faint:#64748b;
+    --sky:#0ea5e9; --sky-bright:#38bdf8; --sky-deep:#0284c7; --indigo:#4f46e5;
+    --green:#10b981; --rose:#f43f5e;
+    --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --ease: 150ms cubic-bezier(0.4,0,0.2,1);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--canvas); color:var(--ink-2);
+    font-family:var(--font); font-size:14px; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px; margin:0 auto; padding:40px 24px 80px}
+  .mark{
+    display:grid; place-items:center; width:44px; height:44px; border-radius:12px;
+    background:linear-gradient(to bottom right, var(--sky), var(--indigo));
+    color:#fff; font-size:14px; font-weight:700;
+  }
+  header.top{display:flex; align-items:center; gap:16px; padding-bottom:24px; border-bottom:1px solid var(--line)}
+  .eyebrow{font-size:10px; font-weight:500; letter-spacing:.18em; text-transform:uppercase; color:var(--faint); margin:0}
+  h1{margin:0; font-size:24px; font-weight:600; line-height:1.2; color:var(--ink)}
+  .sub{margin:4px 0 0; color:var(--faint); font-size:12px}
+  .northstar{
+    margin:24px 0 0; padding:16px 20px; border:1px solid var(--line);
+    background:rgb(15 23 42 / .4); border-radius:16px;
+  }
+  .northstar strong{color:var(--ink); font-weight:600}
+  .northstar p{margin:0; color:var(--muted); font-size:13px}
+  .northstar p + p{margin-top:8px}
+
+  section{margin-top:40px}
+  h2{
+    margin:0 0 4px; font-size:11px; font-weight:600; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--faint);
+  }
+  .lead{margin:0 0 20px; color:var(--faint); font-size:12px; max-width:70ch}
+
+  .swatches{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px}
+  .sw{border:1px solid var(--line); border-radius:12px; overflow:hidden; background:rgb(15 23 42 / .4)}
+  .sw .chip{height:56px; border-bottom:1px solid var(--line)}
+  .sw .meta{padding:8px 10px}
+  .sw .name{font-size:12px; color:var(--ink-2); font-weight:500}
+  .sw .hex{font-size:11px; color:var(--faint); font-variant-numeric:tabular-nums}
+  .sw .role{font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint)}
+  .ramp{display:flex; height:10px}
+  .ramp i{flex:1}
+
+  .typescale > div{display:flex; align-items:baseline; gap:16px; padding:12px 0; border-bottom:1px dashed var(--line)}
+  .typescale .label{width:104px; flex:0 0 auto; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+  .t-title{font-size:18px; font-weight:600; color:var(--ink); line-height:1.3}
+  .t-body{font-size:14px; color:var(--ink-2)}
+  .t-large{font-size:16px; color:var(--ink-2)}
+  .t-meta{font-size:11px; font-weight:500; color:var(--muted)}
+  .t-label{font-size:10px; font-weight:500; letter-spacing:.18em; text-transform:uppercase; color:var(--faint)}
+
+  .grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:16px; align-items:start}
+  .panel{border:1px solid var(--line); background:rgb(15 23 42 / .4); border-radius:16px; padding:16px}
+  .panel h3{margin:0 0 12px; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint); font-weight:500}
+  .row{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+
+  /* components */
+  .btn-primary{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    background:var(--sky-deep); color:#fff; font-size:14px; font-weight:600;
+    padding:10px 16px; border:none; border-radius:8px; cursor:pointer;
+    transition:background-color var(--ease);
+  }
+  .btn-primary:hover{background:var(--sky)}
+  .btn-primary:disabled{opacity:.6; cursor:not-allowed}
+  .btn-send{
+    display:grid; place-items:center; width:44px; height:44px; background:var(--sky-deep);
+    color:#fff; border:none; border-radius:12px; cursor:pointer; transition:background-color var(--ease);
+  }
+  .btn-send:hover{background:var(--sky)}
+  .btn-sec{
+    display:grid; place-items:center; width:36px; height:36px; background:var(--surface);
+    color:var(--muted); border:1px solid var(--line-strong); border-radius:8px; cursor:pointer;
+    transition:color var(--ease), background-color var(--ease), border-color var(--ease);
+  }
+  .btn-sec:hover{color:var(--ink-2)}
+  .btn-sec[aria-pressed="true"]{border-color:rgb(14 165 233 / .5); background:rgb(14 165 233 / .1); color:#7dd3fc}
+  .field-label{display:block; margin-bottom:6px; font-size:12px; font-weight:500; color:var(--muted)}
+  .input{
+    width:100%; background:rgb(2 6 23 / .6); color:#f1f5f9; font-family:var(--font);
+    font-size:14px; padding:8px 12px; border:1px solid var(--line-strong); border-radius:8px;
+    outline:none; transition:border-color var(--ease), box-shadow var(--ease);
+  }
+  .input::placeholder{color:var(--faint)}
+  .input:focus{border-color:var(--sky); box-shadow:0 0 0 3px rgb(14 165 233 / .2)}
+  .composer{display:flex; align-items:flex-end; gap:8px}
+  .composer textarea{
+    flex:1; min-height:44px; max-height:160px; resize:none; background:var(--surface);
+    color:#f1f5f9; font-family:var(--font); font-size:14px; line-height:1.5; padding:12px 16px;
+    border:1px solid var(--line); border-radius:12px; outline:none;
+    transition:border-color var(--ease), box-shadow var(--ease);
+  }
+  .composer textarea::placeholder{color:var(--faint)}
+  .composer textarea:focus{border-color:var(--sky); box-shadow:0 0 0 3px rgb(14 165 233 / .2)}
+  .nav{display:flex; flex-direction:column; gap:4px}
+  .nav-item{
+    display:flex; align-items:center; gap:12px; padding:8px 12px; background:transparent;
+    color:var(--muted); font-size:14px; font-family:var(--font); text-align:left;
+    border:none; border-radius:8px; cursor:pointer;
+    transition:background-color var(--ease), color var(--ease);
+  }
+  .nav-item:hover{background:rgb(30 41 59 / .6); color:var(--ink-2)}
+  .nav-item[aria-current="page"]{background:var(--raised); color:var(--ink)}
+  .pill{
+    display:inline-flex; align-items:center; gap:8px; padding:4px 10px; border-radius:9999px;
+    font-size:11px; font-weight:500; color:#6ee7b7; background:rgb(16 185 129 / .1);
+    box-shadow:inset 0 0 0 1px rgb(16 185 129 / .3);
+  }
+  .pill i{width:6px; height:6px; border-radius:9999px; background:#34d399}
+  .pill.checking{color:var(--muted); background:var(--raised); box-shadow:inset 0 0 0 1px var(--line-strong)}
+  .pill.checking i{background:var(--faint); animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}
+  .pill.offline{color:#fda4af; background:rgb(244 63 94 / .1); box-shadow:inset 0 0 0 1px rgb(244 63 94 / .3)}
+  .pill.offline i{background:#fb7185}
+  @keyframes pulse{50%{opacity:.4}}
+  .card{padding:16px; background:rgb(15 23 42 / .4); border:1px solid var(--line); border-radius:16px}
+  .card .eb{margin:0 0 4px; font-size:10px; font-weight:500; letter-spacing:.18em; text-transform:uppercase; color:var(--faint)}
+  .card .val{margin:0; font-size:18px; font-weight:600; color:#f1f5f9; font-variant-numeric:tabular-nums}
+  .card .note{margin:6px 0 0; font-size:12px; color:var(--faint)}
+  .empty{padding:32px; text-align:center; background:rgb(15 23 42 / .4); border:1px dashed var(--line-strong); border-radius:16px}
+  .empty .t{margin:0; font-size:14px; font-weight:500; color:var(--ink-2)}
+  .empty .n{margin:4px auto 0; max-width:28rem; font-size:12px; color:var(--faint)}
+  .tabs{display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:4px; background:rgb(2 6 23 / .6); border-radius:8px}
+  .tab{
+    padding:6px 10px; background:transparent; color:var(--muted); font-size:14px;
+    font-family:var(--font); border:none; border-radius:6px; cursor:pointer;
+    transition:background-color var(--ease), color var(--ease);
+  }
+  .tab:hover{color:var(--ink-2)}
+  .tab[aria-selected="true"]{background:var(--raised); color:var(--ink)}
+  .bubble{border-radius:16px; padding:12px 16px; font-size:14px; line-height:1.5; max-width:85%}
+  .bubble.user{margin-left:auto; background:var(--sky-deep); color:#fff; border-bottom-right-radius:6px}
+  .bubble.bot{background:var(--surface); border:1px solid var(--line); color:var(--ink-2); border-bottom-left-radius:6px}
+  .cite{color:#7dd3fc; font-variant-numeric:tabular-nums}
+
+  .radii{display:flex; gap:12px; flex-wrap:wrap}
+  .radii div{
+    display:grid; place-items:center; width:88px; height:64px; font-size:11px; color:var(--faint);
+    border:1px solid var(--line-strong); background:var(--surface); font-variant-numeric:tabular-nums;
+  }
+
+  .rules{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px}
+  .rules ul{margin:0; padding-left:18px; color:var(--muted); font-size:13px}
+  .rules li + li{margin-top:6px}
+  .rules .do li::marker{color:var(--green)}
+  .rules .dont li::marker{color:var(--rose)}
+
+  footer{margin-top:48px; padding-top:16px; border-top:1px dashed var(--line); color:var(--faint); font-size:11px}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px; color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="mark">IF</div>
+    <div>
+      <p class="eyebrow">Research console</p>
+      <h1>InsightForge Design System</h1>
+      <p class="sub">Rendered from <code>DESIGN.md</code> + <code>.impeccable/design.json</code> — dark only, no light variant.</p>
+    </div>
+  </header>
+
+  <div class="northstar">
+    <p><strong>Creative North Star: “The Observatory”</strong></p>
+    <p>A dark-adapted instrument for looking at things that are hard to see: the passage inside a paper that answers the question, the row that does not belong, the count that contradicts the narrative. The surface stays dark so the content carries the light.</p>
+  </div>
+
+  <section>
+    <h2>Colors</h2>
+    <p class="lead">One near-black canvas, a four-step text ramp, one accent, and two signals that only ever appear as 10% fills with 30% rings.</p>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#020617"></div><div class="meta"><p class="name">Observation Black</p><p class="hex">#020617</p><p class="role">canvas</p></div></div>
+      <div class="sw"><div class="chip" style="background:#0f172a"></div><div class="meta"><p class="name">Deck Slate</p><p class="hex">#0f172a</p><p class="role">surface</p></div></div>
+      <div class="sw"><div class="chip" style="background:#1e293b"></div><div class="meta"><p class="name">Raised Slate</p><p class="hex">#1e293b</p><p class="role">engaged</p></div></div>
+      <div class="sw"><div class="chip" style="background:#334155"></div><div class="meta"><p class="name">Hairline Strong</p><p class="hex">#334155</p><p class="role">control border</p></div></div>
+      <div class="sw"><div class="chip" style="background:#0ea5e9"></div><div class="meta"><p class="name">Instrument Sky</p><p class="hex">#0ea5e9</p><p class="role">primary</p></div></div>
+      <div class="sw"><div class="chip" style="background:#0284c7"></div><div class="meta"><p class="name">Instrument Sky Deep</p><p class="hex">#0284c7</p><p class="role">button base</p></div></div>
+      <div class="sw"><div class="chip" style="background:#4f46e5"></div><div class="meta"><p class="name">Mark Indigo</p><p class="hex">#4f46e5</p><p class="role">mark only</p></div></div>
+      <div class="sw"><div class="chip" style="background:#f8fafc"></div><div class="meta"><p class="name">Signal White</p><p class="hex">#f8fafc</p><p class="role">ink</p></div></div>
+      <div class="sw"><div class="chip" style="background:#94a3b8"></div><div class="meta"><p class="name">Annotation</p><p class="hex">#94a3b8</p><p class="role">ink muted</p></div></div>
+      <div class="sw"><div class="chip" style="background:#64748b"></div><div class="meta"><p class="name">Whisper</p><p class="hex">#64748b</p><p class="role">faint</p></div></div>
+      <div class="sw"><div class="chip" style="background:#10b981"></div><div class="meta"><p class="name">Verified Green</p><p class="hex">#10b981</p><p class="role">positive</p></div></div>
+      <div class="sw"><div class="chip" style="background:#f43f5e"></div><div class="meta"><p class="name">Alert Rose</p><p class="hex">#f43f5e</p><p class="role">negative</p></div></div>
+    </div>
+    <div class="sw" style="margin-top:12px">
+      <div class="ramp">
+        <i style="background:#082f49"></i><i style="background:#0c4a6e"></i><i style="background:#075985"></i><i style="background:#0369a1"></i><i style="background:#0284c7"></i><i style="background:#0ea5e9"></i><i style="background:#7dd3fc"></i><i style="background:#e0f2fe"></i>
+      </div>
+      <div class="meta"><p class="name">Instrument Sky — tonal ramp</p><p class="hex">8 steps, dark → light</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Typography</h2>
+    <p class="lead">The system UI stack. No display face; hierarchy comes from size, weight and colour step. Anything secondary is 12px or smaller.</p>
+    <div class="typescale">
+      <div><span class="label">Title · 18/600</span><span class="t-title">Outliers &amp; anomalies</span></div>
+      <div><span class="label">Body large · 16</span><span class="t-large">Sign in to your research console</span></div>
+      <div><span class="label">Body · 14</span><span class="t-body">Grounded answer with a citation <span class="cite">[page 4]</span> — the default reading size.</span></div>
+      <div><span class="label">Meta · 11/500</span><span class="t-meta">Online · 48 papers indexed · contamination 0.05</span></div>
+      <div><span class="label">Label · 10/0.18em</span><span class="t-label">Research console</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Shapes</h2>
+    <p class="lead">Instrument-like corners. Pill shapes are reserved for status chips; a dashed hairline means “nothing here yet”.</p>
+    <div class="radii">
+      <div style="border-radius:6px">6 sm</div>
+      <div style="border-radius:8px">8 md</div>
+      <div style="border-radius:12px">12 lg</div>
+      <div style="border-radius:16px">16 xl</div>
+      <div style="border-radius:9999px">pill</div>
+      <div style="border-radius:16px; border-style:dashed">dashed</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Components</h2>
+    <p class="lead">The ten primitives in the sidecar, rendered from their literal CSS. No shadows anywhere: the border and a step of slate lightness do that work.</p>
+    <div class="grid2">
+
+      <div class="panel">
+        <h3>Buttons</h3>
+        <div class="row">
+          <button class="btn-primary">Send message</button>
+          <button class="btn-primary" disabled>Running…</button>
+          <button class="btn-send" aria-label="Send">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"/><path d="M6 12h16"/></svg>
+          </button>
+          <button class="btn-sec" aria-label="Upload" aria-pressed="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+          </button>
+          <button class="btn-sec" aria-label="Upload engaged" aria-pressed="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Status pill</h3>
+        <div class="row">
+          <span class="pill"><i></i>Online</span>
+          <span class="pill checking"><i></i>Checking</span>
+          <span class="pill offline"><i></i>Offline</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Text field / focus</h3>
+        <label class="field-label" for="demo-email">Email</label>
+        <input id="demo-email" class="input" type="email" placeholder="you@example.com" />
+        <p style="margin:12px 0 0"><label class="field-label" for="demo-focus">Focused state</label>
+        <input id="demo-focus" class="input" value="researcher@lab.org" style="border-color:#0ea5e9; box-shadow:0 0 0 3px rgb(14 165 233 / .2)" /></p>
+      </div>
+
+      <div class="panel">
+        <h3>Chat composer</h3>
+        <div class="composer">
+          <textarea rows="1" placeholder="Ask about the paper…"></textarea>
+          <button class="btn-send" aria-label="Send">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"/><path d="M6 12h16"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Navigation</h3>
+        <nav class="nav">
+          <button class="nav-item" aria-current="page">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+            <span>Research Chat</span>
+          </button>
+          <button class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span>Outliers &amp; Anomalies</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="panel">
+        <h3>Segmented tabs</h3>
+        <div class="tabs">
+          <button class="tab" aria-selected="true">Tabla</button>
+          <button class="tab" aria-selected="false">Estadísticas</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Panel card</h3>
+        <div class="card">
+          <p class="eb">Dataset</p>
+          <p class="val">4,182 rows</p>
+          <p class="note">Sampled above 20k for charting only.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel">
+          <h3>Dashed empty state</h3>
+          <div class="empty">
+            <p class="t">No dataset analysed yet</p>
+            <p class="n">Upload a CSV to run anomaly detection.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="grid-column:1/-1">
+        <h3>Signature — the citation readout</h3>
+        <div style="display:flex; flex-direction:column; gap:8px">
+          <div class="bubble user">Does the paper report a labelled anomaly column we should exclude?</div>
+          <div class="bubble bot">Yes. Section 3.2 defines <span class="cite">is_anomaly</span> as the ground-truth label, so it is excluded from modelling and surfaced as “Excluded from model” <span class="cite">[page 5]</span>.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Do's and Don'ts</h2>
+    <div class="rules">
+      <div class="panel">
+        <h3>Do</h3>
+        <ul class="do">
+          <li>Build depth from translucent #0f172a fills plus 1px hairlines.</li>
+          <li>One solid sky action per region; everything else at 10% sky or slate.</li>
+          <li>Dashed #334155 borders for empty states and drop zones.</li>
+          <li><code>tabular-nums</code> on every numeric column.</li>
+          <li>Keep secondary copy at 12px or below.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Don't</h3>
+        <ul class="dont">
+          <li>Introduce a light theme or a second background hue.</li>
+          <li>Put a gradient anywhere except the “IF” mark.</li>
+          <li>Use indigo outside that gradient.</li>
+          <li>Add shadows to cards, buttons, or the sidebar.</li>
+          <li>Use a solid rose or emerald larger than a dot or chip.</li>
+          <li>Use pill shapes outside chips and status readouts.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Tokens are normative in DESIGN.md frontmatter · components in .impeccable/design.json ·
+    this page is a throwaway render, not part of the app
+  </footer>
+</div>
+</body>
+</html>
