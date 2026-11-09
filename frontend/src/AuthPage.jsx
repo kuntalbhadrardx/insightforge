@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import './landing.css'
+import './auth.css'
 import { supabase } from './supabase'
 import SiteNav, { Mark } from './SiteNav'
 
@@ -34,7 +36,9 @@ function GitHubMark() {
   )
 }
 
-export default function AuthPage() {
+// `embedded` renders the form inside the console shell: no marketing nav, and
+// no redirect, because the console's onAuthStateChange picks the session up.
+export default function AuthPage({ embedded = false, onAuthenticated }) {
   const [mode, setMode] = useState('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -64,6 +68,11 @@ export default function AuthPage() {
       // Sign-up with email confirmation on: there is no session until the link is clicked.
       if (!isSignIn && !data.session) {
         setNotice('Account created. Confirm your email address, then sign in.')
+        return
+      }
+
+      if (embedded) {
+        onAuthenticated?.(data.session)
         return
       }
 
@@ -110,9 +119,15 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#04070a] text-slate-200 antialiased selection:bg-[#9bf7c4]/25 selection:text-white">
-      <SiteNav />
+      {!embedded && <SiteNav />}
 
-      <main className="relative isolate flex min-h-screen items-center overflow-hidden px-6 py-32">
+      <main
+        className={
+          embedded
+            ? 'relative isolate flex min-h-screen items-center overflow-hidden px-6 py-16'
+            : 'relative isolate flex min-h-screen items-center overflow-hidden px-6 py-32'
+        }
+      >
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="lp-shaft-haze" />
           <div className="lp-shaft-core" />
@@ -283,10 +298,12 @@ export default function AuthPage() {
             </div>
           </div>
 
-          <div className="mt-6 flex items-center justify-center gap-2 text-[11.5px] text-slate-600">
-            <Mark className="size-5 text-[9px]" />
-            InsightForge · research console
-          </div>
+          {!embedded && (
+            <div className="mt-6 flex items-center justify-center gap-2 text-[11.5px] text-slate-600">
+              <Mark className="size-5 text-[9px]" />
+              InsightForge · research console
+            </div>
+          )}
         </div>
       </main>
     </div>

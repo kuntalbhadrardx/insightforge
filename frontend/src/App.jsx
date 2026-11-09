@@ -5,8 +5,6 @@ import {
   BookOpen,
   ChevronDown,
   Download,
-  Eye,
-  EyeOff,
   FileUp,
   Loader2,
   LogOut,
@@ -16,6 +14,7 @@ import {
   Trash2
 } from "lucide-react";
 import { supabase } from "./supabase";
+import AuthPage from "./AuthPage.jsx";
 import {
   checkBackend,
   deleteChatHistory,
@@ -36,9 +35,6 @@ const NAV_ITEMS = [
   { id: "chat", label: "Research Chat", icon: MessageSquare },
   { id: "anomalies", label: "Outliers & Anomalies", icon: Activity }
 ];
-
-const INPUT_CLASSES =
-  "w-full rounded-lg border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20";
 
 function StatusPill({ online }) {
   return (
@@ -63,158 +59,6 @@ function StatusPill({ online }) {
   );
 }
 
-function AuthView() {
-  const [mode, setMode] = useState("signin");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(null);
-  const [notice, setNotice] = useState(null);
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    setBusy(true);
-    setError(null);
-    setNotice(null);
-    try {
-      const { data, error: authError } =
-        mode === "signin"
-          ? await supabase.auth.signInWithPassword({ email, password })
-          : await supabase.auth.signUp({ email, password });
-
-      if (authError) {
-        setError(authError.message);
-        return;
-      }
-      // Sign-up with email confirmation on: no session until the link is clicked.
-      if (mode === "signup" && !data.session) {
-        setNotice("Account created. Confirm your email address, then sign in.");
-      }
-    } catch (err) {
-      setError(
-        err?.message ??
-          "Could not reach Supabase. Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env."
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="grid min-h-screen place-items-center px-4">
-      <div className="w-full max-w-sm">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 text-sm font-bold text-white">
-            IF
-          </div>
-          <div>
-            <p className="text-base font-semibold leading-tight text-slate-50">InsightForge</p>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">
-              Research console
-            </p>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-2xl shadow-black/40 backdrop-blur">
-          <div className="mb-5 grid grid-cols-2 gap-1 rounded-lg bg-slate-950/60 p-1 text-sm">
-            {[
-              { id: "signin", label: "Sign in" },
-              { id: "signup", label: "Sign up" }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => {
-                  setMode(tab.id);
-                  setError(null);
-                  setNotice(null);
-                }}
-                className={clsx(
-                  "rounded-md px-3 py-1.5 font-medium transition",
-                  mode === tab.id
-                    ? "bg-slate-800 text-slate-50 shadow"
-                    : "text-slate-400 hover:text-slate-200"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <label className="block space-y-1.5">
-              <span className="text-xs font-medium text-slate-400">Email</span>
-              <input
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="you@lab.edu"
-                className={INPUT_CLASSES}
-              />
-            </label>
-
-            <label className="block space-y-1.5">
-              <span className="text-xs font-medium text-slate-400">Password</span>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  required
-                  minLength={6}
-                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="••••••••"
-                  className={`${INPUT_CLASSES} pr-10`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((visible) => !visible)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                  aria-pressed={showPassword}
-                  title={showPassword ? "Hide password" : "Show password"}
-                  className="absolute inset-y-0 right-0 grid w-10 place-items-center rounded-r-lg text-slate-500 transition hover:text-slate-200 focus:outline-none focus-visible:text-sky-400"
-                >
-                  {showPassword ? (
-                    <EyeOff className="size-4" aria-hidden="true" />
-                  ) : (
-                    <Eye className="size-4" aria-hidden="true" />
-                  )}
-                </button>
-              </div>
-            </label>
-
-            {error && (
-              <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
-                {error}
-              </p>
-            )}
-            {notice && (
-              <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
-                {notice}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={busy}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {busy && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
-              {mode === "signin" ? "Sign in" : "Create account"}
-            </button>
-          </form>
-        </div>
-
-        <p className="mt-4 text-center text-xs text-slate-500">
-          Every paper, question and answer is scoped to your account.
-        </p>
-      </div>
-    </div>
-  );
-}
 
 function MessageBubble({ message }) {
   if (message.role === "error") {
@@ -907,7 +751,7 @@ export default function App() {
     );
   }
 
-  if (!session) return <AuthView />;
+  if (!session) return <AuthPage embedded />;
 
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-100">
