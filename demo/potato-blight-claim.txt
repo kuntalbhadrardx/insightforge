@@ -1,0 +1,32 @@
+=== PAGE 1 ===
+Late-blight lesion scoring on the Kestrel farms: a labelling note
+
+1. Scope. This note describes the labelling protocol used for the 2021 potato
+late-blight survey on the three Kestrel farms, and the two quality problems the
+annotation team reported afterwards. It is a claim sheet, not a full paper: it
+exists so that the claims below can be checked against the field data rather
+than taken on trust.
+
+2. Protocol. Images were captured by fixed trap cameras at four plots. Each
+image was scored for late-blight lesion coverage on a percentage scale by a
+single annotator, with 10% of images double-scored as a check. Capture hour is
+recorded in local time from the camera clock. Field readings of leaf temperature
+and relative humidity were taken at the same plots within the same hour.
+
+3. Claim one: contamination rate. The team estimates that 12.4% of the labelled
+images in this survey carry a wrong lesion score, concentrated in images where
+the lesion colour and the soil-splash pattern were hard to distinguish.
+
+=== PAGE 2 ===
+4. Claim two: contamination is a night-time problem. The team reports that 71%
+of the contaminated images were captured between 19:00 and 05:00 under LED
+illumination, and that daytime images from the same plots carry a much lower
+contamination rate. This is the claim the field data can test.
+
+5. Claim three: lesion scores above 60% are implausible. The note states that no
+untreated Kestrel plot reached 60% lesion coverage in 2021, so any score above
+that threshold in the survey data should be treated as a scoring error rather
+than a finding.
+
+6. Limitations stated by the authors. The estimate is metadata-derived, the
+double-scored share is only 10%, and the survey covers one crop and one season.

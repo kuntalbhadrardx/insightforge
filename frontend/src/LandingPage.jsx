@@ -273,6 +273,39 @@ function ChatSurface() {
   )
 }
 
+function DemoExample() {
+  return (
+    <section id="demo" className="px-6 pt-14">
+      <div className="mx-auto max-w-5xl">
+        <div className="rounded-[22px] border border-white/[0.08] bg-white/[0.025] p-7 sm:p-9">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-[#94a3b8]">
+            The headline example
+          </p>
+          <h2 className="mt-4 max-w-2xl text-balance text-[24px] font-medium leading-[1.2] tracking-[-0.02em] text-white sm:text-[30px]">
+            Does the paper&rsquo;s claim match the dataset&rsquo;s outliers?
+          </h2>
+          <p className="mt-4 max-w-2xl text-[14px] leading-relaxed text-slate-400">
+            Upload a claim sheet and a field survey, then ask that question. The sheet says 71% of
+            contaminated images were captured at night; the survey&rsquo;s nine flagged rows are
+            77.8% night. The direction agrees, the magnitude is off by seven points, and both
+            numbers carry their source &mdash; a page for the claim, a computed count for the data.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <a
+              href="https://github.com/kuntalbhadrardx/insightforge/tree/main/demo"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-4 text-[13px] font-semibold text-on-accent transition hover:bg-accent-light"
+            >
+              Try the demo
+              <ArrowRight className="size-3.5" aria-hidden="true" />
+            </a>
+            <p className="text-[12px] text-[#7c8ba1]">Two files, four steps, no keys.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Capabilities() {
   return (
     <section id="capabilities" className="px-6 pt-16 pb-20">
@@ -393,6 +426,7 @@ export default function Landing() {
       <main>
         <Hero />
         <ProductWindow />
+        <DemoExample />
         <Capabilities />
         <HowItWorks />
         <ClosingCta />
