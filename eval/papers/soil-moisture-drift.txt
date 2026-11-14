@@ -1,0 +1,67 @@
+=== PAGE 1 ===
+Field-scale sensor drift in soil-moisture telemetry: a two-season study
+
+Abstract. Soil-moisture probes are the cheapest way to close the irrigation
+loop, and the least trustworthy. We instrumented 48 probes across four
+orchards for two full seasons, cross-checked every reading against gravimetric
+samples taken weekly, and characterise how the relationship between probe
+output and true volumetric water content changes over time. Drift is not random
+noise around a stable calibration: it is a slow, monotone bias that reaches 4.1
+percentage points of volumetric water content after 14 months in the worst
+sensor, and it is strongly correlated with cumulative soil temperature and with
+the number of wet-dry cycles the probe has seen.
+
+1. Introduction. An irrigation decision is a threshold decision. If the probe
+reads 22% when the field is at 18%, the controller delays watering by a day and
+the crop pays for it. Manufacturers specify accuracy at commissioning, not at
+month fourteen, and farm telemetry pipelines almost never re-calibrate because
+re-calibration means digging the probe out. The result is that a fleet of
+sensors reports a coherent-looking time series in which the drift is invisible:
+each probe is internally consistent, and only the cross-check against physical
+samples reveals the bias.
+
+=== PAGE 2 ===
+2. Instrumentation. Each site carries 12 probes at three depths (10, 30 and 60
+centimetres), sampled every 15 minutes and transmitted over LoRaWAN. Weekly
+gravimetric samples were taken at three points per site with a 0-10 cm auger,
+oven-dried at 105 degrees Celsius for 24 hours, and converted to volumetric
+water content using measured bulk density. 2,304 gravimetric samples were
+collected over the two seasons. Soil temperature at 10 centimetres was logged
+by the same probe housing and is used here as the drift covariate.
+
+3. Calibration procedure. At commissioning each probe was calibrated against
+the first four gravimetric samples using a two-point linear fit, which is the
+standard field practice. We then refit the same two-point model every eight
+weeks and record the change in slope and offset. A probe is declared drifting
+when the refitted slope differs from the commissioning slope by more than 10%.
+
+=== PAGE 3 ===
+4. Results. 31 of the 48 probes drifted beyond the 10% slope criterion at least
+once; 12 drifted in both seasons. Median time to first drift detection was 9.5
+months. The worst sensor accumulated 4.1 percentage points of bias at 30
+centimetres after 14 months, enough to move an irrigation trigger from 22% to
+26% and delay watering by roughly one day. Drift magnitude correlates with
+cumulative soil temperature above 15 degrees (Spearman rho 0.62) and with the
+count of wet-dry cycles (rho 0.48), and correlates only weakly with probe age
+alone (rho 0.21), which is why replacement schedules based on age perform poorly.
+Shallow probes drifted more than deep probes: 10-centimetre probes accounted for
+19 of the 31 detections.
+
+5. Discussion. Because drift is monotone, a single mid-season gravimetric check
+recovers most of the accuracy: refitting after one sample reduced mean absolute
+error from 3.2 to 1.4 percentage points in our fleet. The operational advice is
+therefore not better hardware but one physical sample per probe per season, plus
+a slope term in the telemetry database so that the correction is applied at read
+time rather than baked into stored values.
+
+=== PAGE 4 ===
+6. Limitations. Four orchards in one climatic zone, two seasons, 48 probes: the
+correlations are suggestive rather than predictive, and the drift coefficients
+should not be extrapolated to other soil textures without re-measurement. The
+gravimetric reference itself carries about 0.8 percentage points of error from
+bulk-density variation, which sets a floor under every number reported here.
+Radio outages removed 3.7% of the expected readings; we interpolated gaps
+shorter than six hours and dropped longer ones, which biases the wet-season
+coverage slightly downward. We did not test capacitive probes from more than one
+manufacturer, and we did not measure whether drift continues past 14 months,
+because no probe in the fleet ran that long without being serviced.

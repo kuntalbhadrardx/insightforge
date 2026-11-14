@@ -1,0 +1,81 @@
+=== PAGE 1 ===
+Contamination thresholds in crop-pest image classifiers: an empirical audit
+
+Abstract. Pest-detection models are usually trained on field imagery that was
+labelled by contractors under time pressure, so a share of the training labels
+is wrong in a way nobody recorded. We audit three public crop-pest datasets and
+one in-house potato late-blight dataset, report how much of each label set the
+authors of the original release had already flagged as suspect, and measure what
+happens to downstream precision when that contamination is modelled explicitly
+rather than assumed away. The audit covers 41,388 images across four datasets.
+We find contamination between 2.1% and 12.4% depending on dataset and crop, and
+show that a model trained without an explicit contamination term overstates its
+own precision by 3 to 6 points on a clean holdout.
+
+1. Introduction. A pest classifier deployed on a farm is asked a narrow
+question — is this leaf damaged by the target pest or not — and it is asked it
+thousands of times a day, mostly about easy cases. The cost of an error is
+asymmetric: a missed infestation costs a spray cycle, a false alarm costs a
+wasted tank. Both errors are cheap individually and expensive in aggregate,
+which is why the reported precision of these models matters more than their
+top-line accuracy. The literature reports precision on curated test sets that
+were labelled by the same contractors who labelled training data, so the number
+is measured on the distribution the model already fits. This paper is about
+what changes when that assumption is removed.
+
+=== PAGE 2 ===
+2. Data. The four datasets are PlantVillage (54,305 images, 38 classes, studio
+backgrounds), PestImg-21 (9,104 field images, 21 classes), RicePest-BD (3,220
+images captured in Bangladesh during two seasons) and an in-house potato
+late-blight set (4,764 images captured on three farms between 2019 and 2022).
+We use 41,388 of these images after discarding exact duplicates and images whose
+EXIF timestamp is missing. Each dataset shipped with a per-release audit file
+listing images the original authors had already marked as uncertain, mislabelled
+or duplicated. Those audit files are the closest thing to ground truth about
+contamination that exists, and they are almost never used in published
+benchmarks.
+
+3. Method. We fit a logistic model of label correctness against capture
+metadata — hour of day, device model, farm, season, and the annotator's median
+time per image — and use its predicted probability as a per-image contamination
+weight. Training then minimises a weighted cross-entropy in which each image's
+loss is multiplied by one minus its estimated contamination probability. We
+compare this against the same architecture trained on the same split with no
+weighting. Precision is reported on a 2,000-image holdout that was relabelled
+from scratch by two independent annotators, with disagreements adjudicated by a
+third; this holdout is the only part of the study where labels were produced
+without knowledge of the model.
+
+=== PAGE 3 ===
+4. Results. Contamination is not spread evenly. PlantVillage, captured indoors
+against uniform backgrounds, carries the lowest rate at 2.1%. PestImg-21 sits at
+6.8%, RicePest-BD at 9.9%, and the in-house potato late-blight set carries the
+highest rate at 12.4%. In the late-blight set the contamination clusters sharply
+by capture condition: 71% of the flagged images were captured between 19:00 and
+05:00 under LED lighting, where the lesion colour that annotators key on shifts
+toward brown and becomes indistinguishable from soil splash. Daytime images from
+the same farms carry a 4.3% rate. Weighting recovers 3.1 points of precision on
+the clean holdout for the late-blight model, 4.8 for RicePest-BD and 6.0 for
+PestImg-21; PlantVillage, being nearly clean, moves by less than half a point.
+
+5. Discussion. The practical lesson is that contamination is a property of the
+capture protocol, not of the crop. A dataset assembled from daylight hand-held
+photos and a dataset assembled from overnight trap cameras differ by a factor of
+three in label error even when the same annotators and the same guidelines are
+used. Reporting precision without also reporting the estimated contamination
+rate therefore hides the largest single source of variance between studies. We
+recommend that releases publish their audit file alongside the images so that
+downstream users can weight rather than guess.
+
+=== PAGE 4 ===
+6. Limitations. The contamination weights come from metadata, so any error mode
+that is uncorrelated with capture time, device, farm or annotation speed is
+invisible to this method. The in-house set is small and comes from three farms
+in one region, so its 12.4% figure should not be read as a national estimate.
+The clean holdout, while independently labelled, contains only 2,000 images and
+its precision estimates carry roughly ±1.3 points at 95% confidence. We did not
+evaluate detection models (bounding boxes), only whole-image classification, and
+we did not test whether the weighting scheme transfers to a transformer
+backbone. Finally, the audit files we rely on are self-reported by dataset
+authors; a release that never audited its labels would appear clean to this
+method even if it were not.

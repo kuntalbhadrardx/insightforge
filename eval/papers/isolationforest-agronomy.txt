@@ -1,0 +1,69 @@
+=== PAGE 1 ===
+Screening agronomic tables for outliers with IsolationForest: practice notes
+
+Abstract. Agronomic datasets arrive as wide tables in which a handful of rows
+are wrong in ways that survive validation: a yield of 42 tonnes per hectare, a
+pH of 22, a plot recorded twice under two spellings. We describe a screening
+procedure built on IsolationForest, tuned for tables of 5,000 to 100,000 rows,
+and report what it finds on nine published agronomic datasets. We argue that the
+useful output of such a screen is not a list of suspicious rows but a set of
+column-level diagnostics that a domain expert can read in under a minute, and we
+describe the failure modes that make row lists actively misleading.
+
+1. Introduction. Outlier detection is usually presented as a ranking problem:
+score every row, show the top k, let a human adjudicate. In practice the human
+adjudicates the first three rows and then stops, so whatever the ranking put
+first decides what gets cleaned. If the first rows are legitimate extremes —
+a genuinely excellent plot, a genuinely dry season — cleanup removes signal.
+The design goal here is the opposite: report structure, not suspects.
+
+=== PAGE 2 ===
+2. Method. We use IsolationForest with 200 trees, a contamination parameter
+fixed at 0.05 by default, and median imputation for numeric gaps. Exact
+duplicate rows are removed before fitting and their removal is reported
+separately, because duplicates are a data-entry artefact rather than an
+anomaly and averaging their scores double-counts them. Label-like columns
+(anything whose name contains id, label, target, class, name or status) are
+excluded from the feature matrix automatically, and the exclusions are listed in
+the output so the user can object. All statistics are computed on the
+deduplicated rows and then mapped back to original row positions, so a reported
+row index always refers to the file the user uploaded.
+
+3. Diagnostics. For each numeric feature we report the distribution of scores
+for flagged versus clean rows, so the reader can see which columns actually
+drove the flag. For each categorical column with between two and twelve levels
+we report the anomaly rate per level against the overall base rate; a level with
+an anomaly rate far above base is usually a data-entry problem in one stratum
+rather than a biological finding. We deliberately do not tabulate levels that
+occur only once, because a singleton level is a copied cell, not a category.
+
+=== PAGE 3 ===
+4. Results across nine datasets. Median anomaly rate at contamination 0.05 was
+4.8%, close to the nominal target, and the flagged share was stable across
+table sizes. Duplicate removal changed the fitted model materially in two of the
+nine tables: one contained 11% exact duplicates from a repeated field visit, and
+after removal its anomaly count fell by a third. Excluding label-like columns
+mattered more than any tuning: with an identifier left in the feature matrix,
+the model learned to flag rows by identifier magnitude and produced a screen
+that tracked row order rather than agronomy. In the two tables with a known
+ground-truth error list, the diagnostics ranked the affected column first in
+both cases, while a naive top-10 row list surfaced the correct rows in only one.
+
+5. Practical advice. Run the screen with contamination near the expected error
+rate rather than the default, inspect the per-column diagnostics before looking
+at any row, and treat a category-level anomaly rate as a hypothesis about data
+entry. Archive the duplicate count with the dataset: it is the cheapest quality
+signal available and it is lost the moment the table is cleaned in place.
+
+=== PAGE 4 ===
+6. Limitations. IsolationForest assumes anomalies are few and separable, which
+fails on tables where a legitimate subpopulation is small — a rare crop grown on
+three plots will be flagged forever. The method is scale-sensitive across
+columns, so a column measured in grams dominates one measured in tonnes unless
+values are standardised; we standardise by default and report it, but the choice
+is not neutral. Median imputation biases variance downward, and at high missing
+rates the screen reports artificially tight distributions. The nine datasets
+skew toward annual crops and temperate soils; perennial systems with multi-year
+rows behave differently and were not covered. Finally, none of these datasets
+carry a complete, independently produced error list, so the accuracy figures
+here are lower bounds on what a careful reviewer could achieve.

@@ -1,0 +1,178 @@
+{
+  "description": "Retrieval questions over the three sample papers in eval/papers. Each entry names the paper, the page that answers it and a verbatim key phrase that must appear in a retrieved chunk for the hit to count.",
+  "papers": [
+    "contamination-thresholds.txt",
+    "soil-moisture-drift.txt",
+    "isolationforest-agronomy.txt"
+  ],
+  "questions": [
+    {
+      "id": "c1",
+      "paper": "contamination-thresholds.txt",
+      "question": "What contamination rate did the potato late-blight dataset carry?",
+      "expected_page": 3,
+      "key_phrase": "12.4%"
+    },
+    {
+      "id": "c2",
+      "paper": "contamination-thresholds.txt",
+      "question": "How many images were audited across the four datasets?",
+      "expected_page": 1,
+      "key_phrase": "41,388 images"
+    },
+    {
+      "id": "c3",
+      "paper": "contamination-thresholds.txt",
+      "question": "Why did night-time images in the late-blight set get mislabelled?",
+      "expected_page": 3,
+      "key_phrase": "soil splash"
+    },
+    {
+      "id": "c4",
+      "paper": "contamination-thresholds.txt",
+      "question": "How big was the independently relabelled holdout?",
+      "expected_page": 2,
+      "key_phrase": "2,000-image holdout"
+    },
+    {
+      "id": "c5",
+      "paper": "contamination-thresholds.txt",
+      "question": "Which dataset carried the lowest contamination rate?",
+      "expected_page": 3,
+      "key_phrase": "lowest rate at 2.1%"
+    },
+    {
+      "id": "c6",
+      "paper": "contamination-thresholds.txt",
+      "question": "What precision gain did weighting give the RicePest-BD model?",
+      "expected_page": 3,
+      "key_phrase": "4.8 for RicePest-BD"
+    },
+    {
+      "id": "c7",
+      "paper": "contamination-thresholds.txt",
+      "question": "What confidence interval do the holdout precision estimates carry?",
+      "expected_page": 4,
+      "key_phrase": "±1.3 points"
+    },
+    {
+      "id": "c8",
+      "paper": "contamination-thresholds.txt",
+      "question": "What features were used to model label correctness?",
+      "expected_page": 2,
+      "key_phrase": "median time per image"
+    },
+    {
+      "id": "s1",
+      "paper": "soil-moisture-drift.txt",
+      "question": "How many probes were instrumented and for how long?",
+      "expected_page": 1,
+      "key_phrase": "48 probes"
+    },
+    {
+      "id": "s2",
+      "paper": "soil-moisture-drift.txt",
+      "question": "What was the worst-case drift in percentage points?",
+      "expected_page": 3,
+      "key_phrase": "4.1 percentage points"
+    },
+    {
+      "id": "s3",
+      "paper": "soil-moisture-drift.txt",
+      "question": "How were gravimetric samples dried and converted?",
+      "expected_page": 2,
+      "key_phrase": "105 degrees Celsius"
+    },
+    {
+      "id": "s4",
+      "paper": "soil-moisture-drift.txt",
+      "question": "When is a probe declared to be drifting?",
+      "expected_page": 2,
+      "key_phrase": "10% slope criterion"
+    },
+    {
+      "id": "s5",
+      "paper": "soil-moisture-drift.txt",
+      "question": "Which soil depth drifted most often?",
+      "expected_page": 3,
+      "key_phrase": "19 of the 31 detections"
+    },
+    {
+      "id": "s6",
+      "paper": "soil-moisture-drift.txt",
+      "question": "How much did one mid-season check improve error?",
+      "expected_page": 3,
+      "key_phrase": "from 3.2 to 1.4 percentage points"
+    },
+    {
+      "id": "s7",
+      "paper": "soil-moisture-drift.txt",
+      "question": "What share of readings was lost to radio outages?",
+      "expected_page": 4,
+      "key_phrase": "3.7% of the expected readings"
+    },
+    {
+      "id": "s8",
+      "paper": "soil-moisture-drift.txt",
+      "question": "What does the gravimetric reference error set a floor under?",
+      "expected_page": 4,
+      "key_phrase": "0.8 percentage points"
+    },
+    {
+      "id": "i1",
+      "paper": "isolationforest-agronomy.txt",
+      "question": "What contamination parameter does the screening procedure default to?",
+      "expected_page": 2,
+      "key_phrase": "contamination parameter fixed at 0.05"
+    },
+    {
+      "id": "i2",
+      "paper": "isolationforest-agronomy.txt",
+      "question": "How many trees does the forest use?",
+      "expected_page": 2,
+      "key_phrase": "200 trees"
+    },
+    {
+      "id": "i3",
+      "paper": "isolationforest-agronomy.txt",
+      "question": "Why are duplicate rows removed before fitting?",
+      "expected_page": 2,
+      "key_phrase": "double-counts them"
+    },
+    {
+      "id": "i4",
+      "paper": "isolationforest-agronomy.txt",
+      "question": "Why are singleton category levels not tabulated?",
+      "expected_page": 3,
+      "key_phrase": "a copied cell, not a category"
+    },
+    {
+      "id": "i5",
+      "paper": "isolationforest-agronomy.txt",
+      "question": "What happens when an identifier is left in the feature matrix?",
+      "expected_page": 3,
+      "key_phrase": "tracked row order rather than agronomy"
+    },
+    {
+      "id": "i6",
+      "paper": "isolationforest-agronomy.txt",
+      "question": "How many datasets were screened, and what was the median anomaly rate?",
+      "expected_page": 3,
+      "key_phrase": "4.8%"
+    },
+    {
+      "id": "i7",
+      "paper": "isolationforest-agronomy.txt",
+      "question": "Which kind of subpopulation will be flagged forever?",
+      "expected_page": 4,
+      "key_phrase": "a rare crop grown on three plots"
+    },
+    {
+      "id": "i8",
+      "paper": "isolationforest-agronomy.txt",
+      "question": "What biases variance downward when values are missing?",
+      "expected_page": 4,
+      "key_phrase": "Median imputation biases variance"
+    }
+  ]
+}
