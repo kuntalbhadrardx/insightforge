@@ -54,7 +54,7 @@ function Stat({ icon: Icon, label, value, hint }) {
 }
 
 /** Pages-per-paper bars: real figures from /documents, never synthetic. */
-function LibraryChart({ documents, error }) {
+function LibraryChart({ documents, error, onUpload, onRetryDocuments }) {
   const bars = useMemo(
     () =>
       [...documents]
@@ -74,6 +74,15 @@ function LibraryChart({ documents, error }) {
       <div className="flex h-[220px] flex-col items-center justify-center gap-2 text-center">
         <p className="text-sm text-rose-200">Library unavailable</p>
         <p className="dash-faint max-w-xs break-words text-[12px]">{error}</p>
+        {/* The retry lives here rather than in the chat: this card is where the
+            failure is reported, so the way out belongs beside it. */}
+        <button
+          type="button"
+          onClick={onRetryDocuments}
+          className="mt-2 rounded-full border border-rose-400/40 bg-rose-500/10 px-3 py-1.5 text-[11px] font-medium text-rose-100 transition hover:bg-rose-500/20"
+        >
+          Try again
+        </button>
       </div>
     );
   }
@@ -85,6 +94,14 @@ function LibraryChart({ documents, error }) {
         <p className="dash-faint max-w-xs text-[12px]">
           Upload a PDF and its page count appears here the moment ingestion finishes.
         </p>
+        <button
+          type="button"
+          onClick={onUpload}
+          className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-[12px] font-semibold text-on-accent transition hover:bg-accent-light"
+        >
+          <Upload className="size-3.5" aria-hidden="true" />
+          Upload your first paper
+        </button>
       </div>
     );
   }
@@ -159,6 +176,7 @@ export default function Dashboard({
   onOpenAnomalies,
   onUpload,
   onExport,
+  onRetryDocuments,
   exporting
 }) {
   const [question, setQuestion] = useState("");
@@ -284,18 +302,27 @@ export default function Dashboard({
                   Pages per paper, largest first
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => onOpenChat("")}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11.5px] text-slate-300 transition hover:border-accent/40 hover:text-accent"
-              >
-                Open chat
-                <ArrowUpRight className="size-3" aria-hidden="true" />
-              </button>
+              {/* Nothing to open until a paper exists; the upload CTA in the
+                  card below is the action that has somewhere to go. */}
+              {documents.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => onOpenChat("")}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11.5px] text-slate-300 transition hover:border-accent/40 hover:text-accent"
+                >
+                  Open chat
+                  <ArrowUpRight className="size-3" aria-hidden="true" />
+                </button>
+              )}
             </div>
 
             <div className="mt-6">
-              <LibraryChart documents={documents} error={documentsError} />
+              <LibraryChart
+                documents={documents}
+                error={documentsError}
+                onUpload={onUpload}
+                onRetryDocuments={onRetryDocuments}
+              />
             </div>
 
             <form onSubmit={handleAsk} className="dash-prompt mt-6">

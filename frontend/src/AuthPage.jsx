@@ -36,6 +36,11 @@ function GitHubMark() {
   )
 }
 
+// Social sign-in is built but not wired to Supabase yet. Flip this to true once
+// the OAuth providers are configured; the buttons, the divider and the note
+// come back exactly as they are, and both marks are still defined below.
+const SOCIAL_SIGNIN_ENABLED = false
+
 // `embedded` renders the form inside the console shell: no marketing nav, and
 // no redirect, because the console's onAuthStateChange picks the session up.
 export default function AuthPage({ embedded = false, onAuthenticated }) {
@@ -119,7 +124,7 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#04070a] text-slate-200 antialiased selection:bg-accent/25 selection:text-white">
-      {!embedded && <SiteNav />}
+      {!embedded && <SiteNav secondaryAction />}
 
       <main
         className={
@@ -253,7 +258,9 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
                 </button>
               </form>
 
-              <div className="mt-7 flex items-center gap-3">
+              {SOCIAL_SIGNIN_ENABLED && (
+                <>
+                  <div className="mt-7 flex items-center gap-3">
                 <span className="h-px flex-1 bg-white/[0.08]" />
                 <span className="text-[10px] uppercase tracking-[0.18em] text-[#7c8ba1]">
                   Or continue with
@@ -281,9 +288,11 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
                   GitHub
                 </button>
               </div>
-              <p className="mt-3 text-center text-[11px] text-[#7c8ba1]">
-                Social sign-in isn&apos;t enabled yet — email and password only.
-              </p>
+                  <p className="mt-3 text-center text-[11px] text-[#7c8ba1]">
+                    Social sign-in isn&apos;t enabled yet — email and password only.
+                  </p>
+                </>
+              )}
 
               <p className="mt-7 text-center text-[12.5px] text-[#94a3b8]">
                 {isSignIn ? "Don't have an account? " : 'Already have an account? '}

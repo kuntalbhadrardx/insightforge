@@ -886,6 +886,7 @@ export default function App() {
             type="button"
             onClick={() => setView(id)}
             aria-label={label}
+            title={label}
             aria-current={view === id ? "page" : undefined}
             className={clsx(
               "grid size-9 place-items-center rounded-lg transition",
@@ -901,6 +902,7 @@ export default function App() {
           type="button"
           onClick={() => supabase.auth.signOut()}
           aria-label="Sign out"
+          title="Sign out"
           className="ml-auto grid size-9 place-items-center rounded-lg text-slate-400 transition hover:bg-rose-500/10 hover:text-rose-300"
         >
           <LogOut className="size-4" aria-hidden="true" />
@@ -931,6 +933,8 @@ export default function App() {
               key={id}
               type="button"
               onClick={() => setView(id)}
+              aria-label={label}
+              title={label}
               aria-current={view === id ? "page" : undefined}
               className={clsx(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition",
@@ -955,6 +959,8 @@ export default function App() {
           <button
             type="button"
             onClick={() => supabase.auth.signOut()}
+            aria-label="Sign out"
+            title="Sign out"
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-rose-500/10 hover:text-rose-300"
           >
             <LogOut className="size-4" aria-hidden="true" />
@@ -973,6 +979,7 @@ export default function App() {
             reports={reports}
             online={online}
             exporting={exporting}
+            onRetryDocuments={() => setRefreshKey((key) => key + 1)}
             onExport={handleExport}
             onUpload={() => {
               setShowUploader(true);

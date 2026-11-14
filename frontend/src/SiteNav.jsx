@@ -14,7 +14,7 @@ export function Mark({ className = 'size-9' }) {
   )
 }
 
-export default function SiteNav() {
+export default function SiteNav({ secondaryAction = false }) {
   return (
     <header className="absolute inset-x-0 top-0 z-30">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
@@ -40,7 +40,11 @@ export default function SiteNav() {
           </a>
           <a
             href="/"
-            className="inline-flex min-h-11 items-center rounded-full bg-gradient-to-b from-accent-light to-accent px-4 text-[13px] font-semibold text-on-accent shadow-[0_0_28px_-8px_rgba(253, 197, 0,0.4)] transition hover:brightness-105"
+            className={
+              secondaryAction
+                ? "inline-flex min-h-11 items-center rounded-full border border-white/15 bg-white/[0.03] px-4 text-[13px] font-medium text-slate-200 transition hover:border-white/25 hover:bg-white/[0.06] hover:text-white"
+                : "inline-flex min-h-11 items-center rounded-full bg-gradient-to-b from-accent-light to-accent px-4 text-[13px] font-semibold text-on-accent shadow-[0_0_28px_-8px_rgba(253, 197, 0,0.4)] transition hover:brightness-105"
+            }
           >
             Open the console
           </a>
