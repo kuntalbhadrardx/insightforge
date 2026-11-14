@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
 body {
-  background-color: #020617; /* slate-950 */
+  background-color: #04070a; /* console canvas */
   color: #f8fafc; /* slate-50 */
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* One keyboard focus ring for the whole console, in mint so it can't be
+   mistaken for a hover state. */
+:is(main, aside) :is(button, a, input, select, textarea, [role='button']):focus-visible {
+  outline: 2px solid rgba(155, 247, 196, 0.75);
+  outline-offset: 2px;
 }

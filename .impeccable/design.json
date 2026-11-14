@@ -1,130 +1,112 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-07T00:00:00.000Z",
+  "generatedAt": "2026-11-09T00:00:00.000Z",
   "title": "Design System: InsightForge",
   "extensions": {
     "colorMeta": {
       "canvas": {
         "role": "neutral",
-        "displayName": "Observation Black",
-        "canonical": "#020617",
-        "tonalRamp": ["#020617", "#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1"]
+        "displayName": "Canvas Black",
+        "canonical": "#04070a",
+        "tonalRamp": ["#04070a", "#07090c", "#0b0e11", "#131619", "#26292c", "#525457", "#8e9093", "#e8e9ea"]
       },
       "surface": {
         "role": "neutral",
-        "displayName": "Deck Slate",
-        "canonical": "#0f172a",
-        "tonalRamp": ["#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#f1f5f9"]
+        "displayName": "Glass Surface",
+        "canonical": "rgba(255, 255, 255, 0.03)",
+        "tonalRamp": ["#07090b", "#0b0d0f", "#101315", "#171a1c", "#24272a", "#4a4d50", "#8b8e91", "#f0f1f2"]
       },
-      "surface-raised": {
+      "surface-raise": {
         "role": "neutral",
-        "displayName": "Raised Slate",
-        "canonical": "#1e293b",
-        "tonalRamp": ["#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f8fafc"]
+        "displayName": "Raised Control",
+        "canonical": "rgba(255, 255, 255, 0.04)",
+        "tonalRamp": ["#080a0c", "#0c0f11", "#121517", "#1a1d1f", "#282b2d", "#4e5154", "#8d9093", "#f2f3f4"]
       },
       "line": {
         "role": "neutral",
         "displayName": "Hairline",
-        "canonical": "#1e293b",
-        "tonalRamp": ["#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9"]
-      },
-      "line-strong": {
-        "role": "neutral",
-        "displayName": "Hairline Strong",
-        "canonical": "#334155",
-        "tonalRamp": ["#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9", "#f8fafc"]
+        "canonical": "rgba(255, 255, 255, 0.08)",
+        "tonalRamp": ["#101214", "#161819", "#1d1f21", "#26282a", "#333537", "#55575a", "#8f9194", "#f4f4f5"]
       },
       "ink": {
         "role": "neutral",
         "displayName": "Signal White",
         "canonical": "#f8fafc",
-        "tonalRamp": ["#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9", "#f8fafc"]
+        "tonalRamp": ["#1b1f24", "#333942", "#4b535e", "#656e7a", "#8a929d", "#b4bac2", "#d9dde2", "#f8fafc"]
       },
       "ink-secondary": {
         "role": "neutral",
-        "displayName": "Readout",
-        "canonical": "#e2e8f0",
-        "tonalRamp": ["#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9", "#f8fafc"]
+        "displayName": "Readout Grey",
+        "canonical": "#cbd5e1",
+        "tonalRamp": ["#1b2027", "#333b45", "#4c5661", "#667283", "#8996a6", "#b0bcc9", "#d5dde6", "#f5f8fa"]
       },
       "ink-muted": {
         "role": "neutral",
         "displayName": "Annotation",
         "canonical": "#94a3b8",
-        "tonalRamp": ["#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9"]
+        "tonalRamp": ["#161b21", "#2a323c", "#3f4a56", "#566373", "#737f90", "#95a3b4", "#b9c4d0", "#eef1f5"]
       },
       "ink-faint": {
         "role": "neutral",
         "displayName": "Whisper",
-        "canonical": "#64748b",
-        "tonalRamp": ["#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#f1f5f9"]
+        "canonical": "#7c8ba1",
+        "tonalRamp": ["#141920", "#262d38", "#3a4350", "#4e5866", "#657082", "#8695a8", "#adbaca", "#e9edf2"]
       },
-      "accent": {
+      "mint": {
         "role": "primary",
-        "displayName": "Instrument Sky",
-        "canonical": "#0ea5e9",
-        "tonalRamp": ["#082f49", "#0c4a6e", "#075985", "#0369a1", "#0284c7", "#0ea5e9", "#7dd3fc", "#e0f2fe"]
+        "displayName": "Readout Mint",
+        "canonical": "#9bf7c4",
+        "tonalRamp": ["#07231a", "#0d3d2e", "#145843", "#1e7559", "#2d9672", "#4cbf92", "#7ee0b0", "#c4fde0"]
       },
-      "accent-hover": {
+      "mint-bright": {
         "role": "primary",
-        "displayName": "Instrument Sky Bright",
-        "canonical": "#38bdf8",
-        "tonalRamp": ["#082f49", "#0c4a6e", "#0369a1", "#0284c7", "#0ea5e9", "#38bdf8", "#bae6fd", "#f0f9ff"]
+        "displayName": "Mint Light",
+        "canonical": "#eafff3",
+        "tonalRamp": ["#082a1e", "#0f4a35", "#1a6a4d", "#278f68", "#3fb787", "#6fd9a9", "#a9f2cb", "#eafff3"]
       },
-      "accent-deep": {
+      "mint-deep": {
         "role": "primary",
-        "displayName": "Instrument Sky Deep",
-        "canonical": "#0284c7",
-        "tonalRamp": ["#082f49", "#0c4a6e", "#075985", "#0369a1", "#0284c7", "#38bdf8", "#bae6fd", "#f0f9ff"]
+        "displayName": "Mint Deep",
+        "canonical": "#5eead4",
+        "tonalRamp": ["#04201d", "#073832", "#0b544c", "#107269", "#19958a", "#2fbdb0", "#68dfd6", "#c2f7f2"]
       },
-      "accent-partner": {
-        "role": "tertiary",
-        "displayName": "Mark Indigo",
-        "canonical": "#4f46e5",
-        "tonalRamp": ["#1e1b4b", "#312e81", "#3730a3", "#4338ca", "#4f46e5", "#818cf8", "#c7d2fe", "#eef2ff"]
-      },
-      "signal-positive": {
-        "role": "secondary",
-        "displayName": "Verified Green",
-        "canonical": "#10b981",
-        "tonalRamp": ["#022c22", "#064e3b", "#065f46", "#047857", "#059669", "#10b981", "#6ee7b7", "#d1fae5"]
+      "mint-ink": {
+        "role": "primary",
+        "displayName": "Mint Ink",
+        "canonical": "#04120b",
+        "tonalRamp": ["#04120b", "#072015", "#0b3222", "#104832", "#176645", "#24905f", "#3cbb80", "#63e0a4"]
       },
       "signal-negative": {
         "role": "secondary",
         "displayName": "Alert Rose",
         "canonical": "#f43f5e",
-        "tonalRamp": ["#4c0519", "#881337", "#9f1239", "#be123c", "#e11d48", "#f43f5e", "#fda4af", "#ffe4e6"]
+        "tonalRamp": ["#24060d", "#3f0a17", "#5c0f21", "#7d162d", "#a42340", "#cc3d59", "#ec7188", "#fcc3cd"]
+      },
+      "signal-caution": {
+        "role": "tertiary",
+        "displayName": "Caution Amber",
+        "canonical": "#f59e0b",
+        "tonalRamp": ["#241604", "#3f2607", "#5c380b", "#7d4e10", "#a36816", "#cc8a22", "#ecb157", "#fce4b3"]
       }
     },
     "typographyMeta": {
-      "label": { "displayName": "Label", "purpose": "The uppercase 10px eyebrow that names a region." },
-      "meta": { "displayName": "Meta", "purpose": "Status pill text, dense table meta, chip labels." },
-      "body": { "displayName": "Body", "purpose": "Default reading size for messages, values, and buttons." },
-      "body-large": { "displayName": "Body Large", "purpose": "Auth screen product name and the largest inline copy." },
-      "title": { "displayName": "Title", "purpose": "Pane and section headings, used sparingly." }
+      "display": { "displayName": "Display", "purpose": "Landing hero only; two balanced lines." },
+      "headline": { "displayName": "Headline", "purpose": "The Overview title, one per surface." },
+      "title": { "displayName": "Title", "purpose": "Card and pane headings, plus the auth greeting at 27–30px." },
+      "body": { "displayName": "Body", "purpose": "Chat messages, table cells, values." },
+      "meta": { "displayName": "Meta", "purpose": "Captions, KPI hints, timestamps." },
+      "label": { "displayName": "Label", "purpose": "Uppercase tracked region names and table headers." }
     },
     "shadows": [
-      {
-        "name": "floating-panel",
-        "value": "0 25px 50px -12px rgb(0 0 0 / 0.4)",
-        "purpose": "Auth card only, the single surface that floats over an empty page."
-      },
-      {
-        "name": "focus-ring",
-        "value": "0 0 0 3px rgb(14 165 233 / 0.2)",
-        "purpose": "Focus state on text fields, paired with a #0ea5e9 border."
-      }
+      { "name": "auth-window-glow", "value": "0 0 150px -40px rgba(200,255,224,0.6)", "purpose": "The sign-in card, which floats over an empty page." },
+      { "name": "action-glow", "value": "0 0 36px -12px rgba(167,243,208,0.85)", "purpose": "Sign-in submit and landing CTAs; intensifies on hover." },
+      { "name": "lit-edge", "value": "inset 0 1px 0 rgba(255,255,255,0.05)", "purpose": "Top highlight on Overview glass cards." },
+      { "name": "bar-bloom", "value": "0 0 26px rgba(155,247,196,0.28)", "purpose": "The largest library bar only." }
     ],
     "motion": [
-      {
-        "name": "state-transition",
-        "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
-        "purpose": "Every colour, border, and opacity change; no movement or scale."
-      },
-      {
-        "name": "pill-pulse",
-        "value": "2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "purpose": "The neutral status dot while the backend check is unresolved."
-      }
+      { "name": "state-ease", "value": "150ms ease", "purpose": "Borders, fills and glows on hover and focus." },
+      { "name": "tip-ease", "value": "140ms ease", "purpose": "Chart tooltip fade and 4px lift." },
+      { "name": "breath", "value": "lp-breathe 9s ease-in-out infinite", "purpose": "Landing light shaft opacity, disabled under prefers-reduced-motion." }
     ],
     "breakpoints": [
       { "name": "sm", "value": "640px" },
@@ -138,134 +120,94 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The single solid action in a region: submit, send, run.",
-      "html": "<button class=\"ds-btn-primary\">Send message</button>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #0284c7; color: #ffffff; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 14px; font-weight: 600; line-height: 1.5; padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-primary:hover { background: #0ea5e9; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgb(14 165 233 / 0.2); } .ds-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }"
+      "description": "The single mint action in a region: send, run detection, sign in.",
+      "html": "<button class=\"ds-btn-primary\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m22 2-7 20-4-9-9-4Z\"/><path d=\"M22 2 11 13\"/></svg>Run anomaly detection</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: 0; border-radius: 8px; background-image: linear-gradient(135deg, #eafff3 0%, #9bf7c4 100%); color: #04120b; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 12px; font-weight: 600; line-height: 1.4; cursor: pointer; transition: filter 150ms ease; } .ds-btn-primary:hover { filter: brightness(1.08); } .ds-btn-primary:focus-visible { outline: 2px solid rgba(155,247,196,0.75); outline-offset: 2px; } .ds-btn-primary:disabled { background-image: none; background-color: rgba(255,255,255,0.1); color: #94a3b8; cursor: not-allowed; }"
     },
     {
-      "name": "Send Icon Button",
-      "kind": "button",
-      "refersTo": "button-primary",
-      "description": "Square 12px-radius icon action at the end of the composer.",
-      "html": "<button class=\"ds-btn-send\" aria-label=\"Send\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z\"/><path d=\"M6 12h16\"/></svg></button>",
-      "css": ".ds-btn-send { display: grid; place-items: center; width: 44px; height: 44px; background: #0284c7; color: #ffffff; border: none; border-radius: 12px; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-send:hover { background: #0ea5e9; } .ds-btn-send:focus-visible { outline: none; box-shadow: 0 0 0 3px rgb(14 165 233 / 0.35); } .ds-btn-send:disabled { background: #1e293b; color: #64748b; cursor: not-allowed; }"
-    },
-    {
-      "name": "Secondary Icon Button",
+      "name": "Ghost Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Hairline icon button that toggles a panel; engaged state uses a 10% sky fill.",
-      "html": "<button class=\"ds-btn-secondary\" aria-pressed=\"true\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3v12\"/><path d=\"m17 8-5-5-5 5\"/><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/></svg></button>",
-      "css": ".ds-btn-secondary { display: grid; place-items: center; width: 36px; height: 36px; background: #0f172a; color: #94a3b8; border: 1px solid #334155; border-radius: 8px; cursor: pointer; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-secondary:hover { color: #e2e8f0; } .ds-btn-secondary[aria-pressed='true'] { border-color: rgb(14 165 233 / 0.5); background: rgb(14 165 233 / 0.1); color: #7dd3fc; } .ds-btn-secondary:focus-visible { outline: 2px solid #0ea5e9; outline-offset: 2px; }"
+      "description": "Secondary action such as exporting a brief or opening the chat.",
+      "html": "<button class=\"ds-btn-ghost\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><path d=\"M7 10l5 5 5-5\"/><path d=\"M12 15V3\"/></svg>Export Markdown</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #cbd5e1; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 11px; font-weight: 500; cursor: pointer; transition: border-color 150ms ease, color 150ms ease; } .ds-btn-ghost:hover { border-color: rgba(155,247,196,0.35); color: #9bf7c4; } .ds-btn-ghost:focus-visible { outline: 2px solid rgba(155,247,196,0.75); outline-offset: 2px; } .ds-btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }"
     },
     {
-      "name": "Text Field",
+      "name": "Composer Input",
       "kind": "input",
-      "refersTo": "input",
-      "description": "Recessed 8px field with a sky border and soft ring on focus.",
-      "html": "<label class=\"ds-field-label\" for=\"ds-email\">Email</label><input id=\"ds-email\" class=\"ds-input\" type=\"email\" placeholder=\"you@example.com\" />",
-      "css": ".ds-field-label { display: block; margin-bottom: 6px; color: #94a3b8; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 12px; font-weight: 500; } .ds-input { width: 100%; box-sizing: border-box; background: rgb(2 6 23 / 0.6); color: #f1f5f9; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 14px; padding: 8px 12px; border: 1px solid #334155; border-radius: 8px; outline: none; transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-input::placeholder { color: #64748b; } .ds-input:focus { border-color: #0ea5e9; box-shadow: 0 0 0 3px rgb(14 165 233 / 0.2); } .ds-input:disabled { opacity: 0.6; cursor: not-allowed; }"
+      "refersTo": "input-composer",
+      "description": "The chat question field; the prompt bar on the Overview uses the same treatment at 13px.",
+      "html": "<input class=\"ds-input\" placeholder=\"Ask about methods, results, limitations…\" />",
+      "css": ".ds-input { width: 100%; min-height: 44px; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #f1f5f9; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 14px; line-height: 1.5; outline: none; transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease; } .ds-input::placeholder { color: #7c8ba1; } .ds-input:focus { border-color: rgba(155,247,196,0.6); box-shadow: 0 0 0 3px rgba(155,247,196,0.12); background: rgba(255,255,255,0.045); } .ds-input:disabled { opacity: 0.6; cursor: not-allowed; }"
     },
     {
-      "name": "Chat Composer",
-      "kind": "input",
-      "refersTo": "input",
-      "description": "Growing textarea plus the square send button, aligned to the conversation column.",
-      "html": "<div class=\"ds-composer\"><textarea class=\"ds-composer-input\" rows=\"1\" placeholder=\"Ask about the paper…\"></textarea><button class=\"ds-composer-send\" aria-label=\"Send\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z\"/><path d=\"M6 12h16\"/></svg></button></div>",
-      "css": ".ds-composer { display: flex; align-items: flex-end; gap: 8px; max-width: 768px; } .ds-composer-input { flex: 1; min-height: 44px; max-height: 160px; resize: none; background: #0f172a; color: #f1f5f9; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 14px; line-height: 1.5; padding: 12px 16px; border: 1px solid #1e293b; border-radius: 12px; outline: none; transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-composer-input::placeholder { color: #64748b; } .ds-composer-input:focus { border-color: #0ea5e9; box-shadow: 0 0 0 3px rgb(14 165 233 / 0.2); } .ds-composer-send { display: grid; place-items: center; flex: 0 0 auto; width: 44px; height: 44px; background: #0284c7; color: #ffffff; border: none; border-radius: 12px; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-composer-send:hover { background: #0ea5e9; } .ds-composer-send:focus-visible { outline: none; box-shadow: 0 0 0 3px rgb(14 165 233 / 0.35); }"
-    },
-    {
-      "name": "Navigation Item",
+      "name": "Sidebar Navigation",
       "kind": "nav",
-      "refersTo": "nav-item",
-      "description": "Sidebar row with icon and label; active row is Raised Slate, not accent.",
-      "html": "<nav class=\"ds-nav\"><button class=\"ds-nav-item\" aria-current=\"page\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg><span>Research Chat</span></button><button class=\"ds-nav-item\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M22 12h-4l-3 9L9 3l-3 9H2\"/></svg><span>Outliers &amp; Anomalies</span></button></nav>",
-      "css": ".ds-nav { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; } .ds-nav-item { display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: transparent; color: #94a3b8; font-size: 14px; text-align: left; border: none; border-radius: 8px; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-item:hover { background: rgb(30 41 59 / 0.6); color: #e2e8f0; } .ds-nav-item[aria-current='page'] { background: #1e293b; color: #f8fafc; } .ds-nav-item:focus-visible { outline: 2px solid #0ea5e9; outline-offset: 2px; }"
+      "refersTo": "nav-item-active",
+      "description": "Three rows: Overview, Research Chat, Outliers & Anomalies. Below 1024px this collapses to icon buttons.",
+      "html": "<nav class=\"ds-nav\"><button class=\"ds-nav-item is-active\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/></svg>Overview</button><button class=\"ds-nav-item\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg>Research Chat</button></nav>",
+      "css": ".ds-nav { display: flex; flex-direction: column; gap: 4px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; } .ds-nav-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 8px 12px; border: 0; border-radius: 8px; background: transparent; color: #94a3b8; font-size: 14px; text-align: left; cursor: pointer; transition: background 150ms ease, color 150ms ease; } .ds-nav-item:hover { background: rgba(255,255,255,0.04); color: #e2e8f0; } .ds-nav-item.is-active { background: rgba(255,255,255,0.07); color: #fff; box-shadow: inset 0 0 0 1px rgba(155,247,196,0.2); } .ds-nav-item.is-active svg { color: #9bf7c4; } .ds-nav-item:focus-visible { outline: 2px solid rgba(155,247,196,0.75); outline-offset: 2px; }"
     },
     {
-      "name": "Status Pill",
+      "name": "Status Chip",
       "kind": "chip",
-      "refersTo": "card",
-      "description": "Backend reachability readout: neutral while checking, emerald online, rose offline.",
-      "html": "<span class=\"ds-pill ds-pill-online\"><span class=\"ds-pill-dot\"></span>Online</span>",
-      "css": ".ds-pill { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: 9999px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 11px; font-weight: 500; color: #6ee7b7; background: rgb(16 185 129 / 0.1); box-shadow: inset 0 0 0 1px rgb(16 185 129 / 0.3); } .ds-pill-dot { width: 6px; height: 6px; border-radius: 9999px; background: #34d399; } .ds-pill-checking { color: #94a3b8; background: #1e293b; box-shadow: inset 0 0 0 1px #334155; } .ds-pill-checking .ds-pill-dot { background: #64748b; animation: ds-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; } .ds-pill-offline { color: #fda4af; background: rgb(244 63 94 / 0.1); box-shadow: inset 0 0 0 1px rgb(244 63 94 / 0.3); } .ds-pill-offline .ds-pill-dot { background: #fb7185; } @keyframes ds-pulse { 50% { opacity: 0.4; } }"
+      "refersTo": "chip-online",
+      "description": "Backend reachability readout: mint online, rose offline, neutral while checking.",
+      "html": "<span class=\"ds-chip\"><span class=\"ds-chip-dot\"></span>Online</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: 9999px; background: rgba(155,247,196,0.1); box-shadow: inset 0 0 0 1px rgba(155,247,196,0.3); color: #9bf7c4; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 11px; font-weight: 500; } .ds-chip-dot { width: 6px; height: 6px; border-radius: 9999px; background: #9bf7c4; }"
     },
     {
-      "name": "Panel Card",
+      "name": "Glass Card",
       "kind": "card",
-      "refersTo": "card",
-      "description": "The default content container: 16px radius, hairline, translucent slate fill, no shadow.",
-      "html": "<section class=\"ds-card\"><p class=\"ds-card-eyebrow\">Dataset</p><p class=\"ds-card-value\">4,182 rows</p><p class=\"ds-card-note\">Sampled above 20k for charting only.</p></section>",
-      "css": ".ds-card { box-sizing: border-box; padding: 16px; background: rgb(15 23 42 / 0.4); border: 1px solid #1e293b; border-radius: 16px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; } .ds-card-eyebrow { margin: 0 0 4px; color: #64748b; font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; } .ds-card-value { margin: 0; color: #f1f5f9; font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-card-note { margin: 6px 0 0; color: #64748b; font-size: 12px; line-height: 1.5; }"
+      "refersTo": "card-glass",
+      "description": "The Overview's lit pane: gradient fill, inset top highlight, blurred backdrop.",
+      "html": "<section class=\"ds-card-glass\"><p class=\"ds-card-label\">Latest brief</p><h2 class=\"ds-card-title\">Retrieval quality across the indexed corpus</h2><p class=\"ds-card-meta\">9 Nov 2026</p></section>",
+      "css": ".ds-card-glass { padding: 24px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.08); background-image: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.014)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); backdrop-filter: blur(14px); font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; } .ds-card-label { margin: 0; font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: #94a3b8; } .ds-card-title { margin: 12px 0 0; font-size: 19px; font-weight: 500; line-height: 1.35; color: #fff; } .ds-card-meta { margin: 6px 0 0; font-size: 12px; color: #7c8ba1; }"
     },
     {
-      "name": "Dashed Empty State",
+      "name": "Answer Bubble with Citation",
       "kind": "custom",
-      "refersTo": "card",
-      "description": "The invitation shown when nothing has been ingested or analysed yet.",
-      "html": "<div class=\"ds-empty\"><p class=\"ds-empty-title\">No dataset analysed yet</p><p class=\"ds-empty-note\">Upload a CSV to run anomaly detection.</p></div>",
-      "css": ".ds-empty { box-sizing: border-box; padding: 40px; text-align: center; background: rgb(15 23 42 / 0.4); border: 1px dashed #334155; border-radius: 16px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; } .ds-empty-title { margin: 0; color: #e2e8f0; font-size: 14px; font-weight: 500; } .ds-empty-note { margin: 4px auto 0; max-width: 28rem; color: #64748b; font-size: 12px; line-height: 1.5; }"
-    },
-    {
-      "name": "Segmented Tabs",
-      "kind": "custom",
-      "refersTo": "card",
-      "description": "Two-up switch sunk into the canvas; the active tab is Raised Slate.",
-      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button class=\"ds-tab\" role=\"tab\" aria-selected=\"true\">Tabla</button><button class=\"ds-tab\" role=\"tab\" aria-selected=\"false\">Estadísticas</button></div>",
-      "css": ".ds-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: rgb(2 6 23 / 0.6); border-radius: 8px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; } .ds-tab { padding: 6px 10px; background: transparent; color: #94a3b8; font-size: 14px; border: none; border-radius: 6px; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-tab:hover { color: #e2e8f0; } .ds-tab[aria-selected='true'] { background: #1e293b; color: #f8fafc; } .ds-tab:focus-visible { outline: 2px solid #0ea5e9; outline-offset: 2px; }"
+      "description": "The signature block: a claim that always carries its page.",
+      "html": "<div class=\"ds-answer\">The paper fits IsolationForest at a contamination of 0.05.<span class=\"ds-citation\">p. 4</span></div>",
+      "css": ".ds-answer { max-width: 85%; padding: 12px 16px; border-radius: 16px; border-bottom-left-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 14px; line-height: 1.625; } .ds-citation { display: inline-flex; margin-left: 8px; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.06); color: #94a3b8; font-size: 11px; }"
     }
   ],
   "narrative": {
     "northStar": "The Observatory",
-    "overview": "InsightForge is a dark-adapted instrument for looking at things that are hard to see: the passage inside a paper that actually answers the question, the row that does not belong, the count that contradicts the narrative. The surface stays dark so the content carries the light. There is one accent, a sky-blue that leans toward indigo only in the mark, and it is spent almost entirely on the action the user came to take.\n\nThe system is quiet and technical. Surfaces are separated by a 1px border and a step of tonal lightness, not by shadow or ornament; a card at rest is a slightly raised piece of the same dark material. Text is a four-step ramp from near-white down to slate-500, and quiet copy is deliberately quiet: the second line of every label, the empty-state explanation, and the metadata all sit at 12px or below, so the numbers and the citations stay dominant.\n\nNo light variant exists and none should be invented. The user confirmed the nocturnal, low-glow character and rejected decorative gradients beyond the two-stop mark and the accent pair.",
+    "overview": "InsightForge is a dark-adapted instrument. Its job is to make three hard-to-see things visible in one sitting: the passage inside a paper that actually answers the question, the row that does not belong in a dataset, and the count that contradicts the narrative. The surface stays dark so the content carries the light. There is one glowing hue — a pale mint that reads as phosphor or an instrument readout — and it is spent narrowly: on the action you came to take, the thing you have selected, and the state of the system. The palette is deliberately two-material. A near-black canvas holds glass panels built from white at 2–4.5% opacity, separated by 1px hairlines. Nothing in the neutral layer carries hue, which is what lets a single mint survive at full saturation without shouting.",
     "keyCharacteristics": [
-      "One dark canvas (#020617) with tonal layering, never a second background colour family.",
-      "A single accent pair: sky (#0ea5e9) for action, indigo (#4f46e5) only inside the logo mark.",
-      "1px slate borders (#1e293b / #334155) do the work shadows usually do.",
-      "Small type for anything secondary; large type reserved for the one thing that matters in the panel.",
-      "Instrument-like radii: 8px on controls, 12–16px on containers, never pill-shaped except status chips."
+      "One dark canvas (#04070a); depth comes from white-alpha glass, never from a second background family.",
+      "A single accent, mint (#9bf7c4), reserved for action, selection, focus and status.",
+      "Mint appears as a light-to-dark gradient under near-black ink; never as a solid fill behind light text.",
+      "1px white-alpha hairlines do the work shadows usually do; the auth card and chart bars are the only things that glow.",
+      "Small, tracked, uppercase labels for region names; 12px floor for anything a user must read.",
+      "Tabular figures everywhere a column of numbers can appear."
     ],
     "rules": [
-      {
-        "name": "The One Accent Rule",
-        "body": "Sky is the only colour allowed to indicate \"do this\". At most one solid sky element is visible per region; everything else that wants attention uses a hairline, a 10% sky fill, or a step of slate lightness.",
-        "section": "colors"
-      },
-      {
-        "name": "The Gradient Quarantine Rule",
-        "body": "A gradient may appear only inside the \"IF\" mark. No button, card, header, or background may carry one.",
-        "section": "colors"
-      },
-      {
-        "name": "The Small-Text Rule",
-        "body": "Anything that is not the primary content of its panel is 12px or smaller and sits at Annotation or Whisper. If secondary text needs to grow to be legible, the panel has too much in it.",
-        "section": "typography"
-      },
-      {
-        "name": "The Tabular Rule",
-        "body": "Any column of numbers gets tabular-nums. Digits that do not line up vertically are a defect, not a style choice.",
-        "section": "typography"
-      },
-      {
-        "name": "The Border-Not-Shadow Rule",
-        "body": "If a surface needs to separate from what is behind it, add a 1px hairline or step the slate lightness. A shadow is only permitted on a panel that floats over an otherwise empty page.",
-        "section": "elevation"
-      }
+      { "name": "The Mint-Is-A-State Rule", "body": "Mint marks something the user can do, has selected, or the system is reporting. It is never a decorative accent, a background wash, or a bullet colour.", "section": "colors" },
+      { "name": "The Two-Hue Chart Rule", "body": "A chart uses one hue for magnitude (mint at 30–62% alpha) and rose for anomaly. Never interpolate between mint and rose across a continuous scale.", "section": "colors" },
+      { "name": "The 12px Floor Rule", "body": "Anything a user must read is at least 12px. 11px is permitted only for uppercase tracked labels and table headers.", "section": "typography" },
+      { "name": "The Tabular Rule", "body": "Any column of numbers gets tabular-nums. Digits that do not line up vertically are a defect.", "section": "typography" },
+      { "name": "The Lit-Edge Rule", "body": "A surface separates itself with a hairline or an inset highlight, never a drop shadow. Glows belong to actions and to the one bar that must win the eye.", "section": "elevation" }
     ],
     "dos": [
-      "Do keep the canvas at #020617 and build depth from translucent #0f172a fills plus 1px hairlines.",
-      "Do spend the accent deliberately: one solid sky action per region, everything else at 10% sky or slate.",
-      "Do use dashed #334155 borders for empty states and drop zones, so \"nothing here yet\" always looks the same.",
-      "Do reach for tabular-nums on any numeric column and on the stat readouts.",
-      "Do keep secondary copy at 12px or below in Annotation or Whisper."
+      "Do keep the canvas at #04070a and build depth from white-alpha fills plus 1px hairlines.",
+      "Do spend mint on action, selection, focus and status — one solid mint action per region.",
+      "Do put near-black #04120b ink on the mint gradient; light text on mint fails contrast.",
+      "Do use dashed white/10 borders for every empty state and drop zone.",
+      "Do reach for tabular-nums on any numeric column and on the KPI readouts.",
+      "Do keep the 12px floor and use #94a3b8 / #7c8ba1 for secondary text.",
+      "Do label every figure with its source, and describe an empty state by what will appear.",
+      "Do truncate long filenames and titles with a title attribute carrying the full value."
     ],
     "donts": [
-      "Don't introduce a light theme, a second background hue, or a warm neutral.",
-      "Don't put a gradient anywhere except the \"IF\" mark.",
-      "Don't use indigo (#4f46e5) outside that gradient, including as a link or hover colour.",
-      "Don't add shadows to cards, buttons, or the sidebar; the auth card is the only floating surface.",
-      "Don't use a solid rose or a solid emerald fill for anything larger than a status dot or chip.",
-      "Don't go above 16px radius outside the pill, and don't use pill shapes for anything except chips and status readouts."
+      "Don't reintroduce sky, indigo, slate-900, or any hued neutral surface.",
+      "Don't use mint as a decorative fill, a background wash, or gradient text.",
+      "Don't interpolate a colour scale between mint and rose.",
+      "Don't use a solid rose or amber fill larger than a chip, a bar, or the cut-off line.",
+      "Don't add drop shadows to cards, buttons, or the sidebar.",
+      "Don't go above 26px radius, and don't pill anything except chips, status readouts, and the landing CTAs.",
+      "Don't hide, collapse, or ellipsize a citation."
     ]
   }
 }

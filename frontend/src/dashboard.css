@@ -1,0 +1,142 @@
+/* Overview dashboard: glass cards, mint hatch bars, and the ambient bloom. */
+
+/* Text tokens. Both clear WCAG AA on the card gradient (#0a0d10):
+   7.5:1 for secondary, 5.6:1 for faint. */
+.dash-secondary {
+  color: #94a3b8;
+}
+
+.dash-faint {
+  color: #7c8ba1;
+}
+
+/* One visible focus treatment for every control on the surface. */
+.dash-root :is(button, input, a):focus-visible {
+  outline: 2px solid rgba(155, 247, 196, 0.75);
+  outline-offset: 2px;
+}
+
+.dash-card {
+  position: relative;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.014));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(14px);
+}
+
+/* Warm haze behind the header, the way the landing hero is lit. */
+.dash-bloom {
+  position: absolute;
+  left: 50%;
+  top: -180px;
+  width: min(980px, 120%);
+  height: 520px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(219, 255, 236, 0.16) 0%,
+    rgba(167, 243, 208, 0.1) 40%,
+    rgba(4, 7, 10, 0) 78%
+  );
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+/* Bars: the top paper is solid mint, the rest are hatched so the eye lands on it. */
+.dash-hatch-solid {
+  background: linear-gradient(180deg, #eafff3 0%, #9bf7c4 46%, #5eead4 100%);
+  box-shadow: 0 0 26px rgba(155, 247, 196, 0.28);
+}
+
+.dash-hatch {
+  background-color: rgba(155, 247, 196, 0.05);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(155, 247, 196, 0.5) 0 1px,
+    transparent 1px 6px
+  );
+  border-top: 1px solid rgba(203, 255, 228, 0.55);
+}
+
+.dash-bar .dash-tip {
+  opacity: 0;
+  transform: translate(-50%, 4px);
+  transition: opacity 140ms ease, transform 140ms ease;
+  pointer-events: none;
+}
+
+.dash-bar:hover .dash-tip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Faint horizontal rules behind the plot, like the reference's chart grid. */
+.dash-gridlines {
+  position: absolute;
+  inset: 0 0 26px 0;
+  background-image: repeating-linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.055) 0 1px,
+    transparent 1px 42px
+  );
+  pointer-events: none;
+}
+
+.dash-plot {
+  border-radius: 14px;
+}
+
+/* The x-axis rule the bars sit on. */
+.dash-baseline {
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+/* The question bar, echoing the reference's "explore next" strip. */
+.dash-prompt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px 12px 10px 14px;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.dash-prompt:focus-within {
+  border-color: rgba(155, 247, 196, 0.45);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(155, 247, 196, 0.1);
+}
+
+.dash-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  padding: 9px 10px;
+  font-size: 12.5px;
+  color: #cbd5e1;
+  text-align: left;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.dash-action:hover {
+  border-color: rgba(155, 247, 196, 0.28);
+  background: rgba(155, 247, 196, 0.06);
+  color: #9bf7c4;
+}
+
+.dash-action:focus-visible {
+  outline: 2px solid rgba(155, 247, 196, 0.7);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-bar .dash-tip {
+    transition: none;
+  }
+}

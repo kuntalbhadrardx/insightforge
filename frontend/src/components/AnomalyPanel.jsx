@@ -4,21 +4,25 @@ import clsx from "clsx";
 
 const Plot = createPlotlyComponent(Plotly);
 
-// Dark slate theme shared by every chart, so they read as one dashboard.
+// Mint theme shared by every chart, so they read as one console surface.
 const BASE_LAYOUT = {
   paper_bgcolor: "rgba(0,0,0,0)",
-  plot_bgcolor: "rgba(15,23,42,0.35)",
-  font: { color: "#cbd5e1", size: 11, family: "ui-sans-serif, system-ui, sans-serif" },
+  plot_bgcolor: "rgba(255,255,255,0.02)",
+  font: { color: "#e2e8f0", size: 11, family: "ui-sans-serif, system-ui, sans-serif" },
   margin: { l: 52, r: 16, t: 12, b: 40 },
   showlegend: true,
   legend: { orientation: "h", y: -0.28, font: { color: "#94a3b8", size: 10 } },
-  hoverlabel: { bgcolor: "#0f172a", bordercolor: "#334155", font: { color: "#e2e8f0" } }
+  hoverlabel: {
+    bgcolor: "#0a0f14",
+    bordercolor: "rgba(155,247,196,0.3)",
+    font: { color: "#e2e8f0" }
+  }
 };
 
 const AXIS = {
-  gridcolor: "#1e293b",
-  zerolinecolor: "#1e293b",
-  linecolor: "#1e293b",
+  gridcolor: "rgba(255,255,255,0.08)",
+  zerolinecolor: "rgba(255,255,255,0.12)",
+  linecolor: "rgba(255,255,255,0.12)",
   tickfont: { color: "#94a3b8", size: 10 },
   title: { font: { color: "#94a3b8", size: 11 } }
 };
@@ -27,10 +31,10 @@ const CONFIG = { displayModeBar: false, responsive: true };
 
 function ChartCard({ title, caption, children }) {
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900/40 p-3">
+    <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
       <div className="px-1 pb-1">
         <h3 className="text-xs font-semibold text-slate-200">{title}</h3>
-        {caption && <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">{caption}</p>}
+        {caption && <p className="mt-0.5 text-[11px] leading-relaxed text-slate-400">{caption}</p>}
       </div>
       {children}
     </section>
@@ -39,17 +43,17 @@ function ChartCard({ title, caption, children }) {
 
 function Stat({ label, value, sub, tone }) {
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-3">
-      <p className="text-[10px] uppercase tracking-[0.14em] text-slate-500">{label}</p>
+    <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+      <p className="text-[11px] uppercase tracking-[0.14em] text-slate-400">{label}</p>
       <p
         className={clsx(
           "mt-1 text-lg font-semibold",
-          tone === "alert" ? "text-rose-300" : "text-slate-200"
+          tone === "alert" ? "text-rose-300" : "text-slate-100"
         )}
       >
         {value}
       </p>
-      {sub && <p className="text-[11px] text-slate-500">{sub}</p>}
+      {sub && <p className="text-[11px] text-slate-400">{sub}</p>}
     </div>
   );
 }
@@ -97,7 +101,7 @@ function ScoreDistributionChart({ distribution }) {
             name: "Normal",
             x: distribution.bin_centres,
             y: distribution.normal,
-            marker: { color: "rgba(56,189,248,0.55)" },
+            marker: { color: "rgba(155,247,196,0.62)" },
             hovertemplate: "%{y} normal rows<br>score %{x}<extra></extra>"
           },
           {
@@ -143,15 +147,16 @@ function ContributionChart({ contributions }) {
             y: features.map((row) => row.feature),
             marker: {
               color: features.map((row) => row.contribution_percent),
+              // Magnitude reads as one hue; rose is reserved for flagged rows.
               colorscale: [
-                [0, "#0ea5e9"],
-                [1, "#f43f5e"]
+                [0, "rgba(155,247,196,0.3)"],
+                [1, "#9bf7c4"]
               ],
               showscale: false
             },
             text: features.map((row) => `${row.contribution_percent}%`),
             textposition: "outside",
-            textfont: { color: "#cbd5e1", size: 10 },
+            textfont: { color: "#e2e8f0", size: 10 },
             customdata: features.map((row) => [
               row.anomalous_deviation,
               row.normal_deviation
@@ -208,22 +213,22 @@ function FlaggedRowsTable({ rows, featureColumns }) {
   // chart above, but only model features plus the score are tabulated here.
   const columns = [
     "row_index",
-    ...featureColumns.filter((name) => name in (rows[0] ?? {})),
+    ...featureColumns.filter((name) => rows.some((row) => name in row)),
     "anomaly_score"
   ];
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/40">
-      <div className="border-b border-slate-800 px-4 py-3">
+    <section className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+      <div className="border-b border-white/10 px-4 py-3">
         <h3 className="text-xs font-semibold text-slate-200">Top flagged rows</h3>
-        <p className="mt-0.5 text-[11px] text-slate-500">
+        <p className="mt-0.5 text-[11px] text-slate-400">
           Original, unmodified values; scores are the IsolationForest decision function.
         </p>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left text-xs">
           <thead>
-            <tr className="bg-slate-950/40 text-[10px] uppercase tracking-[0.1em] text-slate-500">
+            <tr className="bg-white/[0.04] text-[11px] uppercase tracking-[0.1em] text-slate-400">
               {columns.map((column) => (
                 <th key={column} className="whitespace-nowrap px-3 py-2 font-medium">
                   {column}
@@ -232,18 +237,19 @@ function FlaggedRowsTable({ rows, featureColumns }) {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {rows.map((row, index) => (
               <tr
-                key={row.row_index}
-                className="border-t border-slate-800/80 text-slate-300 transition hover:bg-slate-800/40"
+                key={row.row_index ?? `row-${index}`}
+                className="border-t border-white/10 text-slate-300 transition hover:bg-white/[0.05]"
               >
                 {columns.map((column) => (
                   <td
                     key={column}
+                    title={String(row[column] ?? "")}
                     className={clsx(
-                      "whitespace-nowrap px-3 py-2 tabular-nums",
+                      "max-w-[18rem] truncate px-3 py-2 tabular-nums",
                       column === "anomaly_score" && "text-rose-300",
-                      column === "row_index" && "text-slate-500"
+                      column === "row_index" && "text-slate-400"
                     )}
                   >
                     {typeof row[column] === "number" ? row[column] : String(row[column] ?? "—")}
@@ -285,7 +291,7 @@ export default function AnomalyPanel({ result }) {
         <Stat
           label="Outliers flagged"
           value={Number(result.anomaly_count ?? 0).toLocaleString()}
-          sub={`${result.anomaly_percentage ?? 0}% of the file`}
+          sub={`${Number(result.anomaly_percentage ?? 0).toFixed(2)}% of the file`}
           tone="alert"
         />
         <Stat
@@ -301,8 +307,8 @@ export default function AnomalyPanel({ result }) {
       </div>
 
       {result.excluded_columns?.length > 0 && (
-        <p className="text-[11px] leading-relaxed text-slate-500">
-          <span className="font-medium text-slate-400">Excluded from the model:</span>{" "}
+        <p className="text-[11px] leading-relaxed text-slate-400">
+          <span className="font-medium text-slate-200">Excluded from the model:</span>{" "}
           {result.excluded_columns.join(", ")} — label, target and id columns would leak the answer.
         </p>
       )}
@@ -310,7 +316,7 @@ export default function AnomalyPanel({ result }) {
       {distribution ? (
         <ScoreDistributionChart distribution={distribution} />
       ) : (
-        <p className="rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-3 text-xs text-slate-400">
+        <p className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs text-slate-400">
           Score distribution unavailable: this response has no diagnostics block.
         </p>
       )}
@@ -329,7 +335,7 @@ export default function AnomalyPanel({ result }) {
       {rows.length > 0 ? (
         <FlaggedRowsTable rows={rows} featureColumns={featureColumns} />
       ) : (
-        <p className="rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-3 text-xs text-slate-400">
+        <p className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs text-slate-400">
           No flagged rows to display. Try a higher contamination value.
         </p>
       )}

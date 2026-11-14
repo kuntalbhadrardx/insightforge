@@ -1,4 +1,15 @@
-import { Activity, ArrowRight, Check, Code2, FileText, Paperclip, Send, Sigma } from 'lucide-react'
+import {
+  Activity,
+  ArrowRight,
+  Check,
+  Code2,
+  FileText,
+  LayoutDashboard,
+  MessageSquare,
+  Paperclip,
+  Send,
+  Sigma,
+} from 'lucide-react'
 import SiteNav, { Mark } from './SiteNav'
 
 const TRUST = [
@@ -14,7 +25,13 @@ const PROMPTS = [
   'Where is the attention score defined?',
 ]
 
-const NAV_ITEMS = ['Research Chat', 'Outliers & Anomalies', 'Documents', 'Datasets', 'Reports']
+// Only the console's real surfaces. A preview that invented nav rows would be
+// the one dishonest thing on a page arguing for traceable claims.
+const NAV_ITEMS = [
+  { label: 'Overview', icon: LayoutDashboard, active: false },
+  { label: 'Research Chat', icon: MessageSquare, active: true },
+  { label: 'Outliers & Anomalies', icon: Activity, active: false },
+]
 
 const RECENT = ['attention.pdf', 'detector_readings.csv', 'contamination sweep · 0.08']
 
@@ -74,7 +91,7 @@ function Hero() {
             href="/"
             className="group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-b from-white to-[#a7f3d0] px-6 py-3 text-sm font-semibold text-[#04120b] shadow-[0_0_40px_-8px_rgba(167,243,208,0.7)] transition hover:shadow-[0_0_54px_-6px_rgba(167,243,208,0.9)]"
           >
-            Try the console
+            Open the console
             <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
           </a>
           <a
@@ -100,8 +117,12 @@ function Hero() {
 
 function ProductWindow() {
   return (
-    <section id="product" className="relative px-4 pb-8 sm:px-6">
-      <div className="relative mx-auto max-w-5xl">
+    <section id="product" aria-labelledby="product-title" className="relative px-4 pb-8 sm:px-6">
+      <h2 id="product-title" className="sr-only">
+        The console in one screen
+      </h2>
+
+      <figure className="relative mx-auto max-w-5xl">
         <div className="lp-bloom" aria-hidden="true" />
         {/* Where the shaft meets the window, the light spills along its top edge. */}
         <div
@@ -109,57 +130,70 @@ function ProductWindow() {
           aria-hidden="true"
         />
 
-        {/* Gradient hairline acts as the lit top edge of the window. */}
-        <div className="relative rounded-[22px] bg-gradient-to-b from-[#eafff2]/60 via-white/10 to-white/0 p-px shadow-[0_0_140px_-30px_rgba(200,255,224,0.75)]">
-          <div className="overflow-hidden rounded-[21px] border border-white/[0.06] bg-[#05090c]">
+        {/* The window is an illustration, not a control surface. Hiding its chrome
+            keeps assistive tech from reading forty lines of mock UI; the caption
+            below carries the meaning instead. */}
+        <div
+          aria-hidden="true"
+          className="relative rounded-[22px] bg-gradient-to-b from-[#eafff2]/60 via-white/10 to-white/0 p-px shadow-[0_0_140px_-30px_rgba(200,255,224,0.75)]"
+        >
+          <div className="overflow-hidden rounded-[21px] border border-white/[0.08] bg-[#04070a]">
             <div className="grid md:grid-cols-[200px_1fr] lg:grid-cols-[212px_1fr]">
               <Sidebar />
               <ChatSurface />
             </div>
           </div>
         </div>
-      </div>
+
+        <figcaption className="mt-5 text-center text-[12px] text-[#7c8ba1]">
+          Console preview — illustrative data.
+        </figcaption>
+      </figure>
     </section>
   )
 }
 
 function Sidebar() {
   return (
-    <aside className="hidden border-r border-white/[0.06] bg-[#070c10]/80 px-3 py-4 md:block">
+    <aside className="hidden border-r border-white/[0.08] bg-white/[0.02] px-3 py-4 md:block">
       <div className="mb-6 flex items-center gap-2.5 px-1">
-        <span className="grid size-7 place-items-center rounded-lg bg-gradient-to-br from-sky-500 to-indigo-600 text-[11px] font-bold text-white">
+        <span className="grid size-7 place-items-center rounded-lg bg-gradient-to-br from-white via-[#eafff2] to-[#9bf7c4] text-[11px] font-bold text-[#04120b]">
           IF
         </span>
         <span className="text-[13px] font-semibold tracking-tight text-white">InsightForge</span>
       </div>
 
       <nav className="space-y-0.5">
-        {NAV_ITEMS.map((item, index) => (
+        {NAV_ITEMS.map(({ label, icon: Icon, active }) => (
           <div
-            key={item}
+            key={label}
             className={
-              index === 0
-                ? 'relative flex items-center gap-2 rounded-lg bg-gradient-to-r from-white/[0.09] to-transparent px-2.5 py-2 text-[12.5px] font-medium text-white'
-                : 'flex items-center gap-2 rounded-lg px-2.5 py-2 text-[12.5px] text-slate-500'
+              active
+                ? 'flex items-center gap-2.5 rounded-lg bg-white/[0.07] px-2.5 py-2 text-[12.5px] font-medium text-white ring-1 ring-inset ring-[#9bf7c4]/20'
+                : 'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[12.5px] text-[#94a3b8]'
             }
           >
-            {index === 0 && <span className="absolute left-0 h-4 w-[2px] rounded-full bg-[#9bf7c4]" />}
-            {item}
+            <Icon
+              className={active ? 'size-3.5 text-[#9bf7c4]' : 'size-3.5 text-[#7c8ba1]'}
+              strokeWidth={1.7}
+              aria-hidden="true"
+            />
+            {label}
           </div>
         ))}
       </nav>
 
-      <p className="mt-7 px-2.5 text-[10px] uppercase tracking-[0.18em] text-slate-600">Recent</p>
+      <p className="mt-7 px-2.5 text-[11px] uppercase tracking-[0.18em] text-[#7c8ba1]">Recent</p>
       <ul className="mt-2 space-y-1.5 px-2.5">
         {RECENT.map((entry) => (
-          <li key={entry} className="truncate text-[12px] text-slate-500">
+          <li key={entry} className="truncate text-[12px] text-[#94a3b8]">
             {entry}
           </li>
         ))}
       </ul>
 
-      <div className="mt-8 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
-        <p className="text-[10px] uppercase tracking-[0.18em] text-slate-600">Indexed</p>
+      <div className="mt-8 rounded-xl border border-white/[0.08] bg-white/[0.02] p-3">
+        <p className="text-[11px] uppercase tracking-[0.18em] text-[#7c8ba1]">Indexed</p>
         <p className="mt-1.5 font-mono text-[12px] tabular-nums text-slate-300">
           48 pages · 3 datasets
         </p>
@@ -171,20 +205,20 @@ function Sidebar() {
 function ChatSurface() {
   return (
     <div className="min-h-[430px] px-4 py-4 sm:px-6">
-      <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
+      <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
         <p className="text-[13px] font-medium text-slate-200">Research Chat</p>
         <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
-            <span className="size-1.5 rounded-full bg-emerald-400" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#9bf7c4]/10 px-2 py-0.5 text-[11px] font-medium text-[#9bf7c4] ring-1 ring-inset ring-[#9bf7c4]/30">
+            <span className="size-1.5 rounded-full bg-[#9bf7c4]" />
             Online
           </span>
-          <span className="size-6 rounded-full bg-gradient-to-br from-slate-600 to-slate-800" />
+          <span className="size-6 rounded-full bg-white/10" />
         </div>
       </div>
 
       <div className="mx-auto max-w-xl py-8 text-center">
         <p className="text-[17px] font-medium tracking-tight text-white">Ask the paper</p>
-        <p className="mt-1.5 text-[13px] text-slate-500">
+        <p className="mt-1.5 text-[12.5px] text-[#94a3b8]">
           I answer from your uploaded PDFs and cite the page — or tell you it isn&apos;t there.
         </p>
 
@@ -192,7 +226,7 @@ function ChatSurface() {
           {PROMPTS.map((prompt) => (
             <span
               key={prompt}
-              className="rounded-lg border border-white/[0.08] bg-white/[0.02] px-2.5 py-1.5 text-[11.5px] text-slate-400"
+              className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 py-1.5 text-[12px] text-[#94a3b8]"
             >
               {prompt}
             </span>
@@ -202,31 +236,31 @@ function ChatSurface() {
 
       <div className="mx-auto max-w-xl space-y-4">
         <div className="flex justify-end">
-          <p className="max-w-[85%] rounded-2xl rounded-br-md border border-white/[0.08] bg-white/[0.05] px-3.5 py-2.5 text-[12.5px] leading-relaxed text-slate-200">
+          <p className="max-w-[85%] rounded-2xl rounded-br-sm bg-gradient-to-br from-[#eafff3] to-[#9bf7c4] px-3.5 py-2.5 text-[12.5px] leading-relaxed text-[#04120b]">
             How does multi-head attention differ from a single head?
           </p>
         </div>
 
         <div className="max-w-[92%]">
-          <p className="text-[12.5px] leading-relaxed text-slate-300">
+          <p className="rounded-2xl rounded-bl-sm border border-white/[0.08] bg-white/[0.03] px-3.5 py-2.5 text-[12.5px] leading-relaxed text-slate-200">
             Multi-head attention projects queries, keys and values into several subspaces and
             attends to them in parallel, so the model can track different relationships at the same
             time.
-            <span className="ml-1.5 rounded border border-[#9bf7c4]/30 bg-[#9bf7c4]/10 px-1.5 py-0.5 font-mono text-[10.5px] text-[#c8ffe0]">
-              [page 4]
+            <span className="ml-1.5 inline-flex rounded-md bg-white/[0.06] px-1.5 py-0.5 align-baseline text-[11px] font-medium text-[#94a3b8]">
+              p. 4
             </span>
           </p>
-          <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-slate-600">
+          <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#7c8ba1]">
             attention.pdf · pages 3–5 · similarity 0.81
           </p>
         </div>
       </div>
 
-      <div className="mx-auto mt-6 max-w-xl rounded-xl border border-white/[0.08] bg-[#0a1014] px-3 py-2.5">
+      <div className="mx-auto mt-6 max-w-xl rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-2.5">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-[12px] text-slate-600">Ask a question about your papers…</p>
+          <p className="text-[12px] text-[#7c8ba1]">Ask a question about your papers…</p>
           <div className="flex items-center gap-1.5">
-            <span className="grid size-6 place-items-center rounded-md text-slate-600">
+            <span className="grid size-6 place-items-center rounded-md text-[#7c8ba1]">
               <Paperclip className="size-3.5" strokeWidth={1.7} />
             </span>
             <span className="grid size-6 place-items-center rounded-md bg-gradient-to-b from-white to-[#a7f3d0] text-[#04120b]">
@@ -241,9 +275,9 @@ function ChatSurface() {
 
 function Capabilities() {
   return (
-    <section id="capabilities" className="px-6 py-24">
+    <section id="capabilities" className="px-6 pt-16 pb-20">
       <div className="mx-auto max-w-5xl">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-[#9bf7c4]">What it does</p>
+        <p className="text-[11px] uppercase tracking-[0.2em] text-[#94a3b8]">What it does</p>
         <h2 className="mt-4 max-w-2xl text-balance text-[30px] font-medium leading-[1.15] tracking-[-0.02em] text-white sm:text-[38px]">
           Trust is the feature. The rest is plumbing.
         </h2>
@@ -257,7 +291,7 @@ function Capabilities() {
               key={title}
               className="rounded-2xl border border-white/[0.07] bg-white/[0.015] p-6 transition hover:border-white/[0.12] hover:bg-white/[0.025]"
             >
-              <span className="grid size-9 place-items-center rounded-xl border border-[#9bf7c4]/20 bg-[#9bf7c4]/[0.07] text-[#9bf7c4]">
+              <span className="grid size-9 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-[#94a3b8]">
                 <Icon className="size-4" strokeWidth={1.6} />
               </span>
               <h3 className="mt-5 text-[15px] font-medium tracking-tight text-white">{title}</h3>
@@ -272,12 +306,15 @@ function Capabilities() {
 
 function HowItWorks() {
   return (
-    <section id="how" className="px-6 pb-16">
+    <section id="how" aria-labelledby="how-title" className="px-6 pb-20">
       <div className="mx-auto max-w-5xl">
-        <div className="grid gap-8 border-t border-white/[0.07] pt-12 md:grid-cols-3">
+        <h2 id="how-title" className="text-[11px] uppercase tracking-[0.2em] text-[#94a3b8]">
+          How it works
+        </h2>
+        <div className="mt-4 grid gap-8 border-t border-white/[0.07] pt-12 md:grid-cols-3">
           {STEPS.map(({ step, title, body }) => (
             <div key={step}>
-              <p className="font-mono text-[11px] tabular-nums text-[#9bf7c4]">{step}</p>
+              <p className="font-mono text-[11px] tabular-nums text-[#7c8ba1]">{step}</p>
               <h3 className="mt-3 text-[15px] font-medium tracking-tight text-white">{title}</h3>
               <p className="mt-2 text-[13px] leading-relaxed text-slate-400">{body}</p>
             </div>
@@ -290,7 +327,7 @@ function HowItWorks() {
 
 function ClosingCta() {
   return (
-    <section className="relative isolate overflow-hidden px-6 pt-8 pb-24">
+    <section className="relative isolate overflow-hidden px-6 pt-4 pb-20">
       <div
         className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[840px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,255,224,0.26),rgba(52,211,153,0.1),transparent)] blur-2xl"
         aria-hidden="true"
@@ -309,7 +346,7 @@ function ClosingCta() {
           Open the console
           <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
         </a>
-        <p className="mt-4 flex items-center justify-center gap-1.5 text-[11.5px] text-slate-600">
+        <p className="mt-4 flex items-center justify-center gap-1.5 text-[12px] text-[#7c8ba1]">
           <Check className="size-3.5 text-[#9bf7c4]" strokeWidth={2} />
           Bring your own data — nothing leaves the pipeline you run
         </p>
@@ -321,21 +358,24 @@ function ClosingCta() {
 function Footer() {
   return (
     <footer className="border-t border-white/[0.06] px-6 py-8">
-      <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 text-[12px] text-slate-600 sm:flex-row">
+      <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 text-[12px] text-[#7c8ba1] sm:flex-row">
         <div className="flex items-center gap-2.5">
           <Mark className="size-6 text-[10px]" />
           <span>InsightForge · research console</span>
         </div>
         <div className="flex items-center gap-6">
-          <a href="#capabilities" className="transition hover:text-slate-300">
+          <a
+            href="#capabilities"
+            className="inline-flex min-h-9 items-center transition hover:text-slate-300"
+          >
             Capabilities
           </a>
-          <a href="#how" className="transition hover:text-slate-300">
+          <a href="#how" className="inline-flex min-h-9 items-center transition hover:text-slate-300">
             How it works
           </a>
           <a
             href="https://github.com/kuntalbhadrdx/insightforge"
-            className="flex items-center gap-1.5 transition hover:text-slate-300"
+            className="inline-flex min-h-9 items-center gap-1.5 transition hover:text-slate-300"
           >
             <Code2 className="size-3.5" strokeWidth={1.7} />
             Source

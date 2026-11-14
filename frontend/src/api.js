@@ -1,5 +1,25 @@
 export const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
+const UNREACHABLE = "The API is unreachable. Check the status pill and your connection.";
+
+/**
+ * fetch() rejects with a bare TypeError when the API is down, which the UI
+ * would show as "Failed to fetch". Every rejected request names what happened.
+ */
+async function request(path, options, messages = {}) {
+  try {
+    return await fetch(`${BASE_URL}${path}`, options);
+  } catch (error) {
+    const timedOut = error?.name === "TimeoutError" || error?.name === "AbortError";
+    throw new Error(
+      timedOut
+        ? messages.timeout ?? "The API did not answer in time. Try again."
+        : messages.unreachable ?? UNREACHABLE,
+      { cause: error }
+    );
+  }
+}
+
 /** Prefer the API's own message (FastAPI puts it in `detail`) over a generic one. */
 async function readError(res, fallback) {
   try {
@@ -20,8 +40,8 @@ function authHeaders(token) {
 }
 
 export async function fetchDocuments(token) {
-  const res = await fetch(`${BASE_URL}/documents`, {
-    headers: authHeaders(token)
+  const res = await request("/documents", { headers: authHeaders(token) }, {
+    unreachable: "Could not load your library — the API did not answer."
   });
   if (!res.ok) throw new Error(await readError(res, "Failed to load documents"));
   const payload = await res.json();
@@ -39,17 +59,17 @@ export async function uploadFile(endpoint, file, token) {
   const body = new FormData();
   body.append("file", file);
 
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
-    method: "POST",
-    headers: authHeaders(token),
-    body
-  });
+  const res = await request(
+    endpoint,
+    { method: "POST", headers: authHeaders(token), body },
+    { unreachable: "The upload could not reach the API. Try again once it is back." }
+  );
   if (!res.ok) throw new Error(await readError(res, "Upload failed"));
   return res.json();
 }
 
 export async function fetchChatHistory(documentId, token) {
-  const res = await fetch(`${BASE_URL}/chat/history/${documentId}`, {
+  const res = await request(`/chat/history/${documentId}`, {
     headers: authHeaders(token)
   });
   if (!res.ok) throw new Error(await readError(res, "Failed to load history"));
@@ -57,7 +77,7 @@ export async function fetchChatHistory(documentId, token) {
 }
 
 export async function deleteChatHistory(documentId, token) {
-  const res = await fetch(`${BASE_URL}/chat/history/${documentId}`, {
+  const res = await request(`/chat/history/${documentId}`, {
     method: "DELETE",
     headers: authHeaders(token)
   });
@@ -66,23 +86,29 @@ export async function deleteChatHistory(documentId, token) {
 }
 
 export async function sendQuery(documentId, query, token) {
-  const res = await fetch(`${BASE_URL}/paper/qa`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...authHeaders(token)
+  const res = await request(
+    "/paper/qa",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeaders(token)
+      },
+      // The backend field is `question` (PaperQARequest); `query` is a 422.
+      body: JSON.stringify({ document_id: documentId, question: query }),
+      // Without a ceiling a hung request leaves the composer stuck on "sending".
+      signal: AbortSignal.timeout(120_000)
     },
-    // The backend field is `question` (PaperQARequest); `query` is a 422.
-    body: JSON.stringify({ document_id: documentId, question: query })
-  });
+    { timeout: "No answer came back within 2 minutes. Try a shorter question." }
+  );
   if (!res.ok) throw new Error(await readError(res, "Inference failed"));
   return res.json();
 }
 
 /** Saved executive briefs (newest first) — the agent's persisted reports. */
 export async function fetchReports(token) {
-  const res = await fetch(`${BASE_URL}/reports`, {
-    headers: authHeaders(token)
+  const res = await request("/reports", { headers: authHeaders(token) }, {
+    unreachable: "Could not load your saved briefs — the API did not answer."
   });
   if (!res.ok) throw new Error(await readError(res, "Failed to load briefs"));
   const payload = await res.json();
@@ -94,7 +120,7 @@ export async function fetchReports(token) {
  * Returns `{ blob, filename }`; the filename comes from Content-Disposition.
  */
 export async function downloadReport(reportId, format, token) {
-  const res = await fetch(`${BASE_URL}/reports/${reportId}/export/${format}`, {
+  const res = await request(`/reports/${reportId}/export/${format}`, {
     headers: authHeaders(token)
   });
   if (!res.ok) {
@@ -117,11 +143,11 @@ export async function runAnomalies(datasetId, { contamination, features } = {}, 
   if (contamination !== undefined) body.append("contamination", String(contamination));
   for (const feature of features ?? []) body.append("features", feature);
 
-  const res = await fetch(`${BASE_URL}/dataset/${datasetId}/anomalies`, {
-    method: "POST",
-    headers: authHeaders(token),
-    body
-  });
+  const res = await request(
+    `/dataset/${datasetId}/anomalies`,
+    { method: "POST", headers: authHeaders(token), body },
+    { unreachable: "Could not reach the API to run detection. Try again." }
+  );
   if (!res.ok) throw new Error(await readError(res, "Anomaly detection failed"));
   return res.json();
 }

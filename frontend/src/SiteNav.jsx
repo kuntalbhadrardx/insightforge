@@ -1,5 +1,3 @@
-import { ArrowRight } from 'lucide-react'
-
 const NAV_LINKS = [
   { label: 'Product', href: '/landing.html#product' },
   { label: 'Capabilities', href: '/landing.html#capabilities' },
@@ -36,13 +34,13 @@ export default function SiteNav() {
         <div className="flex items-center gap-2">
           <a
             href="/auth.html"
-            className="hidden rounded-full px-4 py-2 text-[13px] text-slate-300 transition hover:text-white sm:block"
+            className="hidden min-h-11 items-center rounded-full px-4 text-[13px] text-slate-300 transition hover:text-white sm:inline-flex"
           >
             Sign in
           </a>
           <a
             href="/"
-            className="rounded-full bg-gradient-to-b from-white to-[#b8ffd4] px-4 py-2 text-[13px] font-semibold text-[#04120b] shadow-[0_0_28px_-6px_rgba(184,255,212,0.65)] transition hover:from-white hover:to-white"
+            className="inline-flex min-h-11 items-center rounded-full bg-gradient-to-b from-white to-[#b8ffd4] px-4 text-[13px] font-semibold text-[#04120b] shadow-[0_0_28px_-6px_rgba(184,255,212,0.65)] transition hover:from-white hover:to-white"
           >
             Open the console
           </a>

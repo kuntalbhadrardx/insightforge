@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { Component, lazy, Suspense, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import {
   Activity,
@@ -6,6 +6,7 @@ import {
   ChevronDown,
   Download,
   FileUp,
+  LayoutDashboard,
   Loader2,
   LogOut,
   MessageSquare,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 import { supabase } from "./supabase";
 import AuthPage from "./AuthPage.jsx";
+import Dashboard from "./Dashboard.jsx";
 import {
   checkBackend,
   deleteChatHistory,
@@ -32,6 +34,7 @@ import Uploader from "./components/Uploader";
 const AnomalyPanel = lazy(() => import("./components/AnomalyPanel"));
 
 const NAV_ITEMS = [
+  { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "chat", label: "Research Chat", icon: MessageSquare },
   { id: "anomalies", label: "Outliers & Anomalies", icon: Activity }
 ];
@@ -41,15 +44,15 @@ function StatusPill({ online }) {
     <span
       className={clsx(
         "inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] font-medium ring-1 ring-inset",
-        online === true && "bg-emerald-500/10 text-emerald-300 ring-emerald-500/30",
+        online === true && "bg-[#9bf7c4]/10 text-[#9bf7c4] ring-[#9bf7c4]/30",
         online === false && "bg-rose-500/10 text-rose-300 ring-rose-500/30",
-        online === null && "bg-slate-800 text-slate-400 ring-slate-700"
+        online === null && "bg-white/5 text-slate-400 ring-white/10"
       )}
     >
       <span
         className={clsx(
           "size-1.5 rounded-full",
-          online === true && "bg-emerald-400",
+          online === true && "bg-[#9bf7c4]",
           online === false && "bg-rose-400",
           online === null && "animate-pulse bg-slate-500"
         )}
@@ -76,10 +79,10 @@ function MessageBubble({ message }) {
     <div className={clsx("flex", isUser ? "justify-end" : "justify-start")}>
       <div
         className={clsx(
-          "max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-relaxed",
+          "max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-4 py-3 text-sm leading-relaxed",
           isUser
-            ? "rounded-br-sm bg-sky-600 text-white"
-            : "rounded-bl-sm border border-slate-800 bg-slate-900 text-slate-200"
+            ? "rounded-br-sm bg-gradient-to-br from-[#eafff3] to-[#9bf7c4] text-[#04120b]"
+            : "rounded-bl-sm border border-white/10 bg-white/[0.04] text-slate-200"
         )}
       >
         {message.content}
@@ -91,7 +94,9 @@ function MessageBubble({ message }) {
                 title={`cosine similarity ${Number(citation.similarity ?? 0).toFixed(2)}`}
                 className={clsx(
                   "rounded-md px-1.5 py-0.5 text-[11px]",
-                  isUser ? "bg-white/15 text-white/80" : "bg-slate-800 text-slate-400"
+                  isUser
+                    ? "bg-[#04120b]/10 text-[#04120b]/80"
+                    : "bg-white/[0.06] text-slate-400"
                 )}
               >
                 p. {citation.page_number}
@@ -107,12 +112,12 @@ function MessageBubble({ message }) {
 function ThinkingBubble() {
   return (
     <div className="flex justify-start">
-      <div className="flex items-center gap-3 rounded-2xl rounded-bl-sm border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-slate-400">
+      <div className="flex items-center gap-3 rounded-2xl rounded-bl-sm border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-400">
         <span className="flex gap-1" aria-hidden="true">
           {[0, 150, 300].map((delay) => (
             <span
               key={delay}
-              className="size-1.5 animate-bounce rounded-full bg-sky-400"
+              className="size-1.5 animate-pulse rounded-full bg-[#9bf7c4]"
               style={{ animationDelay: `${delay}ms` }}
             />
           ))}
@@ -129,9 +134,9 @@ function ExportBar({ reports, exporting, error, onExport }) {
 
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 bg-slate-900/30 px-6 py-2">
-        <p className="truncate text-[11px] text-slate-500">
-          <span className="font-medium text-slate-400">Executive brief:</span>{" "}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-white/[0.02] px-6 py-2">
+        <p className="truncate text-[11px] text-slate-400">
+          <span className="font-medium text-slate-200">Executive brief:</span>{" "}
           {latest ? latest.title : "none saved yet"}
         </p>
         <div className="flex gap-2">
@@ -149,7 +154,7 @@ function ExportBar({ reports, exporting, error, onExport }) {
                   ? `Download the latest brief as ${format === "pdf" ? "PDF" : "Markdown"}`
                   : "Run the autonomous agent to generate a brief first"
               }
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-[11px] font-medium text-slate-300 transition hover:border-slate-600 hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[11px] font-medium text-slate-300 transition hover:border-[#9bf7c4]/35 hover:text-[#9bf7c4] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {exporting === format ? (
                 <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
@@ -172,6 +177,8 @@ function ExportBar({ reports, exporting, error, onExport }) {
 
 function ChatPanel({
   documents,
+  documentsError,
+  onRetryDocuments,
   selectedDocId,
   onSelectDocument,
   messages,
@@ -203,10 +210,10 @@ function ChatPanel({
 
   return (
     <>
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 px-6 py-4">
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-4">
         <div>
           <h1 className="text-sm font-semibold text-slate-100">Research Chat</h1>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-400">
             Retrieval-grounded answers with page citations
           </p>
         </div>
@@ -218,7 +225,8 @@ function ChatPanel({
               value={selectedDocId ?? ""}
               onChange={(event) => onSelectDocument(event.target.value || null)}
               disabled={!hasDocuments}
-              className="appearance-none rounded-lg border border-slate-700 bg-slate-900 py-2 pl-3 pr-9 text-xs text-slate-200 outline-none transition focus:border-sky-500 disabled:opacity-60"
+              title={selected?.filename ?? "No papers indexed"}
+              className="max-w-[15rem] appearance-none truncate rounded-lg border border-white/10 bg-white/[0.04] py-2 pl-3 pr-9 text-xs text-slate-200 outline-none transition focus:border-[#9bf7c4]/60 disabled:opacity-60"
             >
               {!hasDocuments && <option value="">No papers indexed</option>}
               {documents.map((doc) => (
@@ -228,7 +236,7 @@ function ChatPanel({
               ))}
             </select>
             <ChevronDown
-              className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-slate-500"
+              className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-slate-400"
               aria-hidden="true"
             />
           </div>
@@ -241,8 +249,8 @@ function ChatPanel({
             className={clsx(
               "grid size-9 place-items-center rounded-lg border transition",
               showUploader
-                ? "border-sky-500/50 bg-sky-500/10 text-sky-300"
-                : "border-slate-700 bg-slate-900 text-slate-400 hover:text-slate-200"
+                ? "border-[#9bf7c4]/50 bg-[#9bf7c4]/10 text-[#9bf7c4]"
+                : "border-white/10 bg-white/[0.04] text-slate-400 hover:text-slate-200"
             )}
           >
             <FileUp className="size-4" aria-hidden="true" />
@@ -254,7 +262,7 @@ function ChatPanel({
             disabled={!hasDocument || clearing}
             aria-label="Clear chat"
             title={hasDocument ? "Delete this paper's saved conversation" : "Select a paper first"}
-            className="grid size-9 place-items-center rounded-lg border border-slate-700 bg-slate-900 text-slate-400 transition hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-slate-700 disabled:hover:bg-slate-900 disabled:hover:text-slate-400"
+            className="grid size-9 place-items-center rounded-lg border border-white/10 bg-white/[0.04] text-slate-400 transition hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-white/10 disabled:hover:bg-white/[0.04] disabled:hover:text-slate-400"
           >
             {clearing ? (
               <Loader2 className="size-4 animate-spin" aria-hidden="true" />
@@ -273,7 +281,7 @@ function ChatPanel({
       />
 
       {showUploader && (
-        <div className="border-b border-slate-800 bg-slate-900/20 px-4 py-4 sm:px-6">
+        <div className="border-b border-white/10 bg-white/[0.02] px-4 py-4 sm:px-6">
           <div className="mx-auto max-w-3xl">
             <Uploader
               endpoint="/upload/paper"
@@ -290,11 +298,30 @@ function ChatPanel({
 
       <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
         <div className="mx-auto max-w-3xl space-y-4">
-          {!hasDocuments && (
-            <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 p-8 text-center">
-              <BookOpen className="mx-auto size-6 text-slate-500" aria-hidden="true" />
+          {documentsError && (
+            <div
+              role="alert"
+              className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-6 text-center"
+            >
+              <p className="text-sm font-medium text-rose-100">Could not load your library</p>
+              <p className="mx-auto mt-1 max-w-sm break-words text-xs leading-relaxed text-rose-200">
+                {documentsError}
+              </p>
+              <button
+                type="button"
+                onClick={onRetryDocuments}
+                className="mt-3 rounded-lg border border-rose-400/40 bg-rose-500/10 px-3 py-1.5 text-[11px] font-medium text-rose-100 transition hover:bg-rose-500/20"
+              >
+                Try again
+              </button>
+            </div>
+          )}
+
+          {!hasDocuments && !documentsError && (
+            <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-8 text-center">
+              <BookOpen className="mx-auto size-6 text-slate-400" aria-hidden="true" />
               <p className="mt-3 text-sm font-medium text-slate-200">No papers indexed yet</p>
-              <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-slate-500">
+              <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-slate-400">
                 Upload a PDF with the button above to index it, then pick it in the paper
                 selector.
               </p>
@@ -302,12 +329,15 @@ function ChatPanel({
           )}
 
           {hasDocuments && !loadingHistory && messages.length === 0 && (
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-8 text-center">
-              <Sparkles className="mx-auto size-6 text-sky-400" aria-hidden="true" />
-              <p className="mt-3 text-sm font-medium text-slate-200">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
+              <Sparkles className="mx-auto size-6 text-[#9bf7c4]" aria-hidden="true" />
+              <p
+                className="mt-3 break-words text-sm font-medium text-slate-200"
+                title={selected?.filename}
+              >
                 Ask about {selected?.filename ?? "this paper"}
               </p>
-              <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-slate-500">
+              <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-slate-400">
                 Methods, sample sizes, contamination thresholds, or what the limitations section
                 admits. Answers cite the pages they came from.
               </p>
@@ -315,7 +345,7 @@ function ChatPanel({
           )}
 
           {loadingHistory && (
-            <p className="flex items-center justify-center gap-2 text-xs text-slate-500">
+            <p className="flex items-center justify-center gap-2 text-xs text-slate-400">
               <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
               Loading conversation
             </p>
@@ -329,11 +359,13 @@ function ChatPanel({
         </div>
       </div>
 
-      <form onSubmit={submit} className="border-t border-slate-800 bg-slate-950/80 px-4 py-4 sm:px-6">
+      <form onSubmit={submit} className="border-t border-white/10 bg-[#04070a]/85 px-4 py-4 sm:px-6">
         <div className="mx-auto flex max-w-3xl items-end gap-2">
           <textarea
             rows={1}
             value={draft}
+            maxLength={2000}
+            title="Up to 2,000 characters"
             onChange={(event) => onDraftChange(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) submit(event);
@@ -342,13 +374,13 @@ function ChatPanel({
             placeholder={
               hasDocument ? "Ask about methods, results, limitations…" : "Select a paper to start"
             }
-            className="max-h-40 min-h-11 flex-1 resize-none rounded-xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+            className="max-h-40 min-h-11 flex-1 resize-none rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-100 placeholder:text-slate-400 outline-none transition focus:border-[#9bf7c4]/60 focus:ring-2 focus:ring-[#9bf7c4]/20 disabled:cursor-not-allowed disabled:opacity-60"
           />
           <button
             type="submit"
             disabled={!canSend}
             aria-label="Send question"
-            className="grid size-11 shrink-0 place-items-center rounded-xl bg-sky-600 text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+            className="grid size-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#eafff3] to-[#9bf7c4] text-[#04120b] transition hover:brightness-110 disabled:cursor-not-allowed disabled:from-white/10 disabled:to-white/10 disabled:text-slate-400"
           >
             {sending ? (
               <Loader2 className="size-4 animate-spin" aria-hidden="true" />
@@ -362,17 +394,62 @@ function ChatPanel({
   );
 }
 
+/**
+ * Plotly is a ~5 MB lazy chunk. Without this boundary a failed chunk download
+ * throws during render and takes the whole console down with it.
+ */
+class ChartBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { failed: false };
+    this.retry = this.retry.bind(this);
+  }
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  retry() {
+    this.setState({ failed: false });
+  }
+
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <div
+        role="alert"
+        className="rounded-2xl border border-rose-500/30 bg-rose-500/10 px-5 py-6 text-center"
+      >
+        <p className="text-sm font-medium text-rose-100">Charts could not be loaded</p>
+        <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-rose-200">
+          The chart bundle failed to download. The figures above are computed and still valid.
+        </p>
+        <button
+          type="button"
+          onClick={this.retry}
+          className="mt-3 rounded-lg border border-rose-400/40 bg-rose-500/10 px-3 py-1.5 text-[11px] font-medium text-rose-100 transition hover:bg-rose-500/20"
+        >
+          Load charts again
+        </button>
+      </div>
+    );
+  }
+}
+
 function AnomaliesView({ token }) {
   const [dataset, setDataset] = useState(null);
   const [contamination, setContamination] = useState(0.05);
   const [result, setResult] = useState(null);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState(null);
+  // Bumped per run so a failed chart boundary resets on the next attempt.
+  const [runId, setRunId] = useState(0);
 
   async function run() {
     if (!dataset || running) return;
     setRunning(true);
     setError(null);
+    setRunId((id) => id + 1);
     try {
       const payload = await runAnomalies(
         dataset.dataset_id,
@@ -390,9 +467,9 @@ function AnomaliesView({ token }) {
 
   return (
     <>
-      <header className="border-b border-slate-800 px-6 py-4">
+      <header className="border-b border-white/10 px-6 py-4">
         <h1 className="text-sm font-semibold text-slate-100">Outliers &amp; Anomalies</h1>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-400">
           IsolationForest screening over an uploaded CSV dataset
         </p>
       </header>
@@ -414,11 +491,16 @@ function AnomaliesView({ token }) {
           />
 
           {dataset && (
-            <section className="rounded-2xl border border-slate-800 bg-slate-900/40 p-4">
+            <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-medium text-slate-200">{dataset.filename}</p>
-                  <p className="text-[11px] text-slate-500">
+                <div className="min-w-0">
+                  <p
+                    className="max-w-[22rem] truncate text-sm font-medium text-slate-200"
+                    title={dataset.filename}
+                  >
+                    {dataset.filename}
+                  </p>
+                  <p className="text-[11px] text-slate-400">
                     {Number(dataset.row_count ?? 0).toLocaleString()} rows ×{" "}
                     {Number(dataset.col_count ?? 0).toLocaleString()} columns
                   </p>
@@ -428,7 +510,7 @@ function AnomaliesView({ token }) {
                   type="button"
                   onClick={run}
                   disabled={running}
-                  className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-br from-[#eafff3] to-[#9bf7c4] px-4 py-2 text-xs font-semibold text-[#04120b] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {running ? (
                     <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
@@ -453,9 +535,9 @@ function AnomaliesView({ token }) {
                   step={0.01}
                   value={contamination}
                   onChange={(event) => setContamination(Number(event.target.value))}
-                  className="w-full accent-sky-500"
+                  className="w-full accent-[#9bf7c4]"
                 />
-                <span className="block text-[10px] text-slate-600">
+                <span className="block text-[11px] text-slate-400">
                   Allowed range 0.01 – 0.20, matching the API.
                 </span>
               </label>
@@ -463,13 +545,24 @@ function AnomaliesView({ token }) {
           )}
 
           {error && (
-            <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
-              {error}
-            </p>
+            <div
+              role="alert"
+              className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2"
+            >
+              <p className="min-w-0 flex-1 break-words text-xs text-rose-200">{error}</p>
+              <button
+                type="button"
+                onClick={run}
+                disabled={running}
+                className="shrink-0 rounded-md border border-rose-400/40 px-2.5 py-1 text-[11px] font-medium text-rose-100 transition hover:bg-rose-500/20 disabled:opacity-60"
+              >
+                Try again
+              </button>
+            </div>
           )}
 
           {running && !result && (
-            <p className="flex items-center gap-2 text-xs text-slate-500">
+            <p className="flex items-center gap-2 text-xs text-slate-400">
               <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
               Fitting IsolationForest and scoring each row
             </p>
@@ -478,22 +571,24 @@ function AnomaliesView({ token }) {
           {result ? (
             <Suspense
               fallback={
-                <p className="flex items-center gap-2 text-xs text-slate-500">
+                <p className="flex items-center gap-2 text-xs text-slate-400">
                   <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
                   Loading charts
                 </p>
               }
             >
-              <AnomalyPanel result={result} />
+              <ChartBoundary key={runId}>
+                <AnomalyPanel result={result} />
+              </ChartBoundary>
             </Suspense>
           ) : (
             !dataset && (
-              <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 p-10 text-center">
-                <Activity className="mx-auto size-7 text-slate-500" aria-hidden="true" />
+              <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
+                <Activity className="mx-auto size-7 text-slate-400" aria-hidden="true" />
                 <p className="mt-3 text-sm font-medium text-slate-200">
                   Upload a dataset to screen it
                 </p>
-                <p className="mx-auto mt-1 max-w-md text-xs leading-relaxed text-slate-500">
+                <p className="mx-auto mt-1 max-w-md text-xs leading-relaxed text-slate-400">
                   The score distribution, per-feature contributions and the most anomalous rows
                   render here as interactive charts once a dataset is analysed.
                 </p>
@@ -509,7 +604,7 @@ function AnomaliesView({ token }) {
 export default function App() {
   const [session, setSession] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
-  const [view, setView] = useState("chat");
+  const [view, setView] = useState("overview");
   const [online, setOnline] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [selectedDocId, setSelectedDocId] = useState(null);
@@ -523,7 +618,11 @@ export default function App() {
   const [clearing, setClearing] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [documentsError, setDocumentsError] = useState(null);
   const bottomRef = useRef(null);
+  // Guards against a double Enter and against a paper switch mid-request.
+  const sendingRef = useRef(false);
+  const selectedDocIdRef = useRef(null);
   // Set right before a refresh so the freshly uploaded paper is selected.
   const pendingDocRef = useRef(null);
 
@@ -574,12 +673,14 @@ export default function App() {
   useEffect(() => {
     if (!session) {
       setDocuments([]);
+      setDocumentsError(null);
       setSelectedDocId(null);
       setMessages([]);
       return;
     }
 
     let active = true;
+    setDocumentsError(null);
     fetchDocuments(session.access_token)
       .then((list) => {
         if (!active) return;
@@ -592,8 +693,10 @@ export default function App() {
           return list[0]?.id ?? null;
         });
       })
-      .catch(() => {
-        if (active) setDocuments([]);
+      .catch((error) => {
+        if (!active) return;
+        // An API failure must not read as an empty library.
+        setDocumentsError(error?.message ?? "The API did not answer the library request.");
       });
 
     return () => {
@@ -659,16 +762,25 @@ export default function App() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, sending, loadingHistory]);
 
+  useEffect(() => {
+    selectedDocIdRef.current = selectedDocId;
+  }, [selectedDocId]);
+
   async function handleSend() {
     const question = draft.trim();
-    if (!question || sending || !selectedDocId || !session) return;
+    if (!question || sendingRef.current || !selectedDocId || !session) return;
 
+    // The answer belongs to the paper that was open when the question was sent.
+    const askedDocId = selectedDocId;
+    sendingRef.current = true;
     setDraft("");
     setSending(true);
     setMessages((previous) => [...previous, { role: "user", content: question }]);
 
     try {
-      const payload = await sendQuery(selectedDocId, question, session.access_token);
+      const payload = await sendQuery(askedDocId, question, session.access_token);
+      // Switching papers mid-flight must not file the answer under the new one.
+      if (selectedDocIdRef.current !== askedDocId) return;
       setMessages((previous) => [
         ...previous,
         {
@@ -678,11 +790,18 @@ export default function App() {
         }
       ]);
     } catch (error) {
+      if (selectedDocIdRef.current !== askedDocId) return;
+      // A failed send must not cost the user the question they typed.
+      setDraft((current) => current || question);
       setMessages((previous) => [
         ...previous,
-        { role: "error", content: error?.message ?? "Inference failed" }
+        {
+          role: "error",
+          content: `${error?.message ?? "Inference failed"} — your question is back in the box.`
+        }
       ]);
     } finally {
+      sendingRef.current = false;
       setSending(false);
     }
   }
@@ -708,15 +827,16 @@ export default function App() {
     }
   }
 
-  async function handleExport(format) {
-    const latest = reports[0];
-    if (!latest || !session || exporting) return;
+  async function handleExport(format, reportId) {
+    // The chat bar exports the newest brief; the overview can name any of them.
+    const target = reportId ?? reports[0]?.id;
+    if (!target || !session || exporting) return;
 
     setExporting(format);
     setExportError(null);
     try {
       const { blob, filename } = await downloadReport(
-        latest.id,
+        target,
         format,
         session.access_token
       );
@@ -745,7 +865,7 @@ export default function App() {
 
   if (!authChecked) {
     return (
-      <div className="grid min-h-screen place-items-center text-slate-500">
+      <div className="grid min-h-screen place-items-center text-slate-400">
         <Loader2 className="size-5 animate-spin" aria-label="Loading" />
       </div>
     );
@@ -754,15 +874,48 @@ export default function App() {
   if (!session) return <AuthPage embedded />;
 
   return (
-    <div className="flex min-h-screen bg-slate-950 text-slate-100">
-      <aside className="flex w-64 shrink-0 flex-col border-r border-slate-800 bg-slate-900/50">
+    <div className="min-h-screen bg-[#04070a] text-slate-100">
+      {/* Below lg the sidebar would eat most of the width, so it collapses to one row. */}
+      <header className="sticky top-0 z-20 flex items-center gap-2 border-b border-white/[0.07] bg-[#04070a]/95 px-3 py-2 backdrop-blur lg:hidden">
+        <div className="mr-1 grid size-7 place-items-center rounded-lg border border-[#9bf7c4]/30 bg-gradient-to-br from-[#eafff3] to-[#9bf7c4] text-[11px] font-bold text-[#04120b]">
+          IF
+        </div>
+        {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setView(id)}
+            aria-label={label}
+            aria-current={view === id ? "page" : undefined}
+            className={clsx(
+              "grid size-9 place-items-center rounded-lg transition",
+              view === id
+                ? "bg-white/[0.07] text-[#9bf7c4] ring-1 ring-inset ring-[#9bf7c4]/20"
+                : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
+            )}
+          >
+            <Icon className="size-4" aria-hidden="true" />
+          </button>
+        ))}
+        <button
+          type="button"
+          onClick={() => supabase.auth.signOut()}
+          aria-label="Sign out"
+          className="ml-auto grid size-9 place-items-center rounded-lg text-slate-400 transition hover:bg-rose-500/10 hover:text-rose-300"
+        >
+          <LogOut className="size-4" aria-hidden="true" />
+        </button>
+      </header>
+
+      <div className="flex">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-white/[0.07] bg-[#04070a] lg:flex">
         <div className="flex items-center gap-3 px-5 py-5">
-          <div className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 text-sm font-bold text-white">
+          <div className="grid size-9 place-items-center rounded-xl border border-[#9bf7c4]/30 bg-gradient-to-br from-[#eafff3] to-[#9bf7c4] text-sm font-bold text-[#04120b]">
             IF
           </div>
           <div>
-            <p className="text-sm font-semibold leading-tight text-slate-50">InsightForge</p>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">
+            <p className="text-sm font-semibold leading-tight text-white">InsightForge</p>
+            <p className="text-[10px] uppercase tracking-[0.18em] text-[#9bf7c4]/60">
               Research console
             </p>
           </div>
@@ -782,18 +935,21 @@ export default function App() {
               className={clsx(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition",
                 view === id
-                  ? "bg-slate-800 text-slate-50"
-                  : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
+                  ? "bg-white/[0.07] text-white ring-1 ring-inset ring-[#9bf7c4]/20"
+                  : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
               )}
             >
-              <Icon className="size-4" aria-hidden="true" />
+              <Icon
+                className={clsx("size-4", view === id && "text-[#9bf7c4]")}
+                aria-hidden="true"
+              />
               {label}
             </button>
           ))}
         </nav>
 
-        <div className="mt-auto border-t border-slate-800 p-3">
-          <p className="truncate px-2 pb-2 text-xs text-slate-500">
+        <div className="mt-auto border-t border-white/[0.07] p-3">
+          <p className="truncate px-2 pb-2 text-xs text-slate-400">
             {session.user?.email ?? "Signed in"}
           </p>
           <button
@@ -808,9 +964,35 @@ export default function App() {
       </aside>
 
       <main className="flex min-w-0 flex-1 flex-col">
-        {view === "chat" ? (
+        {view === "overview" ? (
+          <Dashboard
+            documents={documents}
+            documentsError={documentsError}
+            selectedDocId={selectedDocId}
+            onSelectDocument={setSelectedDocId}
+            reports={reports}
+            online={online}
+            exporting={exporting}
+            onExport={handleExport}
+            onUpload={() => {
+              setShowUploader(true);
+              setView("chat");
+            }}
+            onOpenChat={(question) => {
+              if (question) setDraft(question);
+              setView("chat");
+            }}
+            onOpenPaper={(id) => {
+              setSelectedDocId(id);
+              setView("chat");
+            }}
+            onOpenAnomalies={() => setView("anomalies")}
+          />
+        ) : view === "chat" ? (
           <ChatPanel
             documents={documents}
+            documentsError={documentsError}
+            onRetryDocuments={() => setRefreshKey((key) => key + 1)}
             selectedDocId={selectedDocId}
             onSelectDocument={setSelectedDocId}
             messages={messages}
@@ -835,6 +1017,7 @@ export default function App() {
         )}
         <div ref={bottomRef} />
       </main>
+      </div>
     </div>
   );
 }
