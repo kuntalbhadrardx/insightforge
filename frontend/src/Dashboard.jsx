@@ -97,7 +97,7 @@ function LibraryChart({ documents, error, onUpload, onRetryDocuments }) {
         <button
           type="button"
           onClick={onUpload}
-          className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-[12px] font-semibold text-on-accent transition hover:bg-accent-light"
+          className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-[12px] font-semibold text-on-accent transition hover:bg-accent-light"
         >
           <Upload className="size-3.5" aria-hidden="true" />
           Upload your first paper
@@ -258,7 +258,7 @@ export default function Dashboard({
             <button
               type="button"
               onClick={onUpload}
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-accent-light to-accent px-4 py-2 text-[12.5px] font-semibold text-on-accent transition hover:brightness-105"
+                                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-gradient-to-r from-accent-light to-accent px-4 py-2 text-[12.5px] font-semibold text-on-accent transition hover:brightness-105"
             >
               <Upload className="size-3.5" aria-hidden="true" />
               Add a paper
@@ -308,7 +308,7 @@ export default function Dashboard({
                 <button
                   type="button"
                   onClick={() => onOpenChat("")}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11.5px] text-slate-300 transition hover:border-accent/40 hover:text-accent"
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11.5px] text-slate-300 transition hover:border-accent/40 hover:text-accent"
                 >
                   Open chat
                   <ArrowUpRight className="size-3" aria-hidden="true" />
@@ -325,7 +325,7 @@ export default function Dashboard({
               />
             </div>
 
-            <form onSubmit={handleAsk} className="dash-prompt mt-6">
+            <form onSubmit={handleAsk} className="dash-prompt mt-6 flex-wrap">
               <Sparkles className="size-4 shrink-0 text-[#94a3b8]" aria-hidden="true" />
               <input
                 value={question}
@@ -344,7 +344,7 @@ export default function Dashboard({
                     ? `Question for the research chat about ${paperLabel}`
                     : "Question for the research chat"
                 }
-                className="min-w-0 flex-1 bg-transparent text-[13px] text-slate-100 outline-none placeholder:text-slate-400"
+                className="min-h-11 w-full min-w-0 flex-1 bg-transparent text-[13px] text-slate-100 outline-none placeholder:text-slate-400 sm:w-auto"
               />
               {documents.length > 1 && (
                 <div className="relative shrink-0">
@@ -352,7 +352,7 @@ export default function Dashboard({
                     aria-label="Paper this question is about"
                     value={selectedDocId ?? ""}
                     onChange={(event) => onSelectDocument(event.target.value)}
-                    className="max-w-[10rem] appearance-none truncate rounded-full border border-white/10 bg-white/[0.04] py-1 pl-2.5 pr-6 text-[11px] text-slate-300 outline-none transition focus:border-accent/50"
+                    className="min-h-11 max-w-[10rem] appearance-none truncate rounded-full border border-white/10 bg-white/[0.04] py-1 pl-2.5 pr-6 text-[11px] text-slate-300 outline-none transition focus:border-accent/50"
                   >
                     {documents.map((doc) => (
                       <option key={doc.id} value={doc.id}>
@@ -370,7 +370,7 @@ export default function Dashboard({
                 type="submit"
                 disabled={!canAsk}
                 aria-label="Ask in research chat"
-                className="grid size-8 place-items-center rounded-full bg-white/10 text-slate-200 transition hover:bg-accent hover:text-on-accent disabled:cursor-not-allowed disabled:opacity-40"
+                className="grid size-11 shrink-0 place-items-center rounded-full bg-white/10 text-slate-200 transition hover:bg-accent hover:text-on-accent disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ArrowRight className="size-3.5" aria-hidden="true" />
               </button>
@@ -397,7 +397,7 @@ export default function Dashboard({
                         type="button"
                         onClick={() => onExport(format, reports[0].id)}
                         disabled={exporting !== null}
-                        className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 text-[11.5px] text-slate-200 transition hover:border-accent/40 hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
+                        className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 text-[11.5px] text-slate-200 transition hover:border-accent/40 hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {exporting === format ? (
                           <Loader2 className="size-3 animate-spin" aria-hidden="true" />

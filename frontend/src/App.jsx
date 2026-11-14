@@ -154,7 +154,7 @@ function ExportBar({ reports, exporting, error, onExport }) {
                   ? `Download the latest brief as ${format === "pdf" ? "PDF" : "Markdown"}`
                   : "Run the autonomous agent to generate a brief first"
               }
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[11px] font-medium text-slate-300 transition hover:border-accent/35 hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[11px] font-medium text-slate-300 transition hover:border-accent/35 hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
             >
               {exporting === format ? (
                 <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
@@ -226,7 +226,7 @@ function ChatPanel({
               onChange={(event) => onSelectDocument(event.target.value || null)}
               disabled={!hasDocuments}
               title={selected?.filename ?? "No papers indexed"}
-              className="max-w-[15rem] appearance-none truncate rounded-lg border border-white/10 bg-white/[0.04] py-2 pl-3 pr-9 text-xs text-slate-200 outline-none transition focus:border-accent/60 disabled:opacity-60"
+              className="min-h-11 max-w-[15rem] appearance-none truncate rounded-lg border border-white/10 bg-white/[0.04] py-2 pl-3 pr-9 text-xs text-slate-200 outline-none transition focus:border-accent/60 disabled:opacity-60"
             >
               {!hasDocuments && <option value="">No papers indexed</option>}
               {documents.map((doc) => (
@@ -247,7 +247,7 @@ function ChatPanel({
             aria-pressed={showUploader}
             title="Upload a PDF"
             className={clsx(
-              "grid size-9 place-items-center rounded-lg border transition",
+              "grid size-11 place-items-center rounded-lg border transition",
               showUploader
                 ? "border-accent/50 bg-accent/10 text-accent"
                 : "border-white/10 bg-white/[0.04] text-slate-400 hover:text-slate-200"
@@ -262,7 +262,7 @@ function ChatPanel({
             disabled={!hasDocument || clearing}
             aria-label="Clear chat"
             title={hasDocument ? "Delete this paper's saved conversation" : "Select a paper first"}
-            className="grid size-9 place-items-center rounded-lg border border-white/10 bg-white/[0.04] text-slate-400 transition hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-white/10 disabled:hover:bg-white/[0.04] disabled:hover:text-slate-400"
+            className="grid size-11 place-items-center rounded-lg border border-white/10 bg-white/[0.04] text-slate-400 transition hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-white/10 disabled:hover:bg-white/[0.04] disabled:hover:text-slate-400"
           >
             {clearing ? (
               <Loader2 className="size-4 animate-spin" aria-hidden="true" />
@@ -310,7 +310,7 @@ function ChatPanel({
               <button
                 type="button"
                 onClick={onRetryDocuments}
-                className="mt-3 rounded-lg border border-rose-400/40 bg-rose-500/10 px-3 py-1.5 text-[11px] font-medium text-rose-100 transition hover:bg-rose-500/20"
+                className="mt-3 min-h-11 rounded-lg border border-rose-400/40 bg-rose-500/10 px-3 py-1.5 text-[11px] font-medium text-rose-100 transition hover:bg-rose-500/20"
               >
                 Try again
               </button>
@@ -889,7 +889,7 @@ export default function App() {
             title={label}
             aria-current={view === id ? "page" : undefined}
             className={clsx(
-              "grid size-9 place-items-center rounded-lg transition",
+              "grid size-11 place-items-center rounded-lg transition",
               view === id
                 ? "bg-white/[0.07] text-accent ring-1 ring-inset ring-accent/20"
                 : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
@@ -903,7 +903,7 @@ export default function App() {
           onClick={() => supabase.auth.signOut()}
           aria-label="Sign out"
           title="Sign out"
-          className="ml-auto grid size-9 place-items-center rounded-lg text-slate-400 transition hover:bg-rose-500/10 hover:text-rose-300"
+          className="ml-auto grid size-11 place-items-center rounded-lg text-slate-400 transition hover:bg-rose-500/10 hover:text-rose-300"
         >
           <LogOut className="size-4" aria-hidden="true" />
         </button>

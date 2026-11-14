@@ -26,9 +26,11 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* One keyboard focus ring for the whole console, in the accent so it can't be
-   mistaken for a hover state. */
-:is(main, aside) :is(button, a, input, select, textarea, [role='button']):focus-visible {
+/* One keyboard focus ring for the whole app, in the accent so it can't be
+   mistaken for a hover state. Deliberately unscoped: the mobile header and the
+   auth card sit outside <main>/<aside>, and a focus ring that only exists in
+   some regions is worse than none. */
+:is(button, a, input, select, textarea, [role='button'], [tabindex]:not([tabindex='-1'])):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
