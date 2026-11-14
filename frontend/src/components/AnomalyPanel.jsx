@@ -1,10 +1,11 @@
 import createPlotlyComponent from "react-plotly.js/factory";
 import Plotly from "plotly.js/dist/plotly.min.js";
 import clsx from "clsx";
+import { ACCENT, accentAlpha } from "../theme";
 
 const Plot = createPlotlyComponent(Plotly);
 
-// Mint theme shared by every chart, so they read as one console surface.
+// Accent theme shared by every chart, so they read as one console surface.
 const BASE_LAYOUT = {
   paper_bgcolor: "rgba(0,0,0,0)",
   plot_bgcolor: "rgba(255,255,255,0.02)",
@@ -14,7 +15,7 @@ const BASE_LAYOUT = {
   legend: { orientation: "h", y: -0.28, font: { color: "#94a3b8", size: 10 } },
   hoverlabel: {
     bgcolor: "#0a0f14",
-    bordercolor: "rgba(155,247,196,0.3)",
+    bordercolor: accentAlpha(0.3),
     font: { color: "#e2e8f0" }
   }
 };
@@ -73,7 +74,8 @@ function ScoreDistributionChart({ distribution }) {
         y0: 0,
         y1: 1,
         yref: "paper",
-        line: { color: "#f59e0b", width: 1, dash: "dot" }
+        // Neutral, dashed: the cut-off must never be mistaken for the accent.
+        line: { color: "#cbd5e1", width: 1, dash: "6 4" }
       }
     ],
     annotations: [
@@ -83,7 +85,7 @@ function ScoreDistributionChart({ distribution }) {
         yref: "paper",
         text: `cut-off ${distribution.threshold}`,
         showarrow: false,
-        font: { color: "#f59e0b", size: 10 },
+        font: { color: "#cbd5e1", size: 10 },
         yshift: 6
       }
     ]
@@ -101,7 +103,7 @@ function ScoreDistributionChart({ distribution }) {
             name: "Normal",
             x: distribution.bin_centres,
             y: distribution.normal,
-            marker: { color: "rgba(155,247,196,0.62)" },
+            marker: { color: accentAlpha(0.62) },
             hovertemplate: "%{y} normal rows<br>score %{x}<extra></extra>"
           },
           {
@@ -149,8 +151,8 @@ function ContributionChart({ contributions }) {
               color: features.map((row) => row.contribution_percent),
               // Magnitude reads as one hue; rose is reserved for flagged rows.
               colorscale: [
-                [0, "rgba(155,247,196,0.3)"],
-                [1, "#9bf7c4"]
+                [0, accentAlpha(0.3)],
+                [1, ACCENT]
               ],
               showscale: false
             },

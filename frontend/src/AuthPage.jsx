@@ -118,7 +118,7 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#04070a] text-slate-200 antialiased selection:bg-[#9bf7c4]/25 selection:text-white">
+    <div className="min-h-screen overflow-x-hidden bg-[#04070a] text-slate-200 antialiased selection:bg-accent/25 selection:text-white">
       {!embedded && <SiteNav />}
 
       <main
@@ -138,10 +138,10 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
         </div>
 
         <div className="mx-auto w-full max-w-[520px]">
-          <div className="rounded-[26px] bg-gradient-to-b from-[#eafff2]/45 via-white/[0.07] to-white/0 p-px shadow-[0_0_150px_-40px_rgba(200,255,224,0.6)]">
+          <div className="rounded-[26px] bg-gradient-to-b from-white/45 via-white/[0.07] to-white/0 p-px">
             <div className="rounded-[25px] border border-white/[0.04] bg-[#070c0f]/85 px-6 py-9 backdrop-blur-xl sm:px-10 sm:py-10">
               <div className="text-center">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-[#9bf7c4]">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[#94a3b8]">
                   Research console
                 </p>
                 <h1 className="mt-3 text-[27px] font-medium leading-tight tracking-[-0.02em] text-white sm:text-[30px]">
@@ -209,7 +209,7 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
                       type="checkbox"
                       checked={remember}
                       onChange={(event) => setRemember(event.target.checked)}
-                      className="size-3.5 cursor-pointer rounded border-white/20 bg-white/5 accent-[#9bf7c4]"
+                      className="size-3.5 cursor-pointer rounded border-white/20 bg-white/5 [accent-color:var(--accent)]"
                     />
                     Remember me
                   </label>
@@ -219,7 +219,7 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
                       type="button"
                       onClick={handleForgot}
                       disabled={busy}
-                      className="text-[12.5px] text-slate-400 transition hover:text-[#9bf7c4] disabled:opacity-60"
+                      className="text-[12.5px] text-slate-400 transition hover:text-accent disabled:opacity-60"
                     >
                       Forgot password?
                     </button>
@@ -237,7 +237,7 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
                 {notice && (
                   <p
                     role="status"
-                    className="mt-4 rounded-xl border border-[#9bf7c4]/25 bg-[#9bf7c4]/10 px-3 py-2 text-[12.5px] leading-relaxed text-[#c8ffe0]"
+                    className="mt-4 rounded-xl border border-accent/25 bg-accent/10 px-3 py-2 text-[12.5px] leading-relaxed text-accent-light"
                   >
                     {notice}
                   </p>
@@ -246,7 +246,7 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-white to-[#a7f3d0] text-[13.5px] font-semibold text-[#04120b] shadow-[0_0_36px_-12px_rgba(167,243,208,0.85)] transition hover:shadow-[0_0_48px_-8px_rgba(167,243,208,1)] disabled:cursor-not-allowed disabled:opacity-70"
+                  className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-accent text-[13.5px] font-semibold text-on-accent shadow-[0_0_30px_-14px_rgba(253, 197, 0,0.55)] transition hover:bg-accent-light disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {busy && <Loader2 className="size-4 animate-spin" />}
                   {isSignIn ? 'Sign in' : 'Create account'}
@@ -290,7 +290,7 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
                 <button
                   type="button"
                   onClick={switchMode}
-                  className="font-medium text-[#9bf7c4] transition hover:text-white"
+                  className="font-medium text-accent transition hover:text-white"
                 >
                   {isSignIn ? 'Create one' : 'Sign in'}
                 </button>

@@ -7,7 +7,7 @@ const NAV_LINKS = [
 export function Mark({ className = 'size-9' }) {
   return (
     <span
-      className={`grid place-items-center rounded-[10px] bg-gradient-to-br from-white via-[#eafff2] to-[#9bf7c4] text-[13px] font-bold tracking-tight text-[#04120b] ${className}`}
+      className={`grid place-items-center rounded-[10px] bg-gradient-to-br from-white via-accent-light to-accent text-[13px] font-bold tracking-tight text-on-accent ${className}`}
     >
       IF
     </span>
@@ -40,7 +40,7 @@ export default function SiteNav() {
           </a>
           <a
             href="/"
-            className="inline-flex min-h-11 items-center rounded-full bg-gradient-to-b from-white to-[#b8ffd4] px-4 text-[13px] font-semibold text-[#04120b] shadow-[0_0_28px_-6px_rgba(184,255,212,0.65)] transition hover:from-white hover:to-white"
+            className="inline-flex min-h-11 items-center rounded-full bg-gradient-to-b from-accent-light to-accent px-4 text-[13px] font-semibold text-on-accent shadow-[0_0_28px_-8px_rgba(253, 197, 0,0.4)] transition hover:brightness-105"
           >
             Open the console
           </a>

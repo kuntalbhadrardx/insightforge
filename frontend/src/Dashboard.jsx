@@ -39,7 +39,7 @@ function Stat({ icon: Icon, label, value, hint }) {
     <div className="dash-card group relative overflow-hidden p-5">
       <div className="flex items-start justify-between gap-3">
         <p className="text-[12px] font-medium tracking-wide text-slate-400">{label}</p>
-        <span className="grid size-7 place-items-center rounded-lg border border-white/10 bg-white/[0.04] text-[#9bf7c4]/80">
+        <span className="grid size-7 place-items-center rounded-lg border border-white/10 bg-white/[0.04] text-accent/80">
           <Icon className="size-3.5" aria-hidden="true" />
         </span>
       </div>
@@ -208,7 +208,7 @@ export default function Dashboard({
       <div className="relative mx-auto max-w-[1180px]">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.26em] text-[#9bf7c4]/80">
+            <p className="text-[11px] font-medium uppercase tracking-[0.26em] text-accent/80">
               Research console
             </p>
             <h1 className="mt-2 text-[2.9rem] font-medium leading-none tracking-[-0.03em] text-white sm:text-[3.4rem]">
@@ -222,7 +222,7 @@ export default function Dashboard({
               aria-live="polite"
               className={clsx(
                 "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11.5px]",
-                online === true && "border-[#9bf7c4]/30 bg-[#9bf7c4]/10 text-[#9bf7c4]",
+                online === true && "border-accent/30 bg-accent/10 text-accent",
                 online === false && "border-rose-500/30 bg-rose-500/10 text-rose-300",
                 online === null && "border-white/10 bg-white/5 text-slate-400"
               )}
@@ -230,7 +230,7 @@ export default function Dashboard({
               <span
                 className={clsx(
                   "size-1.5 rounded-full",
-                  online === true && "bg-[#9bf7c4]",
+                  online === true && "bg-accent",
                   online === false && "bg-rose-400",
                   online === null && "animate-pulse bg-slate-500"
                 )}
@@ -240,7 +240,7 @@ export default function Dashboard({
             <button
               type="button"
               onClick={onUpload}
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-white to-[#a7f3d0] px-4 py-2 text-[12.5px] font-semibold text-[#04120b] transition hover:brightness-105"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-accent-light to-accent px-4 py-2 text-[12.5px] font-semibold text-on-accent transition hover:brightness-105"
             >
               <Upload className="size-3.5" aria-hidden="true" />
               Add a paper
@@ -287,7 +287,7 @@ export default function Dashboard({
               <button
                 type="button"
                 onClick={() => onOpenChat("")}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11.5px] text-slate-300 transition hover:border-[#9bf7c4]/40 hover:text-[#9bf7c4]"
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11.5px] text-slate-300 transition hover:border-accent/40 hover:text-accent"
               >
                 Open chat
                 <ArrowUpRight className="size-3" aria-hidden="true" />
@@ -299,7 +299,7 @@ export default function Dashboard({
             </div>
 
             <form onSubmit={handleAsk} className="dash-prompt mt-6">
-              <Sparkles className="size-4 shrink-0 text-[#9bf7c4]" aria-hidden="true" />
+              <Sparkles className="size-4 shrink-0 text-accent" aria-hidden="true" />
               <input
                 value={question}
                 onChange={(event) => setQuestion(event.target.value)}
@@ -325,7 +325,7 @@ export default function Dashboard({
                     aria-label="Paper this question is about"
                     value={selectedDocId ?? ""}
                     onChange={(event) => onSelectDocument(event.target.value)}
-                    className="max-w-[10rem] appearance-none truncate rounded-full border border-white/10 bg-white/[0.04] py-1 pl-2.5 pr-6 text-[11px] text-slate-300 outline-none transition focus:border-[#9bf7c4]/50"
+                    className="max-w-[10rem] appearance-none truncate rounded-full border border-white/10 bg-white/[0.04] py-1 pl-2.5 pr-6 text-[11px] text-slate-300 outline-none transition focus:border-accent/50"
                   >
                     {documents.map((doc) => (
                       <option key={doc.id} value={doc.id}>
@@ -343,7 +343,7 @@ export default function Dashboard({
                 type="submit"
                 disabled={!canAsk}
                 aria-label="Ask in research chat"
-                className="grid size-8 place-items-center rounded-full bg-white/10 text-slate-200 transition hover:bg-[#9bf7c4] hover:text-[#04120b] disabled:cursor-not-allowed disabled:opacity-40"
+                className="grid size-8 place-items-center rounded-full bg-white/10 text-slate-200 transition hover:bg-accent hover:text-on-accent disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ArrowRight className="size-3.5" aria-hidden="true" />
               </button>
@@ -370,7 +370,7 @@ export default function Dashboard({
                         type="button"
                         onClick={() => onExport(format, reports[0].id)}
                         disabled={exporting !== null}
-                        className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 text-[11.5px] text-slate-200 transition hover:border-[#9bf7c4]/40 hover:text-[#9bf7c4] disabled:cursor-not-allowed disabled:opacity-50"
+                        className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 text-[11.5px] text-slate-200 transition hover:border-accent/40 hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {exporting === format ? (
                           <Loader2 className="size-3 animate-spin" aria-hidden="true" />
@@ -439,7 +439,7 @@ export default function Dashboard({
                       onClick={() => onOpenPaper(doc.id)}
                       className="group flex w-full items-center gap-3 py-3 text-left"
                     >
-                      <span className="grid size-8 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/[0.03] text-slate-400 transition group-hover:border-[#9bf7c4]/40 group-hover:text-[#9bf7c4]">
+                      <span className="grid size-8 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/[0.03] text-slate-400 transition group-hover:border-accent/40 group-hover:text-accent">
                         <FileText className="size-3.5" aria-hidden="true" />
                       </span>
                       <span className="min-w-0 flex-1">

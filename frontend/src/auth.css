@@ -2,9 +2,9 @@
 
 .auth-dots {
   position: absolute;
-  background-image: radial-gradient(rgba(155, 247, 196, 0.65) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(253, 197, 0, 0.65) 1px, transparent 1px);
   background-size: 9px 9px;
-  opacity: 0.16;
+  opacity: 0.08;
   mask-image: radial-gradient(closest-side, #000 42%, transparent 100%);
   -webkit-mask-image: radial-gradient(closest-side, #000 42%, transparent 100%);
   pointer-events: none;
@@ -18,7 +18,7 @@
 }
 
 .auth-required {
-  color: #9bf7c4;
+  color: var(--accent);
 }
 
 .auth-input {
@@ -39,7 +39,7 @@
 }
 
 .auth-input:focus {
-  border-color: rgba(155, 247, 196, 0.55);
+  border-color: rgba(253, 197, 0, 0.55);
   background: rgba(255, 255, 255, 0.045);
-  box-shadow: 0 0 0 3px rgba(155, 247, 196, 0.12);
+  box-shadow: 0 0 0 3px rgba(253, 197, 0, 0.12);
 }

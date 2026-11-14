@@ -44,7 +44,7 @@ function StatusPill({ online }) {
     <span
       className={clsx(
         "inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] font-medium ring-1 ring-inset",
-        online === true && "bg-[#9bf7c4]/10 text-[#9bf7c4] ring-[#9bf7c4]/30",
+        online === true && "bg-accent/10 text-accent ring-accent/30",
         online === false && "bg-rose-500/10 text-rose-300 ring-rose-500/30",
         online === null && "bg-white/5 text-slate-400 ring-white/10"
       )}
@@ -52,7 +52,7 @@ function StatusPill({ online }) {
       <span
         className={clsx(
           "size-1.5 rounded-full",
-          online === true && "bg-[#9bf7c4]",
+          online === true && "bg-accent",
           online === false && "bg-rose-400",
           online === null && "animate-pulse bg-slate-500"
         )}
@@ -81,7 +81,7 @@ function MessageBubble({ message }) {
         className={clsx(
           "max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-4 py-3 text-sm leading-relaxed",
           isUser
-            ? "rounded-br-sm bg-gradient-to-br from-[#eafff3] to-[#9bf7c4] text-[#04120b]"
+            ? "rounded-br-sm bg-gradient-to-br from-accent-light to-accent text-on-accent"
             : "rounded-bl-sm border border-white/10 bg-white/[0.04] text-slate-200"
         )}
       >
@@ -95,7 +95,7 @@ function MessageBubble({ message }) {
                 className={clsx(
                   "rounded-md px-1.5 py-0.5 text-[11px]",
                   isUser
-                    ? "bg-[#04120b]/10 text-[#04120b]/80"
+                    ? "bg-on-accent/10 text-on-accent/80"
                     : "bg-white/[0.06] text-slate-400"
                 )}
               >
@@ -117,7 +117,7 @@ function ThinkingBubble() {
           {[0, 150, 300].map((delay) => (
             <span
               key={delay}
-              className="size-1.5 animate-pulse rounded-full bg-[#9bf7c4]"
+              className="size-1.5 animate-pulse rounded-full bg-accent"
               style={{ animationDelay: `${delay}ms` }}
             />
           ))}
@@ -154,7 +154,7 @@ function ExportBar({ reports, exporting, error, onExport }) {
                   ? `Download the latest brief as ${format === "pdf" ? "PDF" : "Markdown"}`
                   : "Run the autonomous agent to generate a brief first"
               }
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[11px] font-medium text-slate-300 transition hover:border-[#9bf7c4]/35 hover:text-[#9bf7c4] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[11px] font-medium text-slate-300 transition hover:border-accent/35 hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
             >
               {exporting === format ? (
                 <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
@@ -226,7 +226,7 @@ function ChatPanel({
               onChange={(event) => onSelectDocument(event.target.value || null)}
               disabled={!hasDocuments}
               title={selected?.filename ?? "No papers indexed"}
-              className="max-w-[15rem] appearance-none truncate rounded-lg border border-white/10 bg-white/[0.04] py-2 pl-3 pr-9 text-xs text-slate-200 outline-none transition focus:border-[#9bf7c4]/60 disabled:opacity-60"
+              className="max-w-[15rem] appearance-none truncate rounded-lg border border-white/10 bg-white/[0.04] py-2 pl-3 pr-9 text-xs text-slate-200 outline-none transition focus:border-accent/60 disabled:opacity-60"
             >
               {!hasDocuments && <option value="">No papers indexed</option>}
               {documents.map((doc) => (
@@ -249,7 +249,7 @@ function ChatPanel({
             className={clsx(
               "grid size-9 place-items-center rounded-lg border transition",
               showUploader
-                ? "border-[#9bf7c4]/50 bg-[#9bf7c4]/10 text-[#9bf7c4]"
+                ? "border-accent/50 bg-accent/10 text-accent"
                 : "border-white/10 bg-white/[0.04] text-slate-400 hover:text-slate-200"
             )}
           >
@@ -330,7 +330,7 @@ function ChatPanel({
 
           {hasDocuments && !loadingHistory && messages.length === 0 && (
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
-              <Sparkles className="mx-auto size-6 text-[#9bf7c4]" aria-hidden="true" />
+              <Sparkles className="mx-auto size-6 text-accent" aria-hidden="true" />
               <p
                 className="mt-3 break-words text-sm font-medium text-slate-200"
                 title={selected?.filename}
@@ -374,13 +374,13 @@ function ChatPanel({
             placeholder={
               hasDocument ? "Ask about methods, results, limitations…" : "Select a paper to start"
             }
-            className="max-h-40 min-h-11 flex-1 resize-none rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-100 placeholder:text-slate-400 outline-none transition focus:border-[#9bf7c4]/60 focus:ring-2 focus:ring-[#9bf7c4]/20 disabled:cursor-not-allowed disabled:opacity-60"
+            className="max-h-40 min-h-11 flex-1 resize-none rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-100 placeholder:text-slate-400 outline-none transition focus:border-accent/60 focus:ring-2 focus:ring-accent/20 disabled:cursor-not-allowed disabled:opacity-60"
           />
           <button
             type="submit"
             disabled={!canSend}
             aria-label="Send question"
-            className="grid size-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#eafff3] to-[#9bf7c4] text-[#04120b] transition hover:brightness-110 disabled:cursor-not-allowed disabled:from-white/10 disabled:to-white/10 disabled:text-slate-400"
+            className="grid size-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-accent-light to-accent text-on-accent transition hover:brightness-110 disabled:cursor-not-allowed disabled:from-white/10 disabled:to-white/10 disabled:text-slate-400"
           >
             {sending ? (
               <Loader2 className="size-4 animate-spin" aria-hidden="true" />
@@ -510,7 +510,7 @@ function AnomaliesView({ token }) {
                   type="button"
                   onClick={run}
                   disabled={running}
-                  className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-br from-[#eafff3] to-[#9bf7c4] px-4 py-2 text-xs font-semibold text-[#04120b] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-br from-accent-light to-accent px-4 py-2 text-xs font-semibold text-on-accent transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {running ? (
                     <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
@@ -535,7 +535,7 @@ function AnomaliesView({ token }) {
                   step={0.01}
                   value={contamination}
                   onChange={(event) => setContamination(Number(event.target.value))}
-                  className="w-full accent-[#9bf7c4]"
+                  className="w-full [accent-color:var(--accent)]"
                 />
                 <span className="block text-[11px] text-slate-400">
                   Allowed range 0.01 – 0.20, matching the API.
@@ -877,7 +877,7 @@ export default function App() {
     <div className="min-h-screen bg-[#04070a] text-slate-100">
       {/* Below lg the sidebar would eat most of the width, so it collapses to one row. */}
       <header className="sticky top-0 z-20 flex items-center gap-2 border-b border-white/[0.07] bg-[#04070a]/95 px-3 py-2 backdrop-blur lg:hidden">
-        <div className="mr-1 grid size-7 place-items-center rounded-lg border border-[#9bf7c4]/30 bg-gradient-to-br from-[#eafff3] to-[#9bf7c4] text-[11px] font-bold text-[#04120b]">
+        <div className="mr-1 grid size-7 place-items-center rounded-lg border border-accent/30 bg-gradient-to-br from-accent-light to-accent text-[11px] font-bold text-on-accent">
           IF
         </div>
         {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
@@ -890,7 +890,7 @@ export default function App() {
             className={clsx(
               "grid size-9 place-items-center rounded-lg transition",
               view === id
-                ? "bg-white/[0.07] text-[#9bf7c4] ring-1 ring-inset ring-[#9bf7c4]/20"
+                ? "bg-white/[0.07] text-accent ring-1 ring-inset ring-accent/20"
                 : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
             )}
           >
@@ -910,12 +910,12 @@ export default function App() {
       <div className="flex">
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-white/[0.07] bg-[#04070a] lg:flex">
         <div className="flex items-center gap-3 px-5 py-5">
-          <div className="grid size-9 place-items-center rounded-xl border border-[#9bf7c4]/30 bg-gradient-to-br from-[#eafff3] to-[#9bf7c4] text-sm font-bold text-[#04120b]">
+          <div className="grid size-9 place-items-center rounded-xl border border-accent/30 bg-gradient-to-br from-accent-light to-accent text-sm font-bold text-on-accent">
             IF
           </div>
           <div>
             <p className="text-sm font-semibold leading-tight text-white">InsightForge</p>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-[#9bf7c4]/60">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-accent/60">
               Research console
             </p>
           </div>
@@ -935,12 +935,12 @@ export default function App() {
               className={clsx(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition",
                 view === id
-                  ? "bg-white/[0.07] text-white ring-1 ring-inset ring-[#9bf7c4]/20"
+                  ? "bg-white/[0.07] text-white ring-1 ring-inset ring-accent/20"
                   : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
               )}
             >
               <Icon
-                className={clsx("size-4", view === id && "text-[#9bf7c4]")}
+                className={clsx("size-4", view === id && "text-accent")}
                 aria-hidden="true"
               />
               {label}

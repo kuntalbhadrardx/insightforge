@@ -89,7 +89,7 @@ function Hero() {
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
             href="/"
-            className="group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-b from-white to-[#a7f3d0] px-6 py-3 text-sm font-semibold text-[#04120b] shadow-[0_0_40px_-8px_rgba(167,243,208,0.7)] transition hover:shadow-[0_0_54px_-6px_rgba(167,243,208,0.9)]"
+            className="group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-b from-accent-light to-accent px-6 py-3 text-sm font-semibold text-on-accent shadow-[0_0_40px_-10px_rgba(253, 197, 0,0.45)] transition hover:shadow-[0_0_54px_-8px_rgba(253, 197, 0,0.6)]"
           >
             Open the console
             <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
@@ -105,7 +105,7 @@ function Hero() {
         <ul className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-[12.5px] text-slate-400">
           {TRUST.map(({ icon: Icon, label }) => (
             <li key={label} className="flex items-center gap-2">
-              <Icon className="size-[14px] text-[#9bf7c4]" strokeWidth={1.6} />
+              <Icon className="size-[14px] text-accent" strokeWidth={1.6} />
               {label}
             </li>
           ))}
@@ -126,7 +126,7 @@ function ProductWindow() {
         <div className="lp-bloom" aria-hidden="true" />
         {/* Where the shaft meets the window, the light spills along its top edge. */}
         <div
-          className="pointer-events-none absolute left-1/2 top-0 h-28 w-[62%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#c8ffe0]/25 blur-3xl"
+          className="pointer-events-none absolute left-1/2 top-0 h-28 w-[62%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/20 blur-3xl"
           aria-hidden="true"
         />
 
@@ -135,7 +135,7 @@ function ProductWindow() {
             below carries the meaning instead. */}
         <div
           aria-hidden="true"
-          className="relative rounded-[22px] bg-gradient-to-b from-[#eafff2]/60 via-white/10 to-white/0 p-px shadow-[0_0_140px_-30px_rgba(200,255,224,0.75)]"
+          className="relative rounded-[22px] bg-gradient-to-b from-accent-light/60 via-white/10 to-white/0 p-px shadow-[0_0_140px_-40px_rgba(253, 197, 0,0.3)]"
         >
           <div className="overflow-hidden rounded-[21px] border border-white/[0.08] bg-[#04070a]">
             <div className="grid md:grid-cols-[200px_1fr] lg:grid-cols-[212px_1fr]">
@@ -157,7 +157,7 @@ function Sidebar() {
   return (
     <aside className="hidden border-r border-white/[0.08] bg-white/[0.02] px-3 py-4 md:block">
       <div className="mb-6 flex items-center gap-2.5 px-1">
-        <span className="grid size-7 place-items-center rounded-lg bg-gradient-to-br from-white via-[#eafff2] to-[#9bf7c4] text-[11px] font-bold text-[#04120b]">
+        <span className="grid size-7 place-items-center rounded-lg bg-gradient-to-br from-white via-accent-light to-accent text-[11px] font-bold text-on-accent">
           IF
         </span>
         <span className="text-[13px] font-semibold tracking-tight text-white">InsightForge</span>
@@ -169,12 +169,12 @@ function Sidebar() {
             key={label}
             className={
               active
-                ? 'flex items-center gap-2.5 rounded-lg bg-white/[0.07] px-2.5 py-2 text-[12.5px] font-medium text-white ring-1 ring-inset ring-[#9bf7c4]/20'
+                ? 'flex items-center gap-2.5 rounded-lg bg-white/[0.07] px-2.5 py-2 text-[12.5px] font-medium text-white ring-1 ring-inset ring-accent/20'
                 : 'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[12.5px] text-[#94a3b8]'
             }
           >
             <Icon
-              className={active ? 'size-3.5 text-[#9bf7c4]' : 'size-3.5 text-[#7c8ba1]'}
+              className={active ? 'size-3.5 text-accent' : 'size-3.5 text-[#7c8ba1]'}
               strokeWidth={1.7}
               aria-hidden="true"
             />
@@ -208,8 +208,8 @@ function ChatSurface() {
       <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
         <p className="text-[13px] font-medium text-slate-200">Research Chat</p>
         <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#9bf7c4]/10 px-2 py-0.5 text-[11px] font-medium text-[#9bf7c4] ring-1 ring-inset ring-[#9bf7c4]/30">
-            <span className="size-1.5 rounded-full bg-[#9bf7c4]" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-medium text-accent ring-1 ring-inset ring-accent/30">
+            <span className="size-1.5 rounded-full bg-accent" />
             Online
           </span>
           <span className="size-6 rounded-full bg-white/10" />
@@ -236,7 +236,7 @@ function ChatSurface() {
 
       <div className="mx-auto max-w-xl space-y-4">
         <div className="flex justify-end">
-          <p className="max-w-[85%] rounded-2xl rounded-br-sm bg-gradient-to-br from-[#eafff3] to-[#9bf7c4] px-3.5 py-2.5 text-[12.5px] leading-relaxed text-[#04120b]">
+          <p className="max-w-[85%] rounded-2xl rounded-br-sm bg-gradient-to-br from-accent-light to-accent px-3.5 py-2.5 text-[12.5px] leading-relaxed text-on-accent">
             How does multi-head attention differ from a single head?
           </p>
         </div>
@@ -263,7 +263,7 @@ function ChatSurface() {
             <span className="grid size-6 place-items-center rounded-md text-[#7c8ba1]">
               <Paperclip className="size-3.5" strokeWidth={1.7} />
             </span>
-            <span className="grid size-6 place-items-center rounded-md bg-gradient-to-b from-white to-[#a7f3d0] text-[#04120b]">
+            <span className="grid size-6 place-items-center rounded-md bg-gradient-to-b from-accent-light to-accent text-on-accent">
               <Send className="size-3" strokeWidth={2} />
             </span>
           </div>
@@ -329,7 +329,7 @@ function ClosingCta() {
   return (
     <section className="relative isolate overflow-hidden px-6 pt-4 pb-20">
       <div
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[840px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,255,224,0.26),rgba(52,211,153,0.1),transparent)] blur-2xl"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[840px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,255,255,0.16),rgba(255,255,255,0.06),transparent)] blur-2xl"
         aria-hidden="true"
       />
       <div className="relative mx-auto max-w-2xl text-center">
@@ -341,13 +341,13 @@ function ClosingCta() {
         </p>
         <a
           href="/"
-          className="group mt-9 inline-flex items-center gap-2 rounded-full bg-gradient-to-b from-white to-[#a7f3d0] px-6 py-3 text-sm font-semibold text-[#04120b] shadow-[0_0_40px_-8px_rgba(167,243,208,0.7)] transition hover:shadow-[0_0_54px_-6px_rgba(167,243,208,0.9)]"
+          className="group mt-9 inline-flex items-center gap-2 rounded-full bg-gradient-to-b from-accent-light to-accent px-6 py-3 text-sm font-semibold text-on-accent shadow-[0_0_40px_-10px_rgba(253, 197, 0,0.45)] transition hover:shadow-[0_0_54px_-8px_rgba(253, 197, 0,0.6)]"
         >
           Open the console
           <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
         </a>
         <p className="mt-4 flex items-center justify-center gap-1.5 text-[12px] text-[#7c8ba1]">
-          <Check className="size-3.5 text-[#9bf7c4]" strokeWidth={2} />
+          <Check className="size-3.5 text-accent" strokeWidth={2} />
           Bring your own data — nothing leaves the pipeline you run
         </p>
       </div>
@@ -388,7 +388,7 @@ function Footer() {
 
 export default function Landing() {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#04070a] text-slate-200 antialiased selection:bg-[#9bf7c4]/25 selection:text-white">
+    <div className="min-h-screen overflow-x-hidden bg-[#04070a] text-slate-200 antialiased selection:bg-accent/25 selection:text-white">
       <SiteNav />
       <main>
         <Hero />
