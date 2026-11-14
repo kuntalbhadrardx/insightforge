@@ -330,7 +330,7 @@ function ChatPanel({
 
           {hasDocuments && !loadingHistory && messages.length === 0 && (
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
-              <Sparkles className="mx-auto size-6 text-accent" aria-hidden="true" />
+              <Sparkles className="mx-auto size-6 text-[#94a3b8]" aria-hidden="true" />
               <p
                 className="mt-3 break-words text-sm font-medium text-slate-200"
                 title={selected?.filename}
@@ -917,7 +917,7 @@ export default function App() {
           </div>
           <div>
             <p className="text-sm font-semibold leading-tight text-white">InsightForge</p>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-accent/60">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-[#94a3b8]">
               Research console
             </p>
           </div>

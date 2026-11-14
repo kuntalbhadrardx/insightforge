@@ -105,7 +105,7 @@ function Hero() {
         <ul className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-[12.5px] text-slate-400">
           {TRUST.map(({ icon: Icon, label }) => (
             <li key={label} className="flex items-center gap-2">
-              <Icon className="size-[14px] text-accent" strokeWidth={1.6} />
+              <Icon className="size-[14px] text-[#94a3b8]" strokeWidth={1.6} />
               {label}
             </li>
           ))}
@@ -135,7 +135,7 @@ function ProductWindow() {
             below carries the meaning instead. */}
         <div
           aria-hidden="true"
-          className="relative rounded-[22px] bg-gradient-to-b from-accent-light/60 via-white/10 to-white/0 p-px shadow-[0_0_140px_-40px_rgba(253, 197, 0,0.3)]"
+          className="relative rounded-[22px] bg-gradient-to-b from-white/40 via-white/10 to-white/0 p-px shadow-[0_0_140px_-40px_rgba(255,255,255,0.12)]"
         >
           <div className="overflow-hidden rounded-[21px] border border-white/[0.08] bg-[#04070a]">
             <div className="grid md:grid-cols-[200px_1fr] lg:grid-cols-[212px_1fr]">
@@ -347,7 +347,7 @@ function ClosingCta() {
           <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
         </a>
         <p className="mt-4 flex items-center justify-center gap-1.5 text-[12px] text-[#94a3b8]">
-          <Check className="size-3.5 text-accent" strokeWidth={2} />
+          <Check className="size-3.5 text-[#94a3b8]" strokeWidth={2} />
           Bring your own data — nothing leaves the pipeline you run
         </p>
       </div>

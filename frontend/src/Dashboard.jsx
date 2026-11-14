@@ -39,7 +39,7 @@ function Stat({ icon: Icon, label, value, hint }) {
     <div className="dash-card group relative overflow-hidden p-5">
       <div className="flex items-start justify-between gap-3">
         <p className="text-[12px] font-medium tracking-wide text-slate-400">{label}</p>
-        <span className="grid size-7 place-items-center rounded-lg border border-white/10 bg-white/[0.04] text-accent/80">
+        <span className="grid size-7 place-items-center rounded-lg border border-white/10 bg-white/[0.04] text-[#94a3b8]">
           <Icon className="size-3.5" aria-hidden="true" />
         </span>
       </div>
@@ -226,7 +226,7 @@ export default function Dashboard({
       <div className="relative mx-auto max-w-[1180px]">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.26em] text-accent/80">
+            <p className="text-[11px] font-medium uppercase tracking-[0.26em] text-[#94a3b8]">
               Research console
             </p>
             <h1 className="mt-2 text-[2.9rem] font-medium leading-none tracking-[-0.03em] text-white sm:text-[3.4rem]">
@@ -326,7 +326,7 @@ export default function Dashboard({
             </div>
 
             <form onSubmit={handleAsk} className="dash-prompt mt-6">
-              <Sparkles className="size-4 shrink-0 text-accent" aria-hidden="true" />
+              <Sparkles className="size-4 shrink-0 text-[#94a3b8]" aria-hidden="true" />
               <input
                 value={question}
                 onChange={(event) => setQuestion(event.target.value)}

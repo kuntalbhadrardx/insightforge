@@ -2,7 +2,7 @@
 
 .auth-dots {
   position: absolute;
-  background-image: radial-gradient(rgba(253, 197, 0, 0.65) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px);
   background-size: 9px 9px;
   opacity: 0.08;
   mask-image: radial-gradient(closest-side, #000 42%, transparent 100%);

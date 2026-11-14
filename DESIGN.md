@@ -19,6 +19,11 @@ colors:
   accent-glow: "rgba(253, 197, 0, 0.07)"
   signal-negative: "#f43f5e"
   cutoff: "#cbd5e1"
+  surface-elevated: "#070c0f"
+  surface-tooltip: "#0a0f14"
+  ink-plot: "#e2e8f0"
+  ink-input: "#f1f5f9"
+  rose-ring: "#fda4af"
 typography:
   display:
     fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
@@ -157,6 +162,11 @@ A near-black instrument surface, a sodium-yellow readout, and one strictly seman
 - **Signal White** (`#f8fafc`) and **Readout Grey** (`#cbd5e1`): headings, answers, and primary values.
 - **Annotation** (`#94a3b8`, 7.9:1 on the canvas): secondary text, hints, metadata, axis labels.
 - **Whisper** (`#7c8ba1`, 5.8:1): the faintest permitted text — collapsed list meta, chart tick labels, placeholders.
+- **Surface Elevation** (`#070c0f`): the auth card's inner panel, one step above the canvas so the form separates from the light shaft behind it.
+- **Tooltip** (`#0a0f14`): chart hover labels and the Overview bar tooltip.
+- **Plot Ink** (`#e2e8f0`): Plotly tick, legend and label text.
+- **Input Ink** (`#f1f5f9`): typed text inside the auth inputs, a touch brighter than Readout Grey.
+- **Rose Ring** (`#fda4af`): the 1px outline on flagged-row markers, so a small rose dot still has an edge.
 
 ### Secondary
 - **Alert Rose** (`#f43f5e`): faults only — offline, error banners, flagged bars, destructive hover. Appears as a 10% fill with 30% ring and 200-level text, never as a large solid.
@@ -166,6 +176,16 @@ A near-black instrument surface, a sodium-yellow readout, and one strictly seman
 **The Yellow-Is-A-State Rule.** The accent marks something the user can do, has selected, or the system is reporting. It is never a decorative accent, a background wash, or a bullet colour. If an accent element is not actionable, selected, or a status, it is wrong.
 
 **The Two-Hue Chart Rule.** A chart uses one hue for magnitude (accent at 30–62% alpha) and rose for anomaly. Never interpolate between accent and rose across a continuous scale — the RGB midpoint between yellow and rose goes muddy brown.
+
+### Named Exceptions
+Three places carry the accent for reasons other than state. They are deliberate, and they are the only ones.
+
+- **Brand mark.** The logotype — the "IF" tile and the wordmark beside it — wears the accent gradient. It is identity, not decoration: the mark is how you know which console you are in. It appears in the sidebar, the mobile bar, the site nav and the footer.
+- **User message bubble.** The user's own words sit on the accent gradient with `#0a0800` ink, so authorship is legible at a glance. This is the one place the accent encodes who is speaking rather than what can be done.
+- **Illustration chrome.** The landing page's product window reproduces the console, so the accent marks inside it mean what they mean in the console. It sits under the caption "Console preview — illustrative data."
+- **Third-party brand marks.** The Google and GitHub sign-in marks keep their owners' colours — `#4285F4`, `#34A853`, `#FBBC05`, `#EA4335` inside the Google glyph — because redrawing a provider's logo in our palette would misrepresent it. They are never used as UI colour, and the whole social block sits behind `SOCIAL_SIGNIN_ENABLED = false` until the flow exists.
+
+Chart marks are not an exception but a stated duty: the accent encodes magnitude in a single-hue scale, which is data rather than ornament. Everything else that is not an action, a selection, a focus ring, a status or a chart magnitude is neutral — an accent used for rhythm or ornament is a bug.
 
 ## Typography
 
