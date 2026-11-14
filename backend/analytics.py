@@ -292,6 +292,11 @@ def build_anomaly_breakdown(
         grouped = pd.DataFrame({"value": levels, "anomaly": mask.to_numpy()}).groupby(
             "value", dropna=False
         )["anomaly"].agg(["size", "sum"])
+        if (grouped["size"] <= 1).any():
+            # A level that occurs once is a value copied out of the file, not a
+            # category. Tabulating it would put raw cell contents into a report
+            # the model reads, so drop the whole column instead.
+            continue
         rows: list[dict[str, Any]] = []
         for value, counts in grouped.iterrows():
             rows_in_category = int(counts["size"])
