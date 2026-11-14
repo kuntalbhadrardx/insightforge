@@ -497,6 +497,19 @@ def remove_file(bucket: str, path: str) -> None:
         logger.warning("Could not roll back storage object %s/%s", bucket, path, exc_info=True)
 
 
+def download_file(bucket: str, path: str) -> bytes:
+    """Fetch a storage object's bytes (used to rebuild the dataset cache)."""
+    try:
+        payload = get_client().storage.from_(bucket).download(path)
+    except Exception as exc:
+        raise DatabaseError(f"Could not download {bucket}/{path}: {exc}") from exc
+    if isinstance(payload, bytes):
+        return payload
+    if isinstance(payload, bytearray):
+        return bytes(payload)
+    raise DatabaseError(f"Storage returned no bytes for {bucket}/{path}")
+
+
 def create_signed_url(bucket: str, path: str, expires_in: int = 3600) -> str | None:
     """Create a short-lived download URL, or ``None`` if it cannot be created."""
     try:

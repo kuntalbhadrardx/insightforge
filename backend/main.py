@@ -388,14 +388,45 @@ def _cache_dataframe(dataset_id: str, entry: dict[str, Any]) -> None:
     ACTIVE_DATAFRAMES[dataset_id] = entry
 
 
+def _reload_dataset(dataset_id: uuid.UUID, user_id: str) -> dict[str, Any] | None:
+    """Rebuild a cache entry from Supabase Storage after a restart.
+
+    The in-process cache is deliberate, but losing it must not lose the dataset:
+    the CSV is still in the datasets bucket, referenced by the Postgres row, so
+    reload it instead of asking the user to upload the file again.
+    """
+    try:
+        record = db.get_dataset(dataset_id=str(dataset_id), user_id=user_id)
+        if record is None:
+            return None
+        raw = db.download_file(db.DATASETS_BUCKET, record["storage_path"])
+        frame = analytics.load_dataframe(raw)
+    except (db.DatabaseError, analytics.DatasetError) as exc:
+        logger.warning("Could not reload dataset %s from storage: %s", dataset_id, exc)
+        return None
+
+    entry = {
+        "df": frame,
+        "user_id": user_id,
+        "filename": record["filename"],
+        "storage_path": record["storage_path"],
+    }
+    _cache_dataframe(str(dataset_id), entry)
+    logger.info("Reloaded dataset %s from storage", dataset_id)
+    return entry
+
+
 def _cached_dataset(dataset_id: uuid.UUID, user_id: str) -> dict[str, Any]:
     entry = ACTIVE_DATAFRAMES.get(str(dataset_id))
+    if entry is None:
+        # Restart (or eviction) no longer means "re-upload": the CSV is on disk.
+        entry = _reload_dataset(dataset_id, user_id)
     if entry is None:
         raise HTTPException(
             status_code=404,
             detail=(
-                "Dataset is not loaded in this server process. Re-upload the CSV "
-                "(dataset analysis is session-based)."
+                "Dataset is not available. It may have been deleted, or its CSV could "
+                "not be reloaded from storage. Upload it again to analyse it."
             ),
         )
     if entry["user_id"] != user_id:
