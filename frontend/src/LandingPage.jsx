@@ -346,7 +346,7 @@ function ClosingCta() {
           Open the console
           <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
         </a>
-        <p className="mt-4 flex items-center justify-center gap-1.5 text-[12px] text-[#7c8ba1]">
+        <p className="mt-4 flex items-center justify-center gap-1.5 text-[12px] text-[#94a3b8]">
           <Check className="size-3.5 text-accent" strokeWidth={2} />
           Bring your own data — nothing leaves the pipeline you run
         </p>

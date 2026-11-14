@@ -191,7 +191,7 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
                         type="button"
                         onClick={() => setShowPassword((visible) => !visible)}
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
-                        className="absolute right-1.5 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-lg text-slate-500 transition hover:bg-white/5 hover:text-slate-300"
+                        className="absolute right-1.5 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-lg text-[#94a3b8] transition hover:bg-white/5 hover:text-slate-300"
                       >
                         {showPassword ? (
                           <EyeOff className="size-4" strokeWidth={1.7} />
@@ -255,7 +255,7 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
 
               <div className="mt-7 flex items-center gap-3">
                 <span className="h-px flex-1 bg-white/[0.08]" />
-                <span className="text-[10px] uppercase tracking-[0.18em] text-slate-600">
+                <span className="text-[10px] uppercase tracking-[0.18em] text-[#7c8ba1]">
                   Or continue with
                 </span>
                 <span className="h-px flex-1 bg-white/[0.08]" />
@@ -281,11 +281,11 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
                   GitHub
                 </button>
               </div>
-              <p className="mt-3 text-center text-[11px] text-slate-600">
+              <p className="mt-3 text-center text-[11px] text-[#7c8ba1]">
                 Social sign-in isn&apos;t enabled yet — email and password only.
               </p>
 
-              <p className="mt-7 text-center text-[12.5px] text-slate-500">
+              <p className="mt-7 text-center text-[12.5px] text-[#94a3b8]">
                 {isSignIn ? "Don't have an account? " : 'Already have an account? '}
                 <button
                   type="button"
@@ -299,7 +299,7 @@ export default function AuthPage({ embedded = false, onAuthenticated }) {
           </div>
 
           {!embedded && (
-            <div className="mt-6 flex items-center justify-center gap-2 text-[11.5px] text-slate-600">
+            <div className="mt-6 flex items-center justify-center gap-2 text-[11.5px] text-[#7c8ba1]">
               <Mark className="size-5 text-[9px]" />
               InsightForge · research console
             </div>
