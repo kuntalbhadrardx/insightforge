@@ -28,6 +28,9 @@ data/
 backend/uploads/
 backend/data/
 *.pdf
+# ...except the demo's uploadable claim sheet, which the walkthrough tells you
+# to drag into the console. Everything else PDF stays out of history.
+!demo/potato-blight-claim.pdf
 
 # Logs and local artifacts
 *.log
