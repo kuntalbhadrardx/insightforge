@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-14T00:00:00.000Z",
+  "generatedAt": "2026-11-14T07:27:30Z",
   "title": "Design System: InsightForge",
   "extensions": {
     "colorMeta": {
@@ -8,119 +8,419 @@
         "role": "neutral",
         "displayName": "Canvas Black",
         "canonical": "#04070a",
-        "tonalRamp": ["#04070a", "#07090c", "#0b0e11", "#131619", "#26292c", "#525457", "#8e9093", "#e8e9ea"]
+        "tonalRamp": [
+          "#04070a",
+          "#07090c",
+          "#0b0e11",
+          "#131619",
+          "#26292c",
+          "#525457",
+          "#8e9093",
+          "#e8e9ea"
+        ]
       },
       "surface": {
         "role": "neutral",
-        "displayName": "Glass Surface",
-        "canonical": "rgba(255, 255, 255, 0.03)",
-        "tonalRamp": ["#07090b", "#0b0d0f", "#101315", "#171a1c", "#24272a", "#4a4d50", "#8b8e91", "#f0f1f2"]
+        "displayName": "Panel Surface",
+        "canonical": "#0a0d10",
+        "tonalRamp": [
+          "#090c0f",
+          "#080b0e",
+          "#080a0d",
+          "#06090c",
+          "#36393b",
+          "#5d5f61",
+          "#98999b",
+          "#d3d3d4"
+        ]
       },
       "surface-raise": {
         "role": "neutral",
         "displayName": "Raised Control",
         "canonical": "rgba(255, 255, 255, 0.04)",
-        "tonalRamp": ["#080a0c", "#0c0f11", "#121517", "#1a1d1f", "#282b2d", "#4e5154", "#8d9093", "#f2f3f4"]
+        "tonalRamp": [
+          "#080a0c",
+          "#0c0f11",
+          "#121517",
+          "#1a1d1f",
+          "#282b2d",
+          "#4e5154",
+          "#8d9093",
+          "#f2f3f4"
+        ]
       },
       "line": {
         "role": "neutral",
         "displayName": "Hairline",
         "canonical": "rgba(255, 255, 255, 0.08)",
-        "tonalRamp": ["#101214", "#161819", "#1d1f21", "#26282a", "#333537", "#55575a", "#8f9194", "#f4f4f5"]
+        "tonalRamp": [
+          "#101214",
+          "#161819",
+          "#1d1f21",
+          "#26282a",
+          "#333537",
+          "#55575a",
+          "#8f9194",
+          "#f4f4f5"
+        ]
       },
       "ink": {
         "role": "neutral",
         "displayName": "Signal White",
         "canonical": "#f8fafc",
-        "tonalRamp": ["#1b1f24", "#333942", "#4b535e", "#656e7a", "#8a929d", "#b4bac2", "#d9dde2", "#f8fafc"]
+        "tonalRamp": [
+          "#1b1f24",
+          "#333942",
+          "#4b535e",
+          "#656e7a",
+          "#8a929d",
+          "#b4bac2",
+          "#d9dde2",
+          "#f8fafc"
+        ]
       },
       "ink-secondary": {
         "role": "neutral",
         "displayName": "Readout Grey",
         "canonical": "#cbd5e1",
-        "tonalRamp": ["#1b2027", "#333b45", "#4c5661", "#667283", "#8996a6", "#b0bcc9", "#d5dde6", "#f5f8fa"]
+        "tonalRamp": [
+          "#1b2027",
+          "#333b45",
+          "#4c5661",
+          "#667283",
+          "#8996a6",
+          "#b0bcc9",
+          "#d5dde6",
+          "#f5f8fa"
+        ]
       },
       "ink-muted": {
         "role": "neutral",
         "displayName": "Annotation",
         "canonical": "#94a3b8",
-        "tonalRamp": ["#161b21", "#2a323c", "#3f4a56", "#566373", "#737f90", "#95a3b4", "#b9c4d0", "#eef1f5"]
+        "tonalRamp": [
+          "#161b21",
+          "#2a323c",
+          "#3f4a56",
+          "#566373",
+          "#737f90",
+          "#95a3b4",
+          "#b9c4d0",
+          "#eef1f5"
+        ]
       },
       "ink-faint": {
         "role": "neutral",
         "displayName": "Whisper",
         "canonical": "#7c8ba1",
-        "tonalRamp": ["#141920", "#262d38", "#3a4350", "#4e5866", "#657082", "#8695a8", "#adbaca", "#e9edf2"]
+        "tonalRamp": [
+          "#141920",
+          "#262d38",
+          "#3a4350",
+          "#4e5866",
+          "#657082",
+          "#8695a8",
+          "#adbaca",
+          "#e9edf2"
+        ]
       },
       "accent": {
         "role": "primary",
         "displayName": "Signal Yellow",
         "canonical": "#fdc500",
-        "tonalRamp": ["#241c00", "#3d2f00", "#5c4700", "#7d6100", "#a37e00", "#cc9e00", "#f0c22e", "#fdf0b0"]
+        "tonalRamp": [
+          "#241c00",
+          "#3d2f00",
+          "#5c4700",
+          "#7d6100",
+          "#a37e00",
+          "#cc9e00",
+          "#f0c22e",
+          "#fdf0b0"
+        ]
       },
       "accent-light": {
         "role": "primary",
         "displayName": "Yellow Light",
         "canonical": "#ffe680",
-        "tonalRamp": ["#2a2205", "#46390a", "#665313", "#877020", "#a98f31", "#c9b04c", "#e7d178", "#ffe680"]
+        "tonalRamp": [
+          "#2a2205",
+          "#46390a",
+          "#665313",
+          "#877020",
+          "#a98f31",
+          "#c9b04c",
+          "#e7d178",
+          "#ffe680"
+        ]
       },
       "on-accent": {
         "role": "primary",
         "displayName": "Yellow Ink",
         "canonical": "#0a0800",
-        "tonalRamp": ["#0a0800", "#1c1700", "#2f2600", "#463900", "#614f00", "#816a00", "#a68a10", "#d4b23a"]
+        "tonalRamp": [
+          "#0a0800",
+          "#1c1700",
+          "#2f2600",
+          "#463900",
+          "#614f00",
+          "#816a00",
+          "#a68a10",
+          "#d4b23a"
+        ]
       },
       "accent-soft": {
         "role": "primary",
         "displayName": "Accent Wash",
         "canonical": "rgba(253, 197, 0, 0.12)",
-        "tonalRamp": ["#0c0a03", "#151105", "#1f1907", "#2a2209", "#362c0c", "#45380f", "#554514", "#66531a"]
+        "tonalRamp": [
+          "#0c0a03",
+          "#151105",
+          "#1f1907",
+          "#2a2209",
+          "#362c0c",
+          "#45380f",
+          "#554514",
+          "#66531a"
+        ]
       },
       "accent-glow": {
         "role": "primary",
         "displayName": "Accent Halo",
         "canonical": "rgba(253, 197, 0, 0.07)",
-        "tonalRamp": ["#080704", "#0c0a05", "#100d06", "#141007", "#181308", "#1c1609", "#21190a", "#261d0b"]
+        "tonalRamp": [
+          "#080704",
+          "#0c0a05",
+          "#100d06",
+          "#141007",
+          "#181308",
+          "#1c1609",
+          "#21190a",
+          "#261d0b"
+        ]
       },
       "signal-negative": {
         "role": "secondary",
         "displayName": "Alert Rose",
         "canonical": "#f43f5e",
-        "tonalRamp": ["#24060d", "#3f0a17", "#5c0f21", "#7d162d", "#a42340", "#cc3d59", "#ec7188", "#fcc3cd"]
+        "tonalRamp": [
+          "#24060d",
+          "#3f0a17",
+          "#5c0f21",
+          "#7d162d",
+          "#a42340",
+          "#cc3d59",
+          "#ec7188",
+          "#fcc3cd"
+        ]
       },
       "cutoff": {
         "role": "neutral",
         "displayName": "Cut-off Grey",
         "canonical": "#cbd5e1",
-        "tonalRamp": ["#1b2027", "#333b45", "#4c5661", "#667283", "#8996a6", "#b0bcc9", "#d5dde6", "#f5f8fa"]
+        "tonalRamp": [
+          "#1b2027",
+          "#333b45",
+          "#4c5661",
+          "#667283",
+          "#8996a6",
+          "#b0bcc9",
+          "#d5dde6",
+          "#f5f8fa"
+        ]
+      },
+      "surface-elevated": {
+        "role": "neutral",
+        "displayName": "Elevated Panel",
+        "canonical": "#070c0f",
+        "tonalRamp": [
+          "#070b0e",
+          "#060a0e",
+          "#060a0d",
+          "#06080c",
+          "#34383a",
+          "#5b5f61",
+          "#97999a",
+          "#d2d3d4"
+        ]
+      },
+      "surface-tooltip": {
+        "role": "neutral",
+        "displayName": "Tooltip Surface",
+        "canonical": "#0a0f14",
+        "tonalRamp": [
+          "#090e13",
+          "#080d11",
+          "#080b0f",
+          "#06090d",
+          "#363a3e",
+          "#5d6164",
+          "#989a9c",
+          "#d3d4d5"
+        ]
+      },
+      "ink-plot": {
+        "role": "neutral",
+        "displayName": "Plot Ink",
+        "canonical": "#e2e8f0",
+        "tonalRamp": [
+          "#c3c8d0",
+          "#a0a4ab",
+          "#787c82",
+          "#474a4f",
+          "#e7ecf3",
+          "#ecf0f5",
+          "#f3f5f9",
+          "#fafbfc"
+        ]
+      },
+      "ink-input": {
+        "role": "neutral",
+        "displayName": "Input Ink",
+        "canonical": "#f1f5f9",
+        "tonalRamp": [
+          "#d0d4d8",
+          "#aaaeb1",
+          "#808386",
+          "#4c4e52",
+          "#f4f7fa",
+          "#f6f8fb",
+          "#f9fbfc",
+          "#fcfdfe"
+        ]
+      },
+      "rose-ring": {
+        "role": "negative",
+        "displayName": "Flagged Ring",
+        "canonical": "#fda4af",
+        "tonalRamp": [
+          "#da8e98",
+          "#b3757d",
+          "#865960",
+          "#4f363c",
+          "#fdb4bd",
+          "#fec3ca",
+          "#fed9dd",
+          "#ffeff1"
+        ]
+      },
+      "surface-glass": {
+        "role": "neutral",
+        "displayName": "Glass Fill",
+        "canonical": "rgba(255, 255, 255, 0.03)",
+        "tonalRamp": [
+          "#090c0f",
+          "#0e1114",
+          "#131619",
+          "#1b1d20",
+          "#222527",
+          "#2c2f31",
+          "#3b3e40",
+          "#4f5154"
+        ]
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Emphasised Hairline",
+        "canonical": "rgba(255, 255, 255, 0.12)",
+        "tonalRamp": [
+          "#0e1114",
+          "#16181b",
+          "#1d2022",
+          "#25272a",
+          "#2f3134",
+          "#3b3e40",
+          "#4a4c4f",
+          "#5e6062"
+        ]
       }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "Landing hero only; two balanced lines." },
-      "headline": { "displayName": "Headline", "purpose": "The Overview title, one per surface." },
-      "title": { "displayName": "Title", "purpose": "Card and pane headings, plus the auth greeting at 27–30px." },
-      "body": { "displayName": "Body", "purpose": "Chat messages, table cells, values." },
-      "meta": { "displayName": "Meta", "purpose": "Captions, KPI hints, timestamps." },
-      "label": { "displayName": "Label", "purpose": "Uppercase tracked region names and table headers." }
+      "display": {
+        "displayName": "Display",
+        "purpose": "Landing hero only; two balanced lines."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "The Overview title, one per surface."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card and pane headings, plus the auth greeting at 27–30px."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Chat messages, table cells, values."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "Captions, KPI hints, timestamps."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase tracked region names and table headers."
+      }
     },
     "shadows": [
-      { "name": "action-glow", "value": "0 0 30px -14px rgba(253,197,0,0.55)", "purpose": "Sign-in submit and landing CTAs; never behind a card." },
-      { "name": "lit-edge", "value": "inset 0 1px 0 rgba(255,255,255,0.05)", "purpose": "Top highlight on Overview glass cards." },
-      { "name": "bar-bloom", "value": "0 0 26px rgba(253,197,0,0.22)", "purpose": "The largest library bar only." }
+      {
+        "name": "action-glow",
+        "value": "0 0 30px -14px rgba(253,197,0,0.55)",
+        "purpose": "Sign-in submit and landing CTAs; never behind a card."
+      },
+      {
+        "name": "lit-edge",
+        "value": "inset 0 1px 0 rgba(255,255,255,0.05)",
+        "purpose": "Top highlight on Overview glass cards."
+      },
+      {
+        "name": "bar-bloom",
+        "value": "0 0 26px rgba(253,197,0,0.22)",
+        "purpose": "The largest library bar only."
+      }
     ],
     "motion": [
-      { "name": "state-ease", "value": "150ms ease", "purpose": "Borders, fills and glows on hover and focus." },
-      { "name": "tip-ease", "value": "140ms ease", "purpose": "Chart tooltip fade and 4px lift." },
-      { "name": "breath", "value": "lp-breathe 9s ease-in-out infinite", "purpose": "Landing light shaft opacity, disabled under prefers-reduced-motion." }
+      {
+        "name": "state-ease",
+        "value": "150ms ease",
+        "purpose": "Borders, fills and glows on hover and focus."
+      },
+      {
+        "name": "tip-ease",
+        "value": "140ms ease",
+        "purpose": "Chart tooltip fade and 4px lift."
+      },
+      {
+        "name": "breath",
+        "value": "lp-breathe 9s ease-in-out infinite",
+        "purpose": "Landing light shaft opacity, disabled under prefers-reduced-motion."
+      }
     ],
     "breakpoints": [
-      { "name": "sm", "value": "640px" },
-      { "name": "md", "value": "768px" },
-      { "name": "lg", "value": "1024px" },
-      { "name": "xl", "value": "1280px" }
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
     ],
     "tokens": {
-      "cssVariables": ["--accent", "--accent-light", "--on-accent", "--accent-soft", "--accent-glow"],
+      "cssVariables": [
+        "--accent",
+        "--accent-light",
+        "--on-accent",
+        "--accent-soft",
+        "--accent-glow"
+      ],
       "definedIn": "frontend/src/index.css",
       "jsMirror": "frontend/src/theme.js"
     }
@@ -194,12 +494,41 @@
       "Tabular figures everywhere a column of numbers can appear."
     ],
     "rules": [
-      { "name": "The Yellow-Is-A-State Rule", "body": "The accent marks something the user can do, has selected, or the system is reporting. It is never a decorative accent, a background wash, or a bullet colour.", "section": "colors" },
-      { "name": "The Two-Hue Chart Rule", "body": "A chart uses one hue for magnitude (accent at 30–62% alpha) and rose for anomaly. Never interpolate between accent and rose across a continuous scale — the midpoint goes muddy brown.", "section": "colors" },
-      { "name": "The 12px Floor Rule", "body": "Anything a user must read is at least 12px. 11px is permitted only for uppercase tracked labels and table headers.", "section": "typography" },
-      { "name": "The Tabular Rule", "body": "Any column of numbers gets tabular-nums. Digits that do not line up vertically are a defect.", "section": "typography" },
-      { "name": "The Lit-Edge Rule", "body": "A surface separates itself with a hairline or an inset highlight, never a drop shadow. Glows belong to actions and to the one bar that must win the eye.", "section": "elevation" },
-      { "name": "The No-Olive Rule", "body": "A yellow surface at low alpha over near-black reads brown or olive. Below 12% opacity, glow and wash surfaces are drawn in white instead.", "section": "elevation" }
+      {
+        "name": "The Yellow-Is-A-State Rule",
+        "body": "The accent marks something the user can do, has selected, or the system is reporting. It is never a decorative accent, a background wash, or a bullet colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Hue Chart Rule",
+        "body": "A chart uses one hue for magnitude (accent at 30–62% alpha) and rose for anomaly. Never interpolate between accent and rose across a continuous scale — the midpoint goes muddy brown.",
+        "section": "colors"
+      },
+      {
+        "name": "Named Exceptions",
+        "body": "Three places carry the accent for reasons other than state, and they are the only ones: the brand mark (identity), the user's own message bubble (authorship) and the product-window illustration (it reproduces the console). Chart marks are a stated duty, not an exception: the accent encodes magnitude. Third-party sign-in glyphs keep their owners' colours and are never used as UI colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The 12px Floor Rule",
+        "body": "Anything a user must read is at least 12px. 11px is permitted only for uppercase tracked labels and table headers.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Rule",
+        "body": "Any column of numbers gets tabular-nums. Digits that do not line up vertically are a defect.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lit-Edge Rule",
+        "body": "A surface separates itself with a hairline or an inset highlight, never a drop shadow. Glows belong to actions and to the one bar that must win the eye.",
+        "section": "elevation"
+      },
+      {
+        "name": "The No-Olive Rule",
+        "body": "A yellow surface at low alpha over near-black reads brown or olive. Below 12% opacity, glow and wash surfaces are drawn in white instead.",
+        "section": "elevation"
+      }
     ],
     "dos": [
       "Do keep the canvas at #04070a and build depth from white-alpha fills plus 1px hairlines.",
@@ -210,7 +539,8 @@
       "Do reach for tabular-nums on any numeric column and on the KPI readouts.",
       "Do keep the 12px floor and use #94a3b8 / #7c8ba1 for secondary text.",
       "Do label every figure with its source, and describe an empty state by what will appear.",
-      "Do truncate long filenames and titles with a title attribute carrying the full value."
+      "Do truncate long filenames and titles with a title attribute carrying the full value.",
+      "Do spend the accent on the brand mark and the user's own bubble as well — those are the named exceptions, and they are exhaustive."
     ],
     "donts": [
       "Don't reintroduce sky, indigo, slate-900, or any hued neutral surface.",
@@ -221,7 +551,8 @@
       "Don't use a solid rose fill larger than a chip, a bar, or an error panel.",
       "Don't add drop shadows to cards, buttons, or the sidebar.",
       "Don't go above 26px radius, and don't pill anything except chips, status readouts, and the landing CTAs.",
-      "Don't hide, collapse, or ellipsize a citation."
+      "Don't hide, collapse, or ellipsize a citation.",
+      "Don't invent a fourth exception for rhythm or emphasis; if it is not the mark, the bubble, the illustration or a chart mark, it is neutral."
     ]
   }
 }
