@@ -12,12 +12,13 @@ colors:
   ink-secondary: "#cbd5e1"
   ink-muted: "#94a3b8"
   ink-faint: "#7c8ba1"
-  mint: "#9bf7c4"
-  mint-bright: "#eafff3"
-  mint-deep: "#5eead4"
-  mint-ink: "#04120b"
+  accent: "#fdc500"
+  accent-light: "#ffe680"
+  on-accent: "#0a0800"
+  accent-soft: "rgba(253, 197, 0, 0.12)"
+  accent-glow: "rgba(253, 197, 0, 0.07)"
   signal-negative: "#f43f5e"
-  signal-caution: "#f59e0b"
+  cutoff: "#cbd5e1"
 typography:
   display:
     fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
@@ -69,13 +70,13 @@ spacing:
   xxl: "32px"
 components:
   button-primary:
-    backgroundColor: "{colors.mint-bright}"
-    textColor: "{colors.mint-ink}"
+    backgroundColor: "#fdc500"
+    textColor: "{colors.on-accent}"
     typography: "{typography.meta}"
     rounded: "{rounded.md}"
     padding: "8px 16px"
   button-primary-hover:
-    backgroundColor: "{colors.mint}"
+    backgroundColor: "{colors.accent-light}"
   button-primary-disabled:
     backgroundColor: "{colors.surface-raise}"
     textColor: "{colors.ink-muted}"
@@ -110,8 +111,8 @@ components:
     rounded: "{rounded.glass}"
     padding: "24px"
   chip-online:
-    backgroundColor: "{colors.mint}"
-    textColor: "{colors.mint-ink}"
+    backgroundColor: "{colors.accent-soft}"
+    textColor: "{colors.accent}"
     typography: "{typography.label}"
     rounded: "{rounded.full}"
     padding: "4px 10px"
@@ -123,46 +124,48 @@ components:
 
 **Creative North Star: "The Observatory"**
 
-InsightForge is a dark-adapted instrument. Its job is to make three hard-to-see things visible in one sitting: the passage inside a paper that actually answers the question, the row that does not belong in a dataset, and the count that contradicts the narrative. The surface stays dark so the content carries the light. There is one glowing hue — a pale mint that reads as phosphor or an instrument readout — and it is spent narrowly: on the action you came to take, the thing you have selected, and the state of the system.
+InsightForge is a dark-adapted instrument. Its job is to make three hard-to-see things visible in one sitting: the passage inside a paper that actually answers the question, the row that does not belong in a dataset, and the count that contradicts the narrative. The surface stays dark so the content carries the light. There is one signal colour — a sodium yellow that reads as an instrument lamp — and it is spent narrowly: on the action you came to take, the thing you have selected, and the state of the system.
 
-The palette is deliberately two-material. A near-black canvas (`#04070a`) holds glass panels built from white at 2–4.5% opacity, separated by 1px hairlines of white at 8–12%. Nothing in the neutral layer carries hue, which is what lets a single mint survive at full saturation without shouting. A mint gradient (`#eafff3 → #9bf7c4`) is the surface of every primary action, with near-black ink (`#04120b`) on top of it; the same gradient lights the logotype. Rose and amber are semantic only: rose means a fault or a flagged row, amber marks one thing — the IsolationForest cut-off line.
+The palette is deliberately two-material. A near-black canvas (`#04070a`) holds glass panels built from white at 2–4.5% opacity, separated by 1px hairlines of white at 8–12%. Nothing in the neutral layer carries hue, which is what lets a saturated yellow survive without shouting. The accent is a gradient (`#ffe680 → #fdc500`) under near-black ink (`#0a0800`); the same gradient lights the logotype. Rose is the only other semantic colour. The anomaly cut-off is deliberately neutral and dashed, because a second warm tone beside this accent would read as a second accent.
+
+The accent is not a hardcoded value. It lives in `frontend/src/index.css` as `--accent`, `--accent-light`, `--on-accent`, `--accent-soft` and `--accent-glow`, exposed both as Tailwind theme colours (`bg-accent`, `text-on-accent`) and as CSS variables for the hand-written stylesheets; `frontend/src/theme.js` mirrors them for Plotly. Re-skinning the console means editing those five lines and nothing else.
 
 The register is quiet and technical, closer to a measurement rig than a SaaS dashboard. Numbers are tabular, labels are small and widely tracked, and secondary copy is achromatic so the readouts stay dominant. The Overview carries the largest type in the product — a 54px "Overview" heading — because it is the one surface where the whole library is the subject.
 
 **Key Characteristics:**
 - One dark canvas (`#04070a`); depth comes from white-alpha glass, never from a second background family.
-- A single accent, mint (`#9bf7c4`), reserved for action, selection, focus and status.
-- Mint appears as a light-to-dark gradient under near-black ink; never as a solid fill behind light text.
+- A single accent, yellow (`#fdc500`), reserved for action, selection, focus and status.
+- The accent appears as a light-to-dark gradient under near-black ink; never as a solid fill behind light text.
 - 1px white-alpha hairlines do the work shadows usually do; the auth card and chart bars are the only things that glow.
 - Small, tracked, uppercase labels for region names; 12px floor for anything a user must read.
 - Tabular figures everywhere a column of numbers can appear.
 
 ## Colors
 
-A near-black instrument surface, a mint readout, and two strictly semantic signals. There is no second accent hue and no light variant.
+A near-black instrument surface, a sodium-yellow readout, and one strictly semantic signal. There is no second accent hue and no light variant.
 
 ### Primary
-- **Readout Mint** (`#9bf7c4`): the only action colour. Status text and dots, active nav icons, focus rings, the flag toggle's pressed state, chart marks, and links inside copy. Its 10% and 20% forms mark selection (`.bg-[#9bf7c4]/10`, `ring-[#9bf7c4]/20`); its solid form appears only as text weight on the darkest surfaces or as a 1.5px dot.
-- **Mint Light** (`#eafff3`): the top stop of the action gradient and the highlight end of the logotype. Never a standalone fill.
-- **Mint Deep** (`#5eead4`): the bottom stop of the Overview's filled bar gradient. Exists only inside that 3-stop ramp.
-- **Mint Ink** (`#04120b`): the near-black green that sits on mint. Used for button labels, the "IF" mark, user message text, and citation chips inside a user bubble. It is a text colour only — never a surface.
+- **Signal Yellow** (`#fdc500`): the only action colour. Primary buttons, status text and dots, active nav icons, focus rings, the flag toggle's pressed state, chart magnitude, and links inside copy. Its 10% and 20% forms mark selection (`bg-accent/10`, `ring-accent/20`); its solid form appears as text weight on the darkest surfaces or as a 1.5px dot.
+- **Yellow Light** (`#ffe680`): the light stop of the action gradient, the pressed/hover fill on a solid button, and the highlight end of the logotype. Never a standalone background behind dark text at page scale.
+- **Yellow Ink** (`#0a0800`): the near-black brown that sits on yellow — 12.6:1. Button labels, the "IF" mark, user message text, and citation chips inside a user bubble. It is a text colour only, never a surface.
+- **Accent Soft / Glow** (`rgba(253, 197, 0, 0.12)` / `0.07`): selection washes and the faint halo behind the sidebar mark. The glow stays at or below 7% because yellow at higher alpha over black turns olive.
 
 ### Neutral
 - **Canvas Black** (`#04070a`): the page, the composer's sticky footer at 85%, and the mobile header at 95%.
 - **Glass Surface** (`rgba(255, 255, 255, 0.03)` / `0.04`): every card, bubble, input, and export bar. Raised states step to `0.06`–`0.07`.
 - **Hairline** (`rgba(255, 255, 255, 0.08)`) and **Hairline Strong** (`rgba(255, 255, 255, 0.12)`): the first separates regions at rest, the second outlines interactive controls that must read as touchable.
 - **Signal White** (`#f8fafc`) and **Readout Grey** (`#cbd5e1`): headings, answers, and primary values.
-- **Annotation** (`#94a3b8`, 7.5:1 on the card gradient): secondary text, hints, metadata, axis labels.
-- **Whisper** (`#7c8ba1`, 5.6:1): the faintest permitted text — collapsed list meta, chart tick labels, placeholders.
+- **Annotation** (`#94a3b8`, 7.9:1 on the canvas): secondary text, hints, metadata, axis labels.
+- **Whisper** (`#7c8ba1`, 5.8:1): the faintest permitted text — collapsed list meta, chart tick labels, placeholders.
 
 ### Secondary
 - **Alert Rose** (`#f43f5e`): faults only — offline, error banners, flagged bars, destructive hover. Appears as a 10% fill with 30% ring and 200-level text, never as a large solid.
-- **Caution Amber** (`#f59e0b`): exactly one job — the dashed contamination cut-off line and its annotation on the score histogram. Using it anywhere else would make the cut-off less legible.
+- **Cut-off Grey** (`#cbd5e1`): exactly one job — the dashed contamination cut-off line and its annotation on the score histogram. It is neutral on purpose: a warm second colour would compete with the accent, and the cut-off is a reference line, not a state.
 
 ### Named Rules
-**The Mint-Is-A-State Rule.** Mint marks something the user can do, has selected, or the system is reporting. It is never a decorative accent, a background wash, or a bullet colour. If a mint element is not actionable, selected, or a status, it is wrong.
+**The Yellow-Is-A-State Rule.** The accent marks something the user can do, has selected, or the system is reporting. It is never a decorative accent, a background wash, or a bullet colour. If an accent element is not actionable, selected, or a status, it is wrong.
 
-**The Two-Hue Chart Rule.** A chart uses one hue for magnitude (mint at 30–62% alpha) and rose for anomaly. Never interpolate between mint and rose across a continuous scale — the RGB midpoint goes muddy.
+**The Two-Hue Chart Rule.** A chart uses one hue for magnitude (accent at 30–62% alpha) and rose for anomaly. Never interpolate between accent and rose across a continuous scale — the RGB midpoint between yellow and rose goes muddy brown.
 
 ## Typography
 
@@ -197,22 +200,24 @@ Spacing is a 4px rhythm with a strong preference for tight groups: 8px between r
 
 Tonal layering plus one real material: glass. Depth is a stack of white-alpha fills on the near-black canvas — canvas → 3% card → 4–7% raised control — with a 1px hairline wherever two regions meet. The Overview's cards add the only texture in the console: a 180° gradient from 4.5% to 1.4% white, an inset 1px top highlight, and a `blur(14px)` backdrop, so they read as lit panes rather than filled rectangles.
 
-Light, not shadow, does the lifting. A single radial bloom (mint at 16% fading to nothing, blurred 40px) sits behind the Overview header; the landing page extends the same idea into a vertical shaft of white light behind the hero. Shadows are limited to the auth window (`0 0 150px -40px` mint glow) and the Overview's solid bar (`0 0 26px` mint at 28%).
+Light, not shadow, does the lifting. The Overview's ambient bloom and the landing page's shaft are achromatic: a yellow wash at that size turns brown, so those fields are built from white at low alpha and the accent is left to the elements that mean something. Shadows are limited to the primary action (`0 0 30px -14px` accent at 55%) and the Overview's solid bar (`0 0 26px` accent at 22%). The auth card no longer carries a glow at all.
 
 ### Shadow Vocabulary
-- **Auth window glow** (`box-shadow: 0 0 150px -40px rgba(200, 255, 224, 0.6)`): the sign-in card only, because it floats over an empty page.
-- **Primary action glow** (`box-shadow: 0 0 36px -12px rgba(167, 243, 208, 0.85)`): the sign-in submit and landing CTAs; grows on hover.
+- **Auth window glow** (retired): the sign-in card used to float on a 150px halo. It now separates with a neutral hairline, because a yellow halo at that size reads brown.
+- **Primary action glow** (`box-shadow: 0 0 30px -14px rgba(253, 197, 0, 0.55)`): the sign-in submit and landing CTAs; grows slightly on hover.
 - **Top bar highlight** (`box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05)`): Overview cards, the lit edge of the glass.
-- **Bar bloom** (`box-shadow: 0 0 26px rgba(155, 247, 196, 0.28)`): the largest library bar only.
+- **Bar bloom** (`box-shadow: 0 0 26px rgba(253, 197, 0, 0.22)`): the largest library bar only.
 
 ### Named Rules
 **The Lit-Edge Rule.** A surface separates itself with a hairline or an inset highlight, never a drop shadow. Glows belong to actions and to the one bar that must win the eye.
+
+**The No-Olive Rule.** A yellow surface at low alpha over near-black reads as brown or olive. Below 12% opacity, glow and wash surfaces are drawn in white instead; the accent only covers pixels it means.
 
 ## Shapes
 
 Instrument-like and consistent: 8px on standard buttons and nav rows, 10px on icon buttons, 12px on the composer and auth inputs, 14px on the prompt bar, 16px on cards and empty states, 22px on Overview glass cards, 26px on the auth window. Pill radii (`9999px`) are reserved for status chips, the landing CTAs, and the Overview's "Add a paper" button.
 
-Borders are always 1px, and dashed hairlines are the system's way of saying "nothing here yet" — every empty state and both drop zones use `border-dashed`, so a dashed edge reads as an invitation.
+Borders are always 1px, and dashed hairlines are the system's way of saying "nothing here yet" — every empty state and both drop zones use `border-dashed`, so a dashed edge reads as an invitation. The contamination cut-off is dashed for a different reason: it is a reference line, so it uses `strokeDasharray "6 4"` in a neutral grey and never the accent.
 
 Chat bubbles break the radius rule on purpose: a 16px container with one 6px corner (`rounded-br-sm` for the user, `rounded-bl-sm` for the assistant) so the square side points at the speaker. That asymmetry is the only place corners carry meaning.
 
@@ -220,44 +225,45 @@ Chat bubbles break the radius rule on purpose: a 16px container with one 6px cor
 
 ### Buttons
 - **Shape:** 8px on standard actions, 10px on square icon buttons, full radius on the landing CTAs and the Overview's "Add a paper".
-- **Primary:** the mint gradient `linear-gradient(135deg, #eafff3, #9bf7c4)` with `#04120b` label, 12–13.5px semibold, `px-4 py-2`. One per region: send, run detection, sign in, add a paper.
-- **Hover / Focus:** `filter: brightness(1.08)` on hover; focus is the global 2px mint outline at 2px offset, never a colour swap. Disabled drops the gradient entirely to a `white/10` fill with `#94a3b8` text and `cursor-not-allowed`.
-- **Secondary / Ghost:** `white/[0.04]` fill with a `white/10` hairline and `#cbd5e1` text; hover raises the border to `mint/35` and the text to mint. Destructive hover on the clear-chat button flips to a rose 10% fill with rose-300 text.
+- **Primary:** solid `#fdc500` (or the `#ffe680 → #fdc500` gradient on the landing) with `#0a0800` label, 12–13.5px semibold, `px-4 py-2`. One per region: send, run detection, sign in, add a paper.
+- **Hover / Focus:** hover lightens to `#ffe680` or `brightness(1.08)`; focus is the global 2px accent outline at 2px offset, never a colour swap. Disabled drops the fill to a `white/10` surface with `#94a3b8` text and `cursor-not-allowed`.
+- **Secondary / Ghost:** `white/[0.04]` fill with a `white/10` hairline and `#cbd5e1` text; hover raises the border to `accent/35` and the text to the accent. Destructive hover on the clear-chat button flips to a rose 10% fill with rose-300 text.
 
 ### Chips
 - **Style:** pill, 11px medium, 10% semantic fill with a 30% inset ring and the 300-level text of the same family.
-- **State:** `Online` is mint, `Offline` rose, `Checking` neutral white-alpha with a pulsing dot. The dot and the label always share the family. The Overview's pill is identical in structure with a 11.5px label and reads "API online" / "API offline" / "Checking API".
-- **Citation chips:** 11px, `rounded-md`; `white/6` fill with `#94a3b8` text in an assistant bubble, `#04120b`/10% fill with `#04120b`/80% text inside a mint user bubble. They sit in a row under a `white/10` divider, with the similarity score on hover.
+- **State:** `Online` is accent, `Offline` rose, `Checking` neutral white-alpha with a pulsing dot. The dot and the label always share the family. The Overview's pill is identical in structure with a 11.5px label and reads "API online" / "API offline" / "Checking API".
+- **Citation chips:** 11px, `rounded-md`; `white/6` fill with `#94a3b8` text in an assistant bubble, `#0a0800`/10% fill with `#0a0800`/80% text inside an accent user bubble. They sit in a row under a `white/10` divider, with the similarity score on hover.
 
 ### Cards / Containers
 - **Corner Style:** 16px standard, 22px for Overview glass, 26px for auth.
 - **Background:** `white/[0.03]` inside the console; a 4.5%→1.4% white gradient with `blur(14px)` on the Overview.
 - **Shadow Strategy:** lit edge only, per Elevation & Depth.
-- **Border:** 1px `white/[0.08]`; dashed `white/10` for empty states and drop zones; `mint/50` while a drop zone is armed.
+- **Border:** 1px `white/[0.08]`; dashed `white/10` for empty states and drop zones; `accent/50` while a drop zone is armed.
 - **Internal Padding:** 16px standard, 20–24px for Overview cards, 32–40px for empty states.
 
 ### Inputs / Fields
-- **Style:** 1px `white/10` border, `white/[0.04]` fill, 12px radius, 14px text, `#7c8ba1` placeholder. The auth inputs are 44px tall at 13.5px with a 12px radius.
-- **Focus:** border to `mint/55`, fill to `white/[0.045]`, plus a 3px `mint/12` glow. Console inputs additionally take the global focus outline; either the border shift or the outline is sufficient, both appear on the same control.
+- **Style:** 1px `white/10` border, `white/[0.04]` fill, 12px radius, 14px text, `#7c8ba1` placeholder. The auth inputs are 44px tall at 13.5px with a 12px radius and the same `#7c8ba1` placeholder (5.6:1 on the input fill).
+- **Focus:** border to `accent/55`, fill to `white/[0.045]`, plus a 3px `accent/12` glow. Console inputs additionally take the global focus outline; either the border shift or the outline is sufficient, both appear on the same control.
 - **Error / Disabled:** errors are text on a rose 10% fill inside a `rose/30` hairline, stated as an alert with a recovery action. Disabled is 50–60% opacity with `cursor-not-allowed`.
 
 ### Navigation
-- **Style:** vertical list in the 256px sidebar, 8px rows, 14px text, 12px horizontal padding, icon + label with a 12px gap.
-- **Default / Hover / Active:** `#94a3b8` at rest; hover raises to `#e2e8f0` on `white/4`; active is `white/[0.07]` with a `ring-1` inset `mint/20`, white text, and a mint icon, plus `aria-current="page"`.
-- **Mobile treatment:** below `lg` the sidebar is replaced by a single sticky row: the mint mark, three 36px icon buttons (the same active treatment), and a sign-out button pushed right.
+- **Style:** vertical list in the 256px sidebar, 8px rows, 14px text, 12px horizontal padding, icon + label with a 12px gap. Icon-only rows (mobile bar) carry both `aria-label` and `title`.
+- **Default / Hover / Active:** `#94a3b8` at rest; hover raises to `#e2e8f0` on `white/4`; active is `white/[0.07]` with a `ring-1` inset `accent/20`, white text, and an accent icon, plus `aria-current="page"`.
+- **Mobile treatment:** below `lg` the sidebar is replaced by a single sticky row: the accent mark, three 36px icon buttons (the same active treatment), and a sign-out button pushed right.
 
 ### Signature: The Citation Readout
 The answer block defines the product. Assistant messages are 14px at 1.625 on a 16px glass bubble capped at 85% width; the claim is never separated from its source, and every citation renders as a chip carrying its page number with the cosine similarity on hover. A refusal is a first-class answer: when nothing clears the similarity cut-off the console says the paper does not cover the question. Truncation, collapsing, or an ellipsis over page numbers breaks the system's core promise.
 
 ### Signature: The Overview Plot
-Real figures only. Pages-per-paper comes from `/documents`; the tallest paper is a solid 3-stop mint gradient with a bloom, the rest are hatched mint (`repeating-linear-gradient(-45deg, mint/50 0 1px, transparent 1px 6px)`) with a 1px bright top edge. Bars sit on a `white/9` baseline over faint `white/5.5` gridlines, show their value above the bar, and reveal a dark tooltip on hover. The plot is a `role="img"` with every value restated in its `aria-label`, and the tooltip is `aria-hidden`.
+Real figures only. Pages-per-paper comes from `/documents`; the tallest paper is a solid accent gradient (`#ffe680 → #fdc500`) with a bloom, the rest are hatched accent (`repeating-linear-gradient(-45deg, accent/50 0 1px, transparent 1px 6px)`) with a 1px bright top edge. Bars sit on a `white/9` baseline over faint `white/5.5` gridlines, show their value above the bar, and reveal a dark tooltip on hover. The plot is a `role="img"` with every value restated in its `aria-label`, and the tooltip is `aria-hidden`.
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** keep the canvas at `#04070a` and build depth from white-alpha fills plus 1px hairlines.
-- **Do** spend mint on action, selection, focus and status — one solid mint action per region.
-- **Do** put near-black `#04120b` ink on the mint gradient; light text on mint fails contrast.
+- **Do** spend the accent on action, selection, focus and status — one solid accent action per region.
+- **Do** put near-black `#0a0800` ink on yellow; light text on yellow fails contrast.
+- **Do** reach for `bg-accent`, `text-on-accent`, `accent/10` and `ring-accent/20` rather than a hex value, so the hue stays changeable in `index.css`.
 - **Do** use dashed `white/10` borders for every empty state and drop zone, so "nothing here yet" always looks the same.
 - **Do** reach for `tabular-nums` on any numeric column and on the KPI readouts.
 - **Do** keep the 12px floor and use `#94a3b8` / `#7c8ba1` for secondary text rather than a tinted grey.
@@ -266,9 +272,11 @@ Real figures only. Pages-per-paper comes from `/documents`; the tallest paper is
 
 ### Don't:
 - **Don't** reintroduce `sky`, `indigo`, `slate-900`, or any hued neutral surface; the neutral layer is achromatic white-alpha.
-- **Don't** use mint as a decorative fill, a background wash, or gradient text.
-- **Don't** interpolate a colour scale between mint and rose; use one hue for magnitude and rose only for flagged data.
-- **Don't** use a solid rose or amber fill for anything larger than a chip, a bar, or the cut-off line.
-- **Don't** add drop shadows to cards, buttons, or the sidebar; the auth window and the primary action are the only glowing surfaces.
+- **Don't** use yellow as a decorative fill, a background wash, or gradient text.
+- **Don't** paint a large low-alpha yellow wash: over near-black it reads olive. Use white below 12% opacity.
+- **Don't** interpolate a colour scale between the accent and rose; use one hue for magnitude and rose only for flagged data.
+- **Don't** colour the anomaly cut-off with a warm tone — it is `#cbd5e1`, dashed `6 4`, and never the accent.
+- **Don't** use a solid rose fill for anything larger than a chip, a bar, or an error panel.
+- **Don't** add drop shadows to cards, buttons, or the sidebar; the primary action is the only glowing surface.
 - **Don't** go above 26px radius, and don't pill anything except chips, status readouts, and the landing CTAs.
 - **Don't** hide, collapse, or ellipsize a citation.
